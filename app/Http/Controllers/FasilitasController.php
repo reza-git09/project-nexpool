@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FasilitasController extends Controller
 {
-    // Menampilkan fasilitas sesuai pool admin yang login
     public function index()
     {
         $fasilitas = Fasilitas::where('pool_id', session('admin_pool_id'))
@@ -17,25 +17,31 @@ class FasilitasController extends Controller
         return view('fasilitas.index', compact('fasilitas'));
     }
 
-    // Menampilkan form tambah fasilitas
     public function create()
     {
         return view('fasilitas.create');
     }
 
-    // Menyimpan fasilitas baru
     public function store(Request $request)
     {
         $request->validate([
             'nama_fasilitas' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ]);
+
+        $gambar = null;
+
+        if ($request->hasFile('gambar')) {
+            $gambar = $request->file('gambar')->store('fasilitas', 'public');
+        }
 
         Fasilitas::create([
             'pool_id' => session('admin_pool_id'),
             'nama_fasilitas' => $request->nama_fasilitas,
             'deskripsi' => $request->deskripsi,
+            'gambar' => $gambar,
             'status' => $request->status,
         ]);
 
@@ -44,10 +50,8 @@ class FasilitasController extends Controller
             ->with('success', 'Fasilitas berhasil ditambahkan.');
     }
 
-    // Menampilkan detail fasilitas
     public function show(Fasilitas $fasilita)
     {
-        // Cegah akses ke fasilitas milik pool lain
         if ($fasilita->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
@@ -55,10 +59,8 @@ class FasilitasController extends Controller
         return view('fasilitas.show', compact('fasilita'));
     }
 
-    // Menampilkan form edit
     public function edit(Fasilitas $fasilita)
     {
-        // Cegah edit fasilitas milik pool lain
         if ($fasilita->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
@@ -66,10 +68,8 @@ class FasilitasController extends Controller
         return view('fasilitas.edit', compact('fasilita'));
     }
 
-    // Memperbarui fasilitas
     public function update(Request $request, Fasilitas $fasilita)
     {
-        // Cegah update fasilitas milik pool lain
         if ($fasilita->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
@@ -77,12 +77,25 @@ class FasilitasController extends Controller
         $request->validate([
             'nama_fasilitas' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ]);
+
+        $gambar = $fasilita->gambar;
+
+        if ($request->hasFile('gambar')) {
+
+            if ($fasilita->gambar) {
+                Storage::disk('public')->delete($fasilita->gambar);
+            }
+
+            $gambar = $request->file('gambar')->store('fasilitas', 'public');
+        }
 
         $fasilita->update([
             'nama_fasilitas' => $request->nama_fasilitas,
             'deskripsi' => $request->deskripsi,
+            'gambar' => $gambar,
             'status' => $request->status,
         ]);
 
@@ -91,12 +104,14 @@ class FasilitasController extends Controller
             ->with('success', 'Fasilitas berhasil diperbarui.');
     }
 
-    // Menghapus fasilitas
     public function destroy(Fasilitas $fasilita)
     {
-        // Cegah hapus fasilitas milik pool lain
         if ($fasilita->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
+        if ($fasilita->gambar) {
+            Storage::disk('public')->delete($fasilita->gambar);
         }
 
         $fasilita->delete();

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Reservasi - NEXPOOL</title>
 
     <style>
@@ -86,6 +87,10 @@
             font-size: 14px;
         }
 
+        .logout a:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
         /* MAIN */
         .main {
             margin-left: 240px;
@@ -109,11 +114,9 @@
             padding: 30px;
         }
 
+        /* PAGE HEADER */
         .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .page-header h1 {
@@ -126,18 +129,20 @@
             font-size: 14px;
         }
 
-        .btn-tambah {
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            padding: 12px 18px;
+        /* INFO */
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 14px 16px;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
-        .btn-tambah:hover {
-            background: #1d4ed8;
+        .info-box strong {
+            color: #1e3a8a;
         }
 
         /* TABLE */
@@ -152,7 +157,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1000px;
+            min-width: 1050px;
         }
 
         th {
@@ -162,12 +167,14 @@
             text-align: left;
             padding: 14px;
             border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
         }
 
         td {
             padding: 14px;
             font-size: 13px;
             border-bottom: 1px solid #eef0f4;
+            vertical-align: top;
         }
 
         tr:last-child td {
@@ -181,6 +188,12 @@
 
         .harga {
             font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pool {
+            font-weight: bold;
+            color: #334155;
         }
 
         /* STATUS */
@@ -190,6 +203,7 @@
             border-radius: 20px;
             font-size: 11px;
             font-weight: bold;
+            white-space: nowrap;
         }
 
         .badge-menunggu {
@@ -212,16 +226,22 @@
             color: #dc2626;
         }
 
+        .badge-default {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
         /* ACTION */
         .actions {
             display: flex;
             gap: 6px;
+            white-space: nowrap;
         }
 
         .btn-edit,
-        .btn-hapus {
+        .btn-detail {
             border: none;
-            padding: 7px 10px;
+            padding: 7px 11px;
             border-radius: 6px;
             font-size: 12px;
             text-decoration: none;
@@ -237,13 +257,13 @@
             background: #bfdbfe;
         }
 
-        .btn-hapus {
-            background: #fee2e2;
-            color: #dc2626;
+        .btn-detail {
+            background: #f1f5f9;
+            color: #475569;
         }
 
-        .btn-hapus:hover {
-            background: #fecaca;
+        .btn-detail:hover {
+            background: #e2e8f0;
         }
 
         /* ALERT */
@@ -257,10 +277,45 @@
             font-size: 14px;
         }
 
+        /* EMPTY */
         .empty {
             text-align: center;
-            padding: 40px;
+            padding: 50px 20px;
             color: #94a3b8;
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .empty h3 {
+            margin-bottom: 8px;
+            color: #64748b;
+        }
+
+        .empty p {
+            font-size: 13px;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
         }
     </style>
 </head>
@@ -275,11 +330,13 @@
             <p>ADMINISTRATOR</p>
         </div>
 
-        <div class="menu-title">Menu Utama</div>
+        <div class="menu-title">
+            Menu Utama
+        </div>
 
         <div class="menu">
 
-            <a href="{{ url('/dashboard') }}">
+            <a href="{{ route('dashboard') }}">
                 ▣ <span>Dashboard</span>
             </a>
 
@@ -321,28 +378,51 @@
             <h3>Reservasi</h3>
         </header>
 
+
         <section class="content">
 
+            <!-- SUCCESS ALERT -->
             @if(session('success'))
+
                 <div class="alert">
                     ✓ {{ session('success') }}
                 </div>
+
             @endif
 
+
+            <!-- PAGE HEADER -->
             <div class="page-header">
 
-                <div>
-                    <h1>Data Reservasi</h1>
-                    <p>Kelola data reservasi pengunjung NEXPOOL.</p>
-                </div>
+                <h1>Data Reservasi</h1>
 
-                <a href="{{ route('reservasi.create') }}" class="btn-tambah">
-                    + Tambah Reservasi
-                </a>
+                <p>
+                    Data reservasi pengunjung yang masuk melalui aplikasi mobile NEXPOOL.
+                </p>
 
             </div>
 
 
+            <!-- INFO -->
+            <div class="info-box">
+
+                📱 <strong>Informasi Reservasi</strong>
+                <br>
+
+                Data reservasi pada halaman ini berasal dari
+                <strong>aplikasi mobile NEXPOOL</strong>.
+                Admin hanya bertugas memantau, memeriksa,
+                dan memperbarui status reservasi yang masuk.
+
+                <br><br>
+
+                <strong>Kolam:</strong>
+                {{ session('admin_pool_nama', 'Kolam Renang') }}
+
+            </div>
+
+
+            <!-- TABLE -->
             <div class="table-card">
 
                 @if($reservasi->count() > 0)
@@ -350,19 +430,33 @@
                     <table>
 
                         <thead>
+
                             <tr>
+
                                 <th>No</th>
+
                                 <th>Kode Reservasi</th>
-                                <th>Pool ID</th>
+
+                                <th>Kolam Renang</th>
+
                                 <th>Pengunjung</th>
+
                                 <th>No. HP</th>
+
                                 <th>Tanggal Kunjungan</th>
-                                <th>Jumlah</th>
+
+                                <th>Jumlah Tiket</th>
+
                                 <th>Total Harga</th>
+
                                 <th>Status</th>
+
                                 <th>Aksi</th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody>
 
@@ -370,67 +464,119 @@
 
                                 <tr>
 
-                                    <td>{{ $loop->iteration }}</td>
+                                    <!-- NO -->
+                                    <td>
+                                        {{ $loop->iteration }}
+                                    </td>
 
+
+                                    <!-- KODE -->
                                     <td class="kode">
                                         {{ $item->kode_reservasi }}
                                     </td>
 
-                                    <td>
-                                        {{ $item->pool_id }}
+
+                                    <!-- KOLAM -->
+                                    <td class="pool">
+                                        {{ session('admin_pool_nama', '-') }}
                                     </td>
 
+
+                                    <!-- PENGUNJUNG -->
                                     <td>
                                         {{ $item->nama_pengunjung }}
                                     </td>
 
+
+                                    <!-- NO HP -->
                                     <td>
                                         {{ $item->no_hp }}
                                     </td>
 
+
+                                    <!-- TANGGAL -->
                                     <td>
-                                        {{ $item->tanggal_kunjungan->format('d-m-Y') }}
+
+                                        @if($item->tanggal_kunjungan)
+
+                                            {{ $item->tanggal_kunjungan->format('d-m-Y') }}
+
+                                        @else
+
+                                            -
+
+                                        @endif
+
                                     </td>
 
+
+                                    <!-- JUMLAH TIKET -->
                                     <td>
-                                        Dewasa: {{ $item->jumlah_dewasa }}<br>
-                                        Anak: {{ $item->jumlah_anak }}
+
+                                        Dewasa:
+                                        {{ $item->jumlah_dewasa }}
+
+                                        <br>
+
+                                        Anak:
+                                        {{ $item->jumlah_anak }}
+
                                     </td>
 
+
+                                    <!-- TOTAL HARGA -->
                                     <td class="harga">
-                                        Rp {{ number_format($item->total_harga, 0, ',', '.') }}
+
+                                        Rp
+                                        {{ number_format(
+                                            $item->total_harga,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+
                                     </td>
 
+
+                                    <!-- STATUS -->
                                     <td>
 
-                                        @if($item->status_reservasi == 'Menunggu')
+                                        @if($item->status_reservasi === 'Menunggu')
 
                                             <span class="badge badge-menunggu">
                                                 Menunggu
                                             </span>
 
-                                        @elseif($item->status_reservasi == 'Dikonfirmasi')
+                                        @elseif($item->status_reservasi === 'Dikonfirmasi')
 
                                             <span class="badge badge-dikonfirmasi">
                                                 Dikonfirmasi
                                             </span>
 
-                                        @elseif($item->status_reservasi == 'Selesai')
+                                        @elseif($item->status_reservasi === 'Selesai')
 
                                             <span class="badge badge-selesai">
                                                 Selesai
                                             </span>
 
-                                        @else
+                                        @elseif($item->status_reservasi === 'Dibatalkan')
 
                                             <span class="badge badge-dibatalkan">
                                                 Dibatalkan
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge badge-default">
+                                                {{ $item->status_reservasi ?? 'Tidak diketahui' }}
                                             </span>
 
                                         @endif
 
                                     </td>
 
+
+                                    <!-- AKSI -->
                                     <td>
 
                                         <div class="actions">
@@ -439,26 +585,15 @@
                                                 href="{{ route('reservasi.edit', $item->id) }}"
                                                 class="btn-edit"
                                             >
-                                                ✏️ Edit
+                                                ✏️ Kelola
                                             </a>
 
-                                            <form
-                                                action="{{ route('reservasi.destroy', $item->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus reservasi {{ $item->kode_reservasi }}?')"
+                                            <a
+                                                href="{{ route('reservasi.show', $item->id) }}"
+                                                class="btn-detail"
                                             >
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn-hapus"
-                                                >
-                                                    🗑️ Hapus
-                                                </button>
-
-                                            </form>
+                                                👁️ Detail
+                                            </a>
 
                                         </div>
 
@@ -474,9 +609,24 @@
 
                 @else
 
+                    <!-- EMPTY DATA -->
+
                     <div class="empty">
+
+                        <div class="empty-icon">
+                            📋
+                        </div>
+
                         <h3>Belum Ada Reservasi</h3>
-                        <p>Data reservasi pengunjung belum tersedia.</p>
+
+                        <p>
+                            Belum ada reservasi yang masuk dari aplikasi mobile
+                            untuk
+                            <strong>
+                                {{ session('admin_pool_nama', 'kolam ini') }}
+                            </strong>.
+                        </p>
+
                     </div>
 
                 @endif

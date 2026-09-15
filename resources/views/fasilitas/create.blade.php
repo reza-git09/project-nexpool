@@ -7,6 +7,9 @@
     <title>Tambah Fasilitas - NEXPOOL</title>
 
     <style>
+        /* ==========================================
+            RESET
+        ========================================== */
         * {
             margin: 0;
             padding: 0;
@@ -14,11 +17,17 @@
             font-family: Arial, sans-serif;
         }
 
+        /* ==========================================
+            BODY
+        ========================================== */
         body {
             background: #f5f7fb;
             color: #1f2937;
         }
 
+        /* ==========================================
+            SIDEBAR (Disamakan jadi 240px)
+        ========================================== */
         .sidebar {
             position: fixed;
             left: 0;
@@ -30,6 +39,7 @@
             padding: 25px 15px;
         }
 
+        /* LOGO */
         .logo {
             text-align: center;
             margin-bottom: 35px;
@@ -46,6 +56,7 @@
             margin-top: 5px;
         }
 
+        /* JUDUL MENU */
         .menu-title {
             font-size: 11px;
             color: #8491a7;
@@ -53,8 +64,11 @@
             text-transform: uppercase;
         }
 
+        /* MENU */
         .menu a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             text-decoration: none;
             color: #dce3ef;
             padding: 12px 15px;
@@ -63,12 +77,16 @@
             font-size: 14px;
         }
 
+        /* MENU AKTIF */
         .menu a:hover,
         .menu a.active {
             background: #2563eb;
             color: white;
         }
 
+        /* ==========================================
+            LOGOUT
+        ========================================== */
         .logout {
             position: absolute;
             bottom: 25px;
@@ -77,7 +95,9 @@
         }
 
         .logout a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             text-decoration: none;
             color: #ffb4b4;
             padding: 12px 15px;
@@ -85,6 +105,14 @@
             font-size: 14px;
         }
 
+        .logout a:hover {
+            background: #7f1d1d;
+            color: white;
+        }
+
+        /* ==========================================
+            MAIN & HEADER
+        ========================================== */
         .main {
             margin-left: 240px;
             min-height: 100vh;
@@ -94,6 +122,7 @@
             height: 75px;
             background: white;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 0 30px;
             border-bottom: 1px solid #e5e7eb;
@@ -103,17 +132,80 @@
             font-size: 20px;
         }
 
+        /* USER PROFILE DI HEADER KANAN */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #7b8494;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+            CONTENT
+        ========================================== */
         .content {
             padding: 30px;
         }
 
-        .page-header {
+        .content-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* BACK BUTTON */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #e5e7eb;
+            color: #1f2937;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
             margin-bottom: 20px;
         }
 
-        .page-header h1 {
-            font-size: 25px;
-            margin-bottom: 7px;
+        .back-button:hover {
+            background: #d1d5db;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            margin-bottom: 6px;
         }
 
         .page-header p {
@@ -121,30 +213,14 @@
             font-size: 14px;
         }
 
-        /* TOMBOL KEMBALI */
-        .btn-kembali {
-            display: inline-block;
-            margin-bottom: 18px;
-            padding: 10px 16px;
-            background: #e5e7eb;
-            color: #1e3c72;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-kembali:hover {
-            background: #d1d5db;
-        }
-
+        /* ==========================================
+            FORM CARD
+        ========================================== */
         .form-card {
             background: white;
             border: 1px solid #e8ebf0;
             border-radius: 12px;
             padding: 25px;
-            max-width: 750px;
         }
 
         .form-group {
@@ -156,49 +232,75 @@
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 8px;
+            color: #374151;
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-control {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid #d9dee7;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
             font-size: 14px;
+            background: white;
+            color: #1f2937;
             outline: none;
         }
 
-        .form-group textarea {
-            min-height: 110px;
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.form-control {
+            height: 100px;
             resize: vertical;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: #2563eb;
+        /* FILE UPLOAD BOX */
+        .file-box {
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
         }
 
+        .file-box input[type="file"] {
+            width: 100%;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .file-info {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* ERROR */
         .error {
+            margin-top: 5px;
             color: #dc2626;
             font-size: 12px;
-            margin-top: 5px;
         }
 
-        .buttons {
+        /* BUTTON GROUP */
+        .button-group {
             display: flex;
             gap: 10px;
-            margin-top: 25px;
+            margin-top: 24px;
         }
 
         .btn {
             border: none;
-            padding: 12px 20px;
             border-radius: 8px;
+            padding: 12px 20px;
             font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-primary {
@@ -218,6 +320,27 @@
         .btn-secondary:hover {
             background: #d1d5db;
         }
+
+        /* ==========================================
+            RESPONSIVE
+        ========================================== */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar .logo h2,
+            .sidebar .logo p,
+            .sidebar .menu-title,
+            .sidebar .menu a span,
+            .sidebar .logout span {
+                display: none;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+        }
     </style>
 </head>
 
@@ -225,7 +348,6 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-
         <div class="logo">
             <h2>NEXPOOL</h2>
             <p>ADMINISTRATOR</p>
@@ -234,31 +356,24 @@
         <div class="menu-title">Menu Utama</div>
 
         <div class="menu">
-
-            <a href="{{ url('/dashboard') }}">
+            <a href="{{ route('dashboard') }}">
                 ▣ <span>Dashboard</span>
             </a>
-
             <a href="{{ route('harga-tiket.index') }}">
                 🎟️ <span>Manajemen Tiket</span>
             </a>
-
             <a href="{{ route('fasilitas.index') }}" class="active">
                 🏊 <span>Fasilitas</span>
             </a>
-
-            <a href="#">
+            <a href="{{ route('reservasi.index') }}">
                 📋 <span>Reservasi</span>
             </a>
-
-            <a href="#">
+            <a href="{{ route('promo.index') }}">
                 🏷️ <span>Promo</span>
             </a>
-
-            <a href="#">
+            <a href="{{ route('review.index') }}">
                 ⭐ <span>Review</span>
             </a>
-
         </div>
 
         <div class="logout">
@@ -266,140 +381,95 @@
                 ↪ <span>Logout</span>
             </a>
         </div>
-
     </aside>
-
 
     <!-- MAIN -->
     <main class="main">
 
+        <!-- HEADER -->
         <header class="header">
             <h3>Tambah Fasilitas</h3>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-name">Admin Tiara Park</div>
+                    <div class="user-role">pool_id_01</div>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
         </header>
 
+        <!-- CONTENT -->
         <section class="content">
+            <div class="content-inner">
 
-            <!-- TOMBOL KEMBALI -->
-            <a href="{{ route('fasilitas.index') }}" class="btn-kembali">
-                ← Kembali ke Fasilitas
-            </a>
+                <!-- KEMBALI -->
+                <a href="{{ route('fasilitas.index') }}" class="back-button">
+                    ← Kembali ke Manajemen Fasilitas
+                </a>
 
-            <div class="page-header">
-                <h1>Tambah Fasilitas</h1>
-                <p>Tambahkan fasilitas baru untuk kolam renang.</p>
-            </div>
+                <!-- PAGE HEADER -->
+                <div class="page-header">
+                    <h2>Tambah Fasilitas Baru</h2>
+                    <p>Tambahkan fasilitas baru untuk kolam renang.</p>
+                </div>
 
+                <!-- FORM CARD -->
+                <div class="form-card">
+                    <form action="{{ route('fasilitas.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
 
-            <!-- FORM -->
-            <div class="form-card">
+                        <!-- NAMA FASILITAS -->
+                        <div class="form-group">
+                            <label for="nama_fasilitas">Nama Fasilitas</label>
+                            <input type="text" id="nama_fasilitas" name="nama_fasilitas" class="form-control" value="{{ old('nama_fasilitas') }}" placeholder="Contoh: Kolam Anak" required>
+                            @error('nama_fasilitas')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <form action="{{ route('fasilitas.store') }}" method="POST">
+                        <!-- DESKRIPSI -->
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi</label>
+                            <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Masukkan deskripsi fasilitas...">{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    @csrf
+                        <!-- GAMBAR -->
+                        <div class="form-group">
+                            <label for="gambar">Gambar Fasilitas</label>
+                            <div class="file-box">
+                                <input type="file" id="gambar" name="gambar" accept=".jpg,.jpeg,.png,.webp">
+                                <div class="file-info">Format JPG, JPEG, PNG, WEBP. Maksimal 2 MB.</div>
+                            </div>
+                            @error('gambar')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <!-- POOL ID -->
-                    <div class="form-group">
+                        <!-- STATUS -->
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status" class="form-control" required>
+                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Aktif</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Nonaktif</option>
+                            </select>
+                            @error('status')
+                                <div class="error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                        <label>Pool ID</label>
+                        <!-- BUTTON -->
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                            <a href="{{ route('fasilitas.index') }}" class="btn btn-secondary">Batal</a>
+                        </div>
 
-                        <input
-                            type="text"
-                            name="pool_id"
-                            value="{{ old('pool_id') }}"
-                            placeholder="Contoh: pool_id_01"
-                            required
-                        >
-
-                        @error('pool_id')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
-
-                    <!-- NAMA FASILITAS -->
-                    <div class="form-group">
-
-                        <label>Nama Fasilitas</label>
-
-                        <input
-                            type="text"
-                            name="nama_fasilitas"
-                            value="{{ old('nama_fasilitas') }}"
-                            placeholder="Contoh: Kolam Utama"
-                            required
-                        >
-
-                        @error('nama_fasilitas')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
-
-                    <!-- DESKRIPSI -->
-                    <div class="form-group">
-
-                        <label>Deskripsi</label>
-
-                        <textarea
-                            name="deskripsi"
-                            placeholder="Masukkan deskripsi fasilitas..."
-                        >{{ old('deskripsi') }}</textarea>
-
-                        @error('deskripsi')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
-
-                    <!-- STATUS -->
-                    <div class="form-group">
-
-                        <label>Status</label>
-
-                        <select name="status" required>
-
-                            <option value="1"
-                                {{ old('status', '1') == '1' ? 'selected' : '' }}>
-                                Aktif
-                            </option>
-
-                            <option value="0"
-                                {{ old('status') == '0' ? 'selected' : '' }}>
-                                Nonaktif
-                            </option>
-
-                        </select>
-
-                        @error('status')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-
-                    </div>
-
-
-                    <!-- BUTTON -->
-                    <div class="buttons">
-
-                        <button type="submit" class="btn btn-primary">
-                            💾 Simpan
-                        </button>
-
-                        <a
-                            href="{{ route('fasilitas.index') }}"
-                            class="btn btn-secondary"
-                        >
-                            Batal
-                        </a>
-
-                    </div>
-
-                </form>
+                    </form>
+                </div>
 
             </div>
-
         </section>
 
     </main>

@@ -2,12 +2,14 @@
 <html lang="id">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Review Pengunjung - NEXPOOL</title>
+    <title>Review - NEXPOOL</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -19,6 +21,8 @@
             background: #f5f7fb;
             color: #1f2937;
         }
+
+        /* SIDEBAR */
 
         .sidebar {
             position: fixed;
@@ -87,9 +91,10 @@
         }
 
         .logout a:hover {
-            background: #7f1d1d;
-            color: white;
+            background: rgba(255, 255, 255, 0.08);
         }
+
+        /* MAIN */
 
         .main {
             margin-left: 240px;
@@ -100,7 +105,6 @@
             height: 75px;
             background: white;
             display: flex;
-            justify-content: space-between;
             align-items: center;
             padding: 0 30px;
             border-bottom: 1px solid #e5e7eb;
@@ -108,95 +112,53 @@
 
         .header h3 {
             font-size: 20px;
-            color: #111827;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-meta {
-            text-align: right;
-        }
-
-        .user-meta strong {
-            display: block;
-            color: #111827;
-            font-size: 14px;
-        }
-
-        .user-meta span {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .avatar {
-            width: 38px;
-            height: 38px;
-            background: #2563eb;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 15px;
         }
 
         .content {
             padding: 30px;
         }
 
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+        /* PAGE HEADER */
+
+        .page-header {
+            margin-bottom: 20px;
         }
 
-        .topbar h1 {
+        .page-header h1 {
             font-size: 25px;
             margin-bottom: 7px;
         }
 
-        .topbar p {
+        .page-header p {
             color: #7b8494;
             font-size: 14px;
         }
 
-        .btn {
-            background: #2563eb;
-            color: white;
-            padding: 11px 18px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
+        /* INFO BOX */
 
-        .btn:hover {
-            background: #1d4ed8;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e8ebf0;
-            padding: 22px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            overflow-x: auto;
-        }
-
-        .alert {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 13px 16px;
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 14px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #1e3a8a;
+        }
+
+        /* TABLE CARD */
+
+        .table-card {
+            background: white;
+            border: 1px solid #e8ebf0;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
         }
 
         table {
@@ -212,107 +174,207 @@
             text-align: left;
             padding: 14px;
             border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
         }
 
         td {
             padding: 14px;
-            border-bottom: 1px solid #eef0f3;
-            font-size: 14px;
+            font-size: 13px;
+            border-bottom: 1px solid #eef0f4;
             vertical-align: top;
-            color: #374151;
         }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* PENGUNJUNG */
+
+        .nama {
+            font-weight: bold;
+            color: #334155;
+        }
+
+        /* POOL */
+
+        .pool {
+            font-weight: bold;
+            color: #334155;
+        }
+
+        /* RATING */
 
         .rating {
             color: #f59e0b;
-            font-weight: 600;
+            font-size: 15px;
             white-space: nowrap;
         }
 
-        .status {
+        .rating-number {
+            color: #475569;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        /* KOMENTAR */
+
+        .komentar {
+            max-width: 280px;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        /* STATUS */
+
+        .badge {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 6px 10px;
             border-radius: 20px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
-        .status-menunggu {
-            background: #fef3c7;
-            color: #92400e;
+        .badge-menunggu {
+            background: #fff7ed;
+            color: #c2410c;
         }
 
-        .status-dibalas {
-            background: #dcfce7;
-            color: #166534;
+        .badge-dibalas {
+            background: #ecfdf5;
+            color: #047857;
         }
 
-        .action {
+        /* BALASAN */
+
+        .balasan {
+            max-width: 280px;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .belum-dibalas {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* ACTION */
+
+        .actions {
             display: flex;
-            gap: 7px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
-        .btn-edit {
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 7px 11px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .btn-delete {
-            background: #fee2e2;
-            color: #b91c1c;
+        .btn-reply,
+        .btn-detail {
             border: none;
             padding: 7px 11px;
             border-radius: 6px;
             font-size: 12px;
-            font-weight: 600;
+            text-decoration: none;
             cursor: pointer;
         }
 
-        .btn-delete:hover {
-            background: #fecaca;
+        .btn-reply {
+            background: #dbeafe;
+            color: #1d4ed8;
         }
+
+        .btn-reply:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-detail {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-detail:hover {
+            background: #e2e8f0;
+        }
+
+        /* ALERT */
+
+        .alert {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* EMPTY */
 
         .empty {
             text-align: center;
             padding: 50px 20px;
-            color: #9ca3af;
+            color: #94a3b8;
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
         }
 
         .empty h3 {
-            font-size: 18px;
-            margin-bottom: 5px;
-            color: #374151;
+            margin-bottom: 8px;
+            color: #64748b;
         }
 
-        .comment,
-        .reply {
-            max-width: 250px;
-            line-height: 1.5;
+        .empty p {
+            font-size: 13px;
         }
 
-        .reply {
-            color: #475569;
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
         <div class="logo">
+
             <h2>NEXPOOL</h2>
+
             <p>ADMINISTRATOR</p>
+
         </div>
+
 
         <div class="menu-title">
             Menu Utama
         </div>
+
 
         <div class="menu">
 
@@ -320,21 +382,26 @@
                 ▣ <span>Dashboard</span>
             </a>
 
+
             <a href="{{ route('harga-tiket.index') }}">
                 🎟️ <span>Manajemen Tiket</span>
             </a>
+
 
             <a href="{{ route('fasilitas.index') }}">
                 🏊 <span>Fasilitas</span>
             </a>
 
+
             <a href="{{ route('reservasi.index') }}">
                 📋 <span>Reservasi</span>
             </a>
 
+
             <a href="{{ route('promo.index') }}">
                 🏷️ <span>Promo</span>
             </a>
+
 
             <a href="{{ route('review.index') }}" class="active">
                 ⭐ <span>Review</span>
@@ -342,226 +409,358 @@
 
         </div>
 
+
         <div class="logout">
+
             <a href="{{ route('logout') }}">
                 ↪ <span>Logout</span>
             </a>
+
         </div>
 
     </aside>
 
 
+
     <!-- MAIN -->
+
     <main class="main">
 
-        <!-- HEADER -->
+
         <header class="header">
 
-            <h3>
-                Review Pengunjung
-            </h3>
-
-            <div class="user-profile">
-
-                <div class="user-meta">
-
-                    <strong>
-                        {{ session('admin_pool_nama') }}
-                    </strong>
-
-                    <span>
-                        {{ session('admin_pool_id') }}
-                    </span>
-
-                </div>
-
-                <div class="avatar">
-                    {{ strtoupper(substr(session('admin_pool_nama'), 0, 1)) }}
-                </div>
-
-            </div>
+            <h3>Review</h3>
 
         </header>
 
 
-        <!-- CONTENT -->
+
         <section class="content">
 
-            <div class="topbar">
 
-                <div>
-
-                    <h1>
-                        Review Pengunjung
-                    </h1>
-
-                    <p>
-                        Kelola ulasan dan tanggapan pengunjung NEXPOOL.
-                    </p>
-
-                </div>
-
-                <a href="{{ route('review.create') }}" class="btn">
-                    + Tambah Review
-                </a>
-
-            </div>
-
+            <!-- SUCCESS ALERT -->
 
             @if(session('success'))
 
                 <div class="alert">
-                    {{ session('success') }}
+
+                    ✓ {{ session('success') }}
+
                 </div>
 
             @endif
 
 
-            <div class="card">
 
-                @if(isset($review) && $review->count() > 0)
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <h1>Review Pengunjung</h1>
+
+                <p>
+                    Review dan penilaian yang diberikan pengunjung melalui aplikasi mobile NEXPOOL.
+                </p>
+
+            </div>
+
+
+
+            <!-- INFO -->
+
+            <div class="info-box">
+
+                ⭐ <strong>Informasi Review</strong>
+
+                <br>
+
+                Review berasal dari
+                <strong>aplikasi mobile NEXPOOL</strong>
+                setelah pengunjung melakukan kunjungan.
+
+                Admin dapat melihat rating dan komentar,
+                kemudian memberikan balasan terhadap review.
+
+                <br><br>
+
+                <strong>Kolam:</strong>
+                {{ session('admin_pool_nama', 'Kolam Renang') }}
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <div class="table-card">
+
+
+                @if($review->count() > 0)
+
 
                     <table>
+
 
                         <thead>
 
                             <tr>
+
                                 <th>No</th>
-                                <th>Nama Kolam</th>
+
                                 <th>Pengunjung</th>
+
+                                <th>Kolam Renang</th>
+
                                 <th>Rating</th>
+
                                 <th>Komentar</th>
+
                                 <th>Balasan Admin</th>
+
                                 <th>Status</th>
+
                                 <th>Aksi</th>
+
                             </tr>
 
                         </thead>
 
+
+
                         <tbody>
+
 
                             @foreach($review as $item)
 
+
                                 <tr>
+
+
+                                    <!-- NO -->
 
                                     <td>
                                         {{ $loop->iteration }}
                                     </td>
 
-                                    <td>
-                                        {{ session('admin_pool_nama') }}
+
+
+                                    <!-- PENGUNJUNG -->
+
+                                    <td class="nama">
+
+                                        {{ $item->nama_pengunjung }}
+
                                     </td>
 
-                                    <td>
-                                        <strong>
-                                            {{ $item->nama_pengunjung }}
-                                        </strong>
+
+
+                                    <!-- KOLAM -->
+
+                                    <td class="pool">
+
+                                        {{ session('admin_pool_nama', '-') }}
+
                                     </td>
+
+
+
+                                    <!-- RATING -->
 
                                     <td>
 
                                         <div class="rating">
-                                            {{ str_repeat('★', $item->rating) }}{{ str_repeat('☆', 5 - $item->rating) }}
-                                        </div>
 
-                                    </td>
+                                            @for($i = 1; $i <= 5; $i++)
 
-                                    <td>
+                                                @if($i <= $item->rating)
 
-                                        <div class="comment">
-                                            {{ $item->komentar ?? '-' }}
-                                        </div>
+                                                    ★
 
-                                    </td>
+                                                @else
 
-                                    <td>
+                                                    ☆
 
-                                        <div class="reply">
-                                            {{ $item->balasan_admin ?? 'Belum ada balasan' }}
-                                        </div>
+                                                @endif
 
-                                    </td>
+                                            @endfor
 
-                                    <td>
-
-                                        @if($item->status === 'Dibalas')
-
-                                            <span class="status status-dibalas">
-                                                Dibalas
+                                            <span class="rating-number">
+                                                ({{ $item->rating }}/5)
                                             </span>
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    <!-- KOMENTAR -->
+
+                                    <td>
+
+                                        @if($item->komentar)
+
+                                            <div class="komentar">
+
+                                                {{ $item->komentar }}
+
+                                            </div>
 
                                         @else
 
-                                            <span class="status status-menunggu">
-                                                Menunggu
+                                            <span class="belum-dibalas">
+                                                Tidak ada komentar.
                                             </span>
 
                                         @endif
 
                                     </td>
 
+
+
+                                    <!-- BALASAN -->
+
                                     <td>
 
-                                        <div class="action">
+                                        @if($item->balasan_admin)
+
+                                            <div class="balasan">
+
+                                                {{ $item->balasan_admin }}
+
+                                            </div>
+
+                                        @else
+
+                                            <span class="belum-dibalas">
+                                                Belum ada balasan.
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        @if($item->status === 'Menunggu')
+
+                                            <span class="badge badge-menunggu">
+                                                Menunggu
+                                            </span>
+
+                                        @elseif($item->status === 'Dibalas')
+
+                                            <span class="badge badge-dibalas">
+                                                Dibalas
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge badge-menunggu">
+                                                {{ $item->status ?? 'Menunggu' }}
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+
+
+                                    <!-- AKSI -->
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            @if($item->status === 'Menunggu')
+
+                                                <a
+                                                    href="{{ route('review.edit', $item->id) }}"
+                                                    class="btn-reply"
+                                                >
+                                                    💬 Balas
+                                                </a>
+
+                                            @else
+
+                                                <a
+                                                    href="{{ route('review.edit', $item->id) }}"
+                                                    class="btn-reply"
+                                                >
+                                                    ✏️ Ubah Balasan
+                                                </a>
+
+                                            @endif
+
 
                                             <a
-                                                href="{{ route('review.edit', $item->id) }}"
-                                                class="btn-edit"
+                                                href="{{ route('review.show', $item->id) }}"
+                                                class="btn-detail"
                                             >
-                                                Edit
+                                                👁️ Detail
                                             </a>
 
-                                            <form
-                                                action="{{ route('review.destroy', $item->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus review ini?')"
-                                            >
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn-delete"
-                                                >
-                                                    Hapus
-                                                </button>
-
-                                            </form>
 
                                         </div>
 
                                     </td>
 
+
                                 </tr>
+
 
                             @endforeach
 
+
                         </tbody>
+
 
                     </table>
 
+
                 @else
+
+
+                    <!-- EMPTY DATA -->
 
                     <div class="empty">
 
-                        <h3>
-                            Belum ada review
-                        </h3>
+                        <div class="empty-icon">
+                            ⭐
+                        </div>
+
+                        <h3>Belum Ada Review</h3>
 
                         <p>
-                            Data review pengunjung akan muncul di halaman ini.
+
+                            Belum ada review yang diberikan pengunjung
+                            untuk
+
+                            <strong>
+                                {{ session('admin_pool_nama', 'kolam ini') }}
+                            </strong>.
+
                         </p>
 
                     </div>
 
+
                 @endif
+
 
             </div>
 
+
         </section>
 
+
     </main>
+
 
 </body>
 

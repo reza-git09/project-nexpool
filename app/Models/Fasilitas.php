@@ -12,6 +12,7 @@ class Fasilitas extends Model
         'pool_id',
         'nama_fasilitas',
         'deskripsi',
+        'gambar',
         'status',
     ];
 

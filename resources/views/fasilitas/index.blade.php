@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Fasilitas - NEXPOOL</title>
 
     <style>
@@ -32,7 +33,6 @@
 
         /* ==========================================
            SIDEBAR
-           SAMA DENGAN PROMO
         ========================================== */
 
         .sidebar {
@@ -169,7 +169,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .page-header h1 {
@@ -185,7 +185,6 @@
 
         /* ==========================================
            BUTTON TAMBAH
-           SAMA DENGAN PROMO
         ========================================== */
 
         .btn-tambah {
@@ -200,6 +199,26 @@
 
         .btn-tambah:hover {
             background: #1d4ed8;
+        }
+
+
+        /* ==========================================
+           INFO BOX
+        ========================================== */
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #1e3a8a;
         }
 
 
@@ -220,7 +239,6 @@
 
         /* ==========================================
            TABLE
-           SAMA DENGAN PROMO
         ========================================== */
 
         .table-card {
@@ -234,7 +252,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 850px;
+            min-width: 1000px;
         }
 
 
@@ -265,6 +283,34 @@
 
 
         /* ==========================================
+           GAMBAR
+        ========================================== */
+
+        .gambar-fasilitas {
+            width: 90px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            display: block;
+        }
+
+        .no-gambar {
+            width: 90px;
+            height: 65px;
+            background: #f1f5f9;
+            color: #94a3b8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 11px;
+            border: 1px solid #e5e7eb;
+        }
+
+
+        /* ==========================================
            NAMA FASILITAS
         ========================================== */
 
@@ -275,12 +321,23 @@
 
 
         /* ==========================================
+           NAMA KOLAM
+        ========================================== */
+
+        .nama-kolam {
+            font-weight: bold;
+            color: #334155;
+        }
+
+
+        /* ==========================================
            DESKRIPSI
         ========================================== */
 
         .deskripsi {
             max-width: 300px;
             color: #4b5563;
+            line-height: 1.5;
         }
 
 
@@ -311,7 +368,6 @@
 
         /* ==========================================
            ACTION
-           SAMA DENGAN PROMO
         ========================================== */
 
         .actions {
@@ -361,8 +417,17 @@
 
         .empty {
             text-align: center;
-            padding: 40px;
+            padding: 50px 20px;
             color: #94a3b8;
+        }
+
+        .empty h3 {
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .empty p {
+            font-size: 13px;
         }
 
 
@@ -437,7 +502,7 @@
 
             <!-- DASHBOARD -->
 
-            <a href="/dashboard">
+            <a href="{{ route('dashboard') }}">
 
                 ▣ <span>
                     Dashboard
@@ -457,7 +522,7 @@
             </a>
 
 
-            <!-- FASILITAS AKTIF -->
+            <!-- FASILITAS -->
 
             <a
                 href="{{ route('fasilitas.index') }}"
@@ -576,7 +641,7 @@
                     </h1>
 
                     <p>
-                        Kelola fasilitas yang tersedia pada kolam renang.
+                        Kelola fasilitas dan informasi pendukung kolam renang.
                     </p>
 
                 </div>
@@ -593,6 +658,27 @@
 
                 </a>
 
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 INFO BOX
+            ========================================== -->
+
+            <div class="info-box">
+
+                🏊 <strong>Kolam Renang:</strong>
+
+                {{ session('admin_pool_nama') }}
+
+                <br>
+
+                Admin dapat menambahkan nama fasilitas,
+                deskripsi, gambar, dan status fasilitas.
+                Informasi fasilitas ini nantinya dapat ditampilkan
+                pada aplikasi mobile NEXPOOL.
 
             </div>
 
@@ -622,7 +708,11 @@
                                 </th>
 
                                 <th>
-                                    Pool ID
+                                    Gambar
+                                </th>
+
+                                <th>
+                                    Nama Kolam
                                 </th>
 
                                 <th>
@@ -665,11 +755,39 @@
                                     </td>
 
 
-                                    <!-- POOL ID -->
+
+                                    <!-- GAMBAR -->
 
                                     <td>
-                                        {{ $item->pool_id }}
+
+                                        @if($item->gambar)
+
+                                            <img
+                                                src="{{ asset('storage/fasilitas/' . $item->gambar) }}"
+                                                alt="{{ $item->nama_fasilitas }}"
+                                                class="gambar-fasilitas"
+                                            >
+
+                                        @else
+
+                                            <div class="no-gambar">
+                                                Tidak ada gambar
+                                            </div>
+
+                                        @endif
+
                                     </td>
+
+
+
+                                    <!-- NAMA KOLAM -->
+
+                                    <td class="nama-kolam">
+
+                                        {{ session('admin_pool_nama') }}
+
+                                    </td>
+
 
 
                                     <!-- NAMA FASILITAS -->
@@ -681,6 +799,7 @@
                                     </td>
 
 
+
                                     <!-- DESKRIPSI -->
 
                                     <td class="deskripsi">
@@ -688,6 +807,7 @@
                                         {{ $item->deskripsi ?? '-' }}
 
                                     </td>
+
 
 
                                     <!-- STATUS -->
@@ -715,6 +835,7 @@
 
 
                                     </td>
+
 
 
                                     <!-- AKSI -->
@@ -795,7 +916,8 @@
                         </h3>
 
                         <p>
-                            Data fasilitas pengunjung belum tersedia.
+                            Belum ada fasilitas yang ditambahkan
+                            untuk {{ session('admin_pool_nama') }}.
                         </p>
 
                     </div>
