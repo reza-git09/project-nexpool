@@ -31,11 +31,13 @@
             top: 0;
             width: 240px;
             height: 100vh;
-            background: #006D6F;
-            color: white;
+            background: #ffffff;
+            color: #0f172a;
             padding: 15px;
             overflow-y: auto;
             z-index: 1000;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 2px 0 14px rgba(15, 23, 42, 0.05);
         }
 
         /* LOGO */
@@ -57,18 +59,19 @@
             font-size: 22px;
             letter-spacing: 1px;
             line-height: 1.2;
+            color: #0f172a;
         }
 
         .logo p {
             font-size: 11px;
-            color: #aeb9cc;
+            color: #64748b;
             margin-top: 2px;
         }
 
         /* JUDUL MENU */
         .menu-title {
             font-size: 11px;
-            color: #8491a7;
+            color: #94a3b8;
             margin: 15px 12px 8px;
             text-transform: uppercase;
         }
@@ -79,18 +82,21 @@
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            color: #dce3ef;
+            color: #334155;
             padding: 10px 15px;
             margin-bottom: 4px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
         }
 
         /* MENU AKTIF OTOMATIS */
         .menu a:hover,
         .menu a.active {
-            background: #0b876e;
-            color: white;
+            background: #edf6ff;
+            color: #1d4ed8;
+            box-shadow: inset 0 0 0 1px #dbeafe;
         }
 
         /* ==========================================
@@ -108,15 +114,16 @@
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            color: #ffb4b4;
+            color: #dc2626;
             padding: 12px 15px;
             border-radius: 8px;
             font-size: 14px;
+            font-weight: 600;
         }
 
         .logout a:hover {
-            background: #7f1d1d;
-            color: white;
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         /* ==========================================

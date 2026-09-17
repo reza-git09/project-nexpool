@@ -1,17 +1,25 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-
-class HargaTiket extends Model
+return new class extends Migration
 {
-    protected $table = 'harga_tiket';
+    public function up(): void
+    {
+        Schema::create('harga_tiket', function (Blueprint $table) {
+            $table->id();
+            $table->string('pool_id');
+            $table->enum('kategori', ['Dewasa', 'Anak']);
+            $table->enum('jenis_hari', ['Weekday', 'Weekend']);
+            $table->decimal('harga', 6, 2);
+            $table->timestamps();
+        });
+    }
 
-    protected $fillable = [
-        'pool_id',
-        'kategori',
-        'jenis_hari',
-        'harga',
-    ];
-}
+    public function down(): void
+    {
+        Schema::dropIfExists('harga_tiket');
+    }
+};

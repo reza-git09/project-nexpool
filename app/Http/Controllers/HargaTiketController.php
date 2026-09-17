@@ -30,7 +30,16 @@ class HargaTiketController extends Controller
         $request->validate([
             'kategori' => 'required|in:Dewasa,Anak',
             'jenis_hari' => 'required|in:Weekday,Weekend',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:0|max:999999.99',
+        ], [
+            'kategori.required' => 'Kategori tiket wajib dipilih.',
+            'kategori.in' => 'Kategori tiket tidak valid.',
+            'jenis_hari.required' => 'Jenis hari wajib dipilih.',
+            'jenis_hari.in' => 'Jenis hari tidak valid.',
+            'harga.required' => 'Harga tiket wajib diisi.',
+            'harga.numeric' => 'Harga tiket harus berupa angka.',
+            'harga.min' => 'Harga tiket tidak boleh kurang dari Rp0.',
+            'harga.max' => 'Harga tiket tidak sesuai atau melebihi batas yang ditentukan.',
         ]);
 
         HargaTiket::create([
@@ -67,7 +76,16 @@ class HargaTiketController extends Controller
         $request->validate([
             'kategori' => 'required|in:Dewasa,Anak',
             'jenis_hari' => 'required|in:Weekday,Weekend',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:0|max:9999.99',
+        ], [
+            'kategori.required' => 'Kategori tiket wajib dipilih.',
+            'kategori.in' => 'Kategori tiket tidak valid.',
+            'jenis_hari.required' => 'Jenis hari wajib dipilih.',
+            'jenis_hari.in' => 'Jenis hari tidak valid.',
+            'harga.required' => 'Harga tiket wajib diisi.',
+            'harga.numeric' => 'Harga tiket harus berupa angka.',
+            'harga.min' => 'Harga tiket tidak boleh kurang dari Rp0.',
+            'harga.max' => 'Harga tiket tidak sesuai atau melebihi batas yang ditentukan.',
         ]);
 
         $hargaTiket->update([

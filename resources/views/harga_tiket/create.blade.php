@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tambah Harga Tiket - NEXPOOL</title>
 
     <style>
@@ -182,6 +183,17 @@
             max-width: 750px;
         }
 
+        /* NOTIFIKASI */
+        .alert {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -209,10 +221,26 @@
             border-color: #2563eb;
         }
 
+        .form-group input.input-warning {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .form-group input.input-error {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
         .error {
             color: #dc2626;
             font-size: 12px;
             margin-top: 5px;
+        }
+
+        .harga-info {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 6px;
         }
 
         .buttons {
@@ -311,11 +339,13 @@
                     <strong>Admin Tiara Park</strong>
                     <span>pool_id_01</span>
                 </div>
+
                 <div class="avatar">
                     A
                 </div>
             </div>
         </header>
+
 
         <section class="content">
 
@@ -324,86 +354,130 @@
                 ← Kembali ke Manajemen Tiket
             </a>
 
+
             <div class="page-header">
                 <h1>Tambah Harga Tiket</h1>
                 <p>Tambahkan harga tiket baru untuk kolam renang.</p>
             </div>
 
 
+            <!-- NOTIFIKASI VALIDASI -->
+            @if ($errors->any())
+                <div class="alert">
+                    ⚠️ {{ $errors->first() }}
+                </div>
+            @endif
+
             <!-- FORM -->
             <div class="form-card">
 
-                <form action="{{ route('harga-tiket.store') }}" method="POST">
+                <form id="hargaForm"
+                    action="{{ route('harga-tiket.store') }}"
+                    method="POST">
 
                     @csrf
-
-                    <!-- POOL ID -->
-                    <div class="form-group">
-                        <label>Pool ID</label>
-                        <input
-                            type="text"
-                            name="pool_id"
-                            value="{{ old('pool_id') }}"
-                            placeholder="Contoh: pool_id_01"
-                        >
-                        @error('pool_id')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
 
 
                     <!-- KATEGORI -->
                     <div class="form-group">
+
                         <label>Kategori Tiket</label>
-                        <select name="kategori">
+
+                        <select name="kategori" required>
+
                             <option value="">-- Pilih Kategori --</option>
-                            <option value="Dewasa" {{ old('kategori') == 'Dewasa' ? 'selected' : '' }}>Dewasa</option>
-                            <option value="Anak" {{ old('kategori') == 'Anak' ? 'selected' : '' }}>Anak</option>
+
+                            <option value="Dewasa"
+                                {{ old('kategori') == 'Dewasa' ? 'selected' : '' }}>
+                                Dewasa
+                            </option>
+
+                            <option value="Anak"
+                                {{ old('kategori') == 'Anak' ? 'selected' : '' }}>
+                                Anak
+                            </option>
+
                         </select>
+
                         @error('kategori')
-                            <div class="error">{{ $message }}</div>
+                            <div class="error">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
 
 
                     <!-- JENIS HARI -->
                     <div class="form-group">
+
                         <label>Jenis Hari</label>
-                        <select name="jenis_hari">
+
+                        <select name="jenis_hari" required>
+
                             <option value="">-- Pilih Jenis Hari --</option>
-                            <option value="Weekday" {{ old('jenis_hari') == 'Weekday' ? 'selected' : '' }}>Weekday</option>
-                            <option value="Weekend" {{ old('jenis_hari') == 'Weekend' ? 'selected' : '' }}>Weekend</option>
+
+                            <option value="Weekday"
+                                {{ old('jenis_hari') == 'Weekday' ? 'selected' : '' }}>
+                                Weekday
+                            </option>
+
+                            <option value="Weekend"
+                                {{ old('jenis_hari') == 'Weekend' ? 'selected' : '' }}>
+                                Weekend
+                            </option>
+
                         </select>
+
                         @error('jenis_hari')
-                            <div class="error">{{ $message }}</div>
+                            <div class="error">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
 
 
                     <!-- HARGA -->
                     <div class="form-group">
+
                         <label>Harga Tiket</label>
+
                         <input
-                            type="number"
-                            name="harga"
-                            value="{{ old('harga') }}"
-                            placeholder="Contoh: 15000"
-                            min="0"
-                        >
+                        type="number"
+                        id="harga"
+                        name="harga"
+                        value="{{ old('harga') }}"
+                        placeholder="Contoh: 5000"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+                        <div class="harga-info">
+                            Maksimal harga yang dapat dimasukkan: Rp999.999,99
+                        </div>
                         @error('harga')
-                            <div class="error">{{ $message }}</div>
+                            <div class="error">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
 
 
                     <!-- BUTTON -->
                     <div class="buttons">
-                        <button type="submit" class="btn btn-primary">
+
+                        <button type="submit"
+                            class="btn btn-primary">
                             💾 Simpan
                         </button>
-                        <a href="{{ route('harga-tiket.index') }}" class="btn btn-secondary">
+
+                        <a href="{{ route('harga-tiket.index') }}"
+                            class="btn btn-secondary">
                             Batal
                         </a>
+
                     </div>
 
                 </form>
@@ -413,6 +487,9 @@
         </section>
 
     </main>
+
+
+
 
 </body>
 
