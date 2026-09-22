@@ -247,8 +247,10 @@
             color: #dc2626;
         }
 
+        /* Memperbaiki tata letak tombol aksi agar sejajar */
         .actions {
             display: flex;
+            align-items: center;
             gap: 6px;
         }
 
@@ -260,6 +262,9 @@
             font-size: 12px;
             text-decoration: none;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .btn-edit {
@@ -375,7 +380,7 @@
 
             <div class="info-box">
                 🏊 <strong>Kolam Renang:</strong>
-                {{ session('admin_pool_nama') }}
+                {{ session('admin_pool_nama') ?? 'Semua Kolam' }}
                 <br>
                 Admin dapat menambahkan nama fasilitas, deskripsi, dan status fasilitas.
             </div>
@@ -397,7 +402,9 @@
                             @foreach($fasilitas as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td class="nama-kolam">{{ session('admin_pool_nama') }}</td>
+                                    <td class="nama-kolam">
+                                        {{ isset($item->pool) ? $item->pool->nama_kolam : (session('admin_pool_nama') ?? '-') }}
+                                    </td>
                                     <td class="nama-fasilitas">{{ $item->nama_fasilitas }}</td>
                                     <td class="deskripsi">{{ $item->deskripsi ?? '-' }}</td>
                                     <td>
@@ -412,7 +419,7 @@
                                             <a href="{{ route('fasilitas.edit', $item->id) }}" class="btn-edit">
                                                 ✏️ Edit
                                             </a>
-                                            <form action="{{ route('fasilitas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus fasilitas {{ $item->nama_fasilitas }}?')">
+                                            <form action="{{ route('fasilitas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus fasilitas {{ $item->nama_fasilitas }}?')" style="margin: 0;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn-hapus">
@@ -428,7 +435,7 @@
                 @else
                     <div class="empty">
                         <h3>Belum Ada Fasilitas</h3>
-                        <p>Belum ada fasilitas yang ditambahkan untuk {{ session('admin_pool_nama') }}.</p>
+                        <p>Belum ada fasilitas yang ditambahkan untuk {{ session('admin_pool_nama') ?? 'kolam ini' }}.</p>
                     </div>
                 @endif
             </div>

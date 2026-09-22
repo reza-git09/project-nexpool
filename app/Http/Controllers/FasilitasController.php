@@ -25,10 +25,16 @@ class FasilitasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_fasilitas' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama_fasilitas' => 'required|string|regex:/^[a-zA-Z\s]+$/|max:255|unique:fasilitas,nama_fasilitas',
+            'deskripsi' => 'required|string|unique:fasilitas,deskripsi',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
+        ], [
+            'nama_fasilitas.required' => 'Nama fasilitas wajib diisi.',
+            'nama_fasilitas.regex' => 'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
+            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada, tidak boleh sama.',
+            'deskripsi.required' => 'Deskripsi wajib diisi.',
+            'deskripsi.unique' => 'Deskripsi ini sudah digunakan oleh fasilitas lain, tidak boleh sama.',
         ]);
 
         $gambar = null;
@@ -75,16 +81,21 @@ class FasilitasController extends Controller
         }
 
         $request->validate([
-            'nama_fasilitas' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama_fasilitas' => 'required|string|regex:/^[a-zA-Z\s]+$/|max:255|unique:fasilitas,nama_fasilitas,' . $fasilita->id,
+            'deskripsi' => 'required|string|unique:fasilitas,deskripsi,' . $fasilita->id,
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
+        ], [
+            'nama_fasilitas.required' => 'Nama fasilitas wajib diisi.',
+            'nama_fasilitas.regex' => 'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
+            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada, tidak boleh sama.',
+            'deskripsi.required' => 'Deskripsi wajib diisi.',
+            'deskripsi.unique' => 'Deskripsi ini sudah digunakan oleh fasilitas lain, tidak boleh sama.',
         ]);
 
         $gambar = $fasilita->gambar;
 
         if ($request->hasFile('gambar')) {
-
             if ($fasilita->gambar) {
                 Storage::disk('public')->delete($fasilita->gambar);
             }

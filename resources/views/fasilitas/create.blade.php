@@ -256,6 +256,12 @@
             resize: vertical;
         }
 
+        .form-hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
         /* FILE UPLOAD BOX */
         .file-box {
             border: 1px dashed #cbd5e1;
@@ -421,7 +427,8 @@
                         <!-- NAMA FASILITAS -->
                         <div class="form-group">
                             <label for="nama_fasilitas">Nama Fasilitas</label>
-                            <input type="text" id="nama_fasilitas" name="nama_fasilitas" class="form-control" value="{{ old('nama_fasilitas') }}" placeholder="Contoh: Kolam Anak" required>
+                            <input type="text" id="nama_fasilitas" name="nama_fasilitas" class="form-control" value="{{ old('nama_fasilitas') }}" placeholder="Contoh: Kolam Anak" pattern="[A-Za-z\s]+" title="Hanya boleh menggunakan huruf dan spasi (tanpa angka/simbol)" required>
+                            <div class="form-hint">Catatan: Nama fasilitas harus unik dan hanya boleh menggunakan huruf (tanpa angka dan simbol).</div>
                             @error('nama_fasilitas')
                                 <div class="error">{{ $message }}</div>
                             @enderror
@@ -430,7 +437,8 @@
                         <!-- DESKRIPSI -->
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>
-                            <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Masukkan deskripsi fasilitas...">{{ old('deskripsi') }}</textarea>
+                            <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Masukkan deskripsi fasilitas..." required>{{ old('deskripsi') }}</textarea>
+                            <div class="form-hint">Catatan: Deskripsi wajib diisi dan tidak boleh sama dengan deskripsi fasilitas lain.</div>
                             @error('deskripsi')
                                 <div class="error">{{ $message }}</div>
                             @enderror

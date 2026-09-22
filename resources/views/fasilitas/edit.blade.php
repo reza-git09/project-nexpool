@@ -309,6 +309,8 @@
                             type="text"
                             name="nama_fasilitas"
                             value="{{ old('nama_fasilitas', $fasilita->nama_fasilitas) }}"
+                            pattern="[A-Za-z\s]+"
+                            title="Hanya boleh menggunakan huruf dan spasi (tanpa angka/simbol)"
                             required
                         >
 
@@ -323,7 +325,7 @@
 
                         <label>Deskripsi</label>
 
-                        <textarea name="deskripsi">{{ old('deskripsi', $fasilita->deskripsi) }}</textarea>
+                        <textarea name="deskripsi" required>{{ old('deskripsi', $fasilita->deskripsi) }}</textarea>
 
                         @error('deskripsi')
                             <div class="error">{{ $message }}</div>
