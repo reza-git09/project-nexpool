@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Edit Reservasi - NEXPOOL</title>
 
     <style>
@@ -250,33 +251,33 @@
 
         <div class="menu">
             <a href="{{ route('dashboard') }}">
-                ▣ <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-                🎟️ <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}">
-                🏊 <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}" class="active">
-                📋 <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
             </a>
 
             <a href="{{ route('promo.index') }}">
-                🏷️ <span>Promo</span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
             </a>
 
             <a href="{{ route('review.index') }}">
-                ⭐ <span>Review</span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
         </div>
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                ↪ <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
             </a>
         </div>
     </aside>

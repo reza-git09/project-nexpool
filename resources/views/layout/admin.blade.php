@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <title>@yield('title', 'NEXPOOL Administrator')</title>
 
@@ -415,39 +416,39 @@
 
             <a href="{{ route('dashboard') }}"
                 class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                ▣ <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}"
                 class="{{ request()->routeIs('harga-tiket*') ? 'active' : '' }}">
-                🎟️ <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}"
                 class="{{ request()->routeIs('fasilitas*') ? 'active' : '' }}">
-                🏊 <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}"
                 class="{{ request()->routeIs('reservasi*') ? 'active' : '' }}">
-                📋 <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
             </a>
 
             <a href="{{ route('promo.index') }}"
                 class="{{ request()->routeIs('promo*') ? 'active' : '' }}">
-                🏷️ <span>Promo</span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
             </a>
 
             <a href="{{ route('review.index') }}"
                 class="{{ request()->routeIs('review*') ? 'active' : '' }}">
-                ⭐ <span>Review</span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
 
         </div>
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                ↪ <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
             </a>
         </div>
 
@@ -465,7 +466,7 @@
                     type="button"
                     class="mobile-menu-btn"
                     onclick="openSidebar()">
-                    ☰
+                    <i class="fa-solid fa-bars"></i>
                 </button>
 
                 <h3>

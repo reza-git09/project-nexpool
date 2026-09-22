@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Dashboard - NEXPOOL</title>
 
     <style>
@@ -399,34 +400,34 @@
         <!-- MENU -->
         <div class="menu">
             <a href="{{ route('dashboard') }}" class="active">
-                ▣ <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-                🎟️ <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}">
-                🏊 <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}">
-                📋 <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
             </a>
 
             <a href="{{ route('promo.index') }}">
-                🏷️ <span>Promo</span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
             </a>
 
             <a href="{{ route('review.index') }}">
-                ⭐ <span>Review</span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
         </div>
 
         <!-- LOGOUT -->
         <div class="logout">
             <a href="{{ route('logout') }}">
-                ↪ <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
             </a>
         </div>
 
@@ -457,7 +458,7 @@
         <section class="content">
 
             <div class="welcome">
-                <h1>Selamat Datang 👋</h1>
+                <h1>Selamat Datang <i class="fa-solid fa-hand" style="color:#f59e0b;font-size:22px;"></i></h1>
                 <p>Pantau aktivitas dan pengelolaan kolam renang melalui dashboard NEXPOOL.</p>
             </div>
 
@@ -466,7 +467,7 @@
                 <div class="card">
                     <div class="card-top">
                         <div class="card-title">Total Pengunjung</div>
-                        <div class="card-icon">👥</div>
+                        <div class="card-icon"><i class="fa-solid fa-users" style="color:#3b82f6;font-size:18px;"></i></div>
                     </div>
                     <h2>0</h2>
                     <small>+12% bulan ini</small>
@@ -475,7 +476,7 @@
                 <div class="card">
                     <div class="card-top">
                         <div class="card-title">Tiket Terjual</div>
-                        <div class="card-icon">🎟</div>
+                        <div class="card-icon"><i class="fa-solid fa-ticket" style="color:#f59e0b;font-size:18px;"></i></div>
                     </div>
                     <h2>0</h2>
                     <small>+8% bulan ini</small>
@@ -484,7 +485,7 @@
                 <div class="card">
                     <div class="card-top">
                         <div class="card-title">Promo Aktif</div>
-                        <div class="card-icon">🏷</div>
+                        <div class="card-icon"><i class="fa-solid fa-tags" style="color:#8b5cf6;font-size:18px;"></i></div>
                     </div>
                     <h2>2</h2>
                     <small>Promo sedang berjalan</small>
@@ -576,17 +577,17 @@
                         </div>
 
                         <div class="notification">
-                            <strong>💳 Pembayaran baru</strong>
+                            <strong><i class="fa-solid fa-credit-card" style="color:#3b82f6;"></i> Pembayaran baru</strong>
                             <p>Pembayaran TRX003 telah diterima.</p>
                         </div>
 
                         <div class="notification">
-                            <strong>⭐ Review baru</strong>
+                            <strong><i class="fa-solid fa-star" style="color:#eab308;"></i> Review baru</strong>
                             <p>Pengunjung memberikan review baru.</p>
                         </div>
 
                         <div class="notification">
-                            <strong>🎟 Reservasi baru</strong>
+                            <strong><i class="fa-solid fa-ticket" style="color:#f59e0b;"></i> Reservasi baru</strong>
                             <p>Ada reservasi baru masuk.</p>
                         </div>
                     </div>

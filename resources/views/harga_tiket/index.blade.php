@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <title>Harga Tiket - NEXPOOL</title>
 
@@ -454,7 +455,7 @@
 
             <a href="/dashboard">
 
-                ▣ <span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Dashboard
                 </span>
 
@@ -468,7 +469,7 @@
                 class="active"
             >
 
-                🎟️ <span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Manajemen Tiket
                 </span>
 
@@ -479,7 +480,7 @@
 
             <a href="{{ route('fasilitas.index') }}">
 
-                🏊 <span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Fasilitas
                 </span>
 
@@ -490,7 +491,7 @@
 
             <a href="{{ route('reservasi.index') }}">
 
-                📋 <span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Reservasi
                 </span>
 
@@ -501,7 +502,7 @@
 
             <a href="{{ route('promo.index') }}">
 
-                🏷️ <span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Promo
                 </span>
 
@@ -512,7 +513,7 @@
 
             <a href="{{ route('review.index') }}">
 
-                ⭐ <span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Review
                 </span>
 
@@ -528,7 +529,7 @@
 
             <a href="{{ route('logout') }}">
 
-                ↪ <span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>
                     Logout
                 </span>
 
@@ -588,9 +589,7 @@
                 <a
                     href="{{ route('harga-tiket.create') }}"
                     class="btn-tambah"
-                >
-
-                    + Tambah Harga
+                > <i class="fa-solid fa-plus fa-xs"></i> Tambah Harga
 
                 </a>
 
@@ -605,7 +604,7 @@
 
                 <div class="alert">
 
-                    ✓ {{ session('success') }}
+                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
 
                 </div>
 
@@ -750,7 +749,7 @@
                                                 class="btn-edit"
                                             >
 
-                                                ✏️ Edit
+                                                <i class="fa-solid fa-pen-to-square"></i> Edit
 
                                             </a>
 
@@ -774,7 +773,7 @@
                                                     class="btn-hapus"
                                                 >
 
-                                                    🗑️ Hapus
+                                                    <i class="fa-solid fa-trash"></i> Hapus
 
                                                 </button>
 

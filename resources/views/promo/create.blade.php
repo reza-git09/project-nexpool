@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Tambah Promo - NEXPOOL</title>
 
     <style>
@@ -260,34 +261,34 @@
         <div class="menu">
 
             <a href="{{ url('/dashboard') }}">
-                ▣ <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-                🎟️ <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}">
-                🏊 <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}">
-                📋 <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
             </a>
 
             <a href="{{ route('promo.index') }}" class="active">
-                🏷 <span>Promo</span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
             </a>
 
             <a href="#">
-                ⭐ <span>Review</span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
 
         </div>
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                ↪ <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
             </a>
         </div>
 
@@ -321,37 +322,19 @@
 
                     @csrf
 
-                    <!-- POOL ID & NAMA PROMO -->
-                    <div class="form-row">
-
-                        <div class="form-group">
-                            <label>Pool ID</label>
-                            <input
-                                type="text"
-                                name="pool_id"
-                                value="{{ old('pool_id', 'pool_id_01') }}"
-                                placeholder="Contoh: pool_id_01"
-                                required
-                            >
-                            @error('pool_id')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label>Nama Promo</label>
-                            <input
-                                type="text"
-                                name="nama_promo"
-                                value="{{ old('nama_promo') }}"
-                                placeholder="Contoh: Promo Liburan Hemat"
-                                required
-                            >
-                            @error('nama_promo')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
+                    <!-- NAMA PROMO -->
+                    <div class="form-group">
+                        <label>Nama Promo</label>
+                        <input
+                            type="text"
+                            name="nama_promo"
+                            value="{{ old('nama_promo') }}"
+                            placeholder="Contoh: Promo Liburan Hemat"
+                            required
+                        >
+                        @error('nama_promo')
+                            <div class="error">{{ $message }}</div>
+                        @enderror
                     </div>
 
 
@@ -391,13 +374,18 @@
                             <label>Nilai Diskon</label>
                             <input
                                 type="number"
+                                id="nilai_diskon"
                                 name="nilai_diskon"
                                 value="{{ old('nilai_diskon') }}"
                                 min="0"
-                                step="0.01"
-                                placeholder="Contoh: 20 atau 10000"
+                                max="100"
+                                step="1"
+                                placeholder="Contoh: 20 (maks. 100 untuk persentase)"
                                 required
+                                oninput="validateDiskon(this)"
+                                onkeydown="blockSymbol(event)"
                             >
+                            <div id="error-diskon" class="error" style="display:none;"></div>
                             @error('nilai_diskon')
                                 <div class="error">{{ $message }}</div>
                             @enderror
@@ -413,9 +401,11 @@
                             <label>Tanggal Mulai</label>
                             <input
                                 type="date"
+                                id="tanggal_mulai"
                                 name="tanggal_mulai"
                                 value="{{ old('tanggal_mulai') }}"
                                 required
+                                onchange="validateTanggal()"
                             >
                             @error('tanggal_mulai')
                                 <div class="error">{{ $message }}</div>
@@ -426,10 +416,13 @@
                             <label>Tanggal Selesai</label>
                             <input
                                 type="date"
+                                id="tanggal_selesai"
                                 name="tanggal_selesai"
                                 value="{{ old('tanggal_selesai') }}"
                                 required
+                                onchange="validateTanggal()"
                             >
+                            <div id="error-tanggal" class="error" style="display:none;"></div>
                             @error('tanggal_selesai')
                                 <div class="error">{{ $message }}</div>
                             @enderror
@@ -458,7 +451,7 @@
                     <!-- BUTTON -->
                     <div class="buttons">
                         <button type="submit" class="btn btn-primary">
-                            💾 Simpan Promo
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Promo
                         </button>
                         <a href="{{ route('promo.index') }}" class="btn btn-secondary">
                             Batal
@@ -474,5 +467,131 @@
     </main>
 
 </body>
+
+<script>
+    // ====== VALIDASI NILAI DISKON ======
+    const jenisDiskonEl = document.querySelector('select[name="jenis_diskon"]');
+    const nilaiDiskonEl = document.getElementById('nilai_diskon');
+    const errorDiskon   = document.getElementById('error-diskon');
+
+    function blockSymbol(e) {
+        // Blokir karakter simbol seperti +, -, e, E, ., koma, dsb.
+        const blocked = ['+', '-', 'e', 'E', '.', ','];
+        if (blocked.includes(e.key)) {
+            e.preventDefault();
+            showDiskonError('Nilai diskon tidak boleh mengandung simbol. Masukkan angka saja.');
+        } else {
+            hideDiskonError();
+        }
+    }
+
+    function validateDiskon(input) {
+        const jenis = jenisDiskonEl.value;
+        const val   = parseFloat(input.value);
+
+        if (input.value === '') {
+            hideDiskonError();
+            return;
+        }
+
+        if (jenis === 'Persentase' && val > 100) {
+            showDiskonError('Nilai diskon persentase tidak boleh melebihi 100%.');
+            input.value = 100;
+        } else if (val < 0) {
+            showDiskonError('Nilai diskon tidak boleh negatif.');
+            input.value = 0;
+        } else {
+            hideDiskonError();
+        }
+    }
+
+    // Update max ketika jenis diskon berubah
+    jenisDiskonEl.addEventListener('change', function () {
+        if (this.value === 'Persentase') {
+            nilaiDiskonEl.setAttribute('max', '100');
+            nilaiDiskonEl.placeholder = 'Contoh: 20 (maks. 100%)';
+            // Re-validasi jika sudah ada nilai
+            if (nilaiDiskonEl.value !== '') validateDiskon(nilaiDiskonEl);
+        } else {
+            nilaiDiskonEl.removeAttribute('max');
+            nilaiDiskonEl.placeholder = 'Contoh: 10000';
+            hideDiskonError();
+        }
+    });
+
+    function showDiskonError(msg) {
+        errorDiskon.textContent = msg;
+        errorDiskon.style.display = 'block';
+    }
+
+    function hideDiskonError() {
+        errorDiskon.style.display = 'none';
+    }
+
+    // ====== VALIDASI TANGGAL ======
+    const mulaiEl    = document.getElementById('tanggal_mulai');
+    const selesaiEl  = document.getElementById('tanggal_selesai');
+    const errorTgl   = document.getElementById('error-tanggal');
+
+    function validateTanggal() {
+        const mulai   = mulaiEl.value;
+        const selesai = selesaiEl.value;
+
+        if (!mulai || !selesai) {
+            hideTglError();
+            return;
+        }
+
+        const tMulai   = new Date(mulai);
+        const tSelesai = new Date(selesai);
+        const diffMs   = tSelesai - tMulai;
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+        // Hitung maks 1 bulan ke depan dari tanggal mulai
+        const maxSelesai = new Date(tMulai);
+        maxSelesai.setMonth(maxSelesai.getMonth() + 1);
+
+        if (diffDays <= 0) {
+            showTglError('Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.');
+            selesaiEl.value = '';
+        } else if (tSelesai > maxSelesai) {
+            showTglError('Tanggal Selesai tidak boleh lebih dari 1 bulan setelah Tanggal Mulai.');
+            selesaiEl.value = '';
+        } else {
+            hideTglError();
+        }
+    }
+
+    function showTglError(msg) {
+        errorTgl.textContent = msg;
+        errorTgl.style.display = 'block';
+    }
+
+    function hideTglError() {
+        errorTgl.style.display = 'none';
+    }
+
+    // Cegah submit jika masih ada error
+    document.querySelector('form').addEventListener('submit', function (e) {
+        // Cek error diskon
+        if (errorDiskon.style.display !== 'none' && errorDiskon.textContent !== '') {
+            e.preventDefault();
+            alert('Harap perbaiki nilai diskon terlebih dahulu.');
+            return;
+        }
+        // Cek error tanggal
+        if (errorTgl.style.display !== 'none' && errorTgl.textContent !== '') {
+            e.preventDefault();
+            alert('Harap perbaiki tanggal promo terlebih dahulu.');
+            return;
+        }
+        // Cek tanggal kosong
+        if (!mulaiEl.value || !selesaiEl.value) return;
+        validateTanggal();
+        if (errorTgl.style.display !== 'none') {
+            e.preventDefault();
+        }
+    });
+</script>
 
 </html>

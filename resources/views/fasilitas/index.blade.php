@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Fasilitas - NEXPOOL</title>
     <style>
         /* ==========================================
@@ -330,28 +331,28 @@
 
         <div class="menu">
             <a href="{{ route('dashboard') }}">
-                ▣ <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
             </a>
             <a href="{{ route('harga-tiket.index') }}">
-                🎟️ <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
             </a>
             <a href="{{ route('fasilitas.index') }}" class="active">
-                🏊 <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
             </a>
             <a href="{{ route('reservasi.index') }}">
-                📋 <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
             </a>
             <a href="{{ route('promo.index') }}">
-                🏷️ <span>Promo</span>
+                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
             </a>
             <a href="{{ route('review.index') }}">
-                ⭐ <span>Review</span>
+                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
         </div>
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                ↪ <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
             </a>
         </div>
     </aside>
@@ -364,7 +365,7 @@
         <section class="content">
             @if(session('success'))
                 <div class="alert">
-                    ✓ {{ session('success') }}
+                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
                 </div>
             @endif
 
@@ -373,8 +374,7 @@
                     <h1>Manajemen Fasilitas</h1>
                     <p>Kelola fasilitas dan informasi pendukung kolam renang.</p>
                 </div>
-                <a href="{{ route('fasilitas.create') }}" class="btn-tambah">
-                    + Tambah Fasilitas
+                <a href="{{ route('fasilitas.create') }}" class="btn-tambah"> <i class="fa-solid fa-plus fa-xs"></i> Tambah Fasilitas
                 </a>
             </div>
 
@@ -417,13 +417,13 @@
                                     <td>
                                         <div class="actions">
                                             <a href="{{ route('fasilitas.edit', $item->id) }}" class="btn-edit">
-                                                ✏️ Edit
+                                                <i class="fa-solid fa-pen-to-square"></i> Edit
                                             </a>
                                             <form action="{{ route('fasilitas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus fasilitas {{ $item->nama_fasilitas }}?')" style="margin: 0;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn-hapus">
-                                                    🗑️ Hapus
+                                                    <i class="fa-solid fa-trash"></i> Hapus
                                                 </button>
                                             </form>
                                         </div>
