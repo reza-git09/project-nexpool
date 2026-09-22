@@ -222,16 +222,6 @@
             border-color: #2563eb;
         }
 
-        .form-group input.input-warning {
-            border-color: #f59e0b;
-            background: #fffbeb;
-        }
-
-        .form-group input.input-error {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-
         .error {
             color: #dc2626;
             font-size: 12px;
@@ -442,20 +432,21 @@
                     <!-- HARGA -->
                     <div class="form-group">
 
-                        <label>Harga Tiket</label>
+                        <label>Harga Tiket (Rp)</label>
 
                         <input
-                        type="number"
-                        id="harga"
-                        name="harga"
-                        value="{{ old('harga') }}"
-                        placeholder="Contoh: 5000"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
+                            type="text"
+                            id="harga"
+                            name="harga"
+                            value="{{ old('harga') }}"
+                            placeholder="Contoh: 15000"
+                            maxlength="5"
+                            inputmode="numeric"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
+                            required
+                        >
                         <div class="harga-info">
-                            Maksimal harga yang dapat dimasukkan: Rp999.999,99
+                            Harga tiket harus berupa angka 4 hingga 5 digit (Rp1.000 s/d Rp99.999).
                         </div>
                         @error('harga')
                             <div class="error">
@@ -488,9 +479,6 @@
         </section>
 
     </main>
-
-
-
 
 </body>
 

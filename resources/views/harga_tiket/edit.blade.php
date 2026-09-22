@@ -374,21 +374,24 @@
                     <div class="form-group">
 
                         <label for="harga">
-                            Harga Tiket
+                            Harga Tiket (Rp)
                         </label>
 
                         <input
                             type="number"
                             id="harga"
                             name="harga"
-                            value="{{ old('harga', $hargaTiket->harga) }}"
-                            min="0"
-                            max="9999.99"
-                            step="0.01"
+                            value="{{ old('harga', (int) $hargaTiket->harga) }}"
+                            min="1000"
+                            max="99999"
+                            step="1"
+                            placeholder="Contoh: 10000"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
+                            required
                         >
 
                         <div class="hint">
-                            Maksimal harga yang dapat dimasukkan: Rp9.999,99
+                            Harga tiket harus berupa angka 4 hingga 5 digit (Rp1.000 s/d Rp99.999).
                         </div>
 
                         @error('harga')
