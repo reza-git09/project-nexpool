@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Dashboard - NEXPOOL</title>
 
     <style>
@@ -266,33 +267,11 @@
         /* ==========================================
             CHART
         ========================================== */
-        .chart {
-            height: 230px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            padding-top: 20px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .bar-wrapper {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .bar {
-            width: 35px;
-            background: #2563eb;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .bar-wrapper span {
-            font-size: 11px;
-            color: #8a94a6;
+        .chart-container {
+            position: relative;
+            height: 240px;
+            width: 100%;
+            padding-top: 5px;
         }
 
         /* ==========================================
@@ -503,35 +482,8 @@
                             <span>7 Hari Terakhir</span>
                         </div>
 
-                        <div class="chart">
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 45%;"></div>
-                                <span>Sen</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 60%;"></div>
-                                <span>Sel</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 50%;"></div>
-                                <span>Rab</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 75%;"></div>
-                                <span>Kam</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 65%;"></div>
-                                <span>Jum</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 90%;"></div>
-                                <span>Sab</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 80%;"></div>
-                                <span>Min</span>
-                            </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
                         </div>
                     </div>
 
@@ -613,5 +565,90 @@
 
     </main>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+            gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+            gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                    datasets: [{
+                        label: 'Penjualan Tiket',
+                        data: [45, 60, 50, 75, 65, 90, 80],
+                        borderColor: '#2563eb',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#2563eb',
+                        pointBorderWidth: 2.5,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#2563eb',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#14213d',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.parsed.y + ' Tiket';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#8a94a6',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                color: '#8a94a6',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
