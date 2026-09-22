@@ -127,7 +127,6 @@
             padding: 35px;
         }
 
-        /* Back Button Style ala Halaman Fasilitas */
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -202,6 +201,12 @@
             color: #dc2626;
             font-size: 13px;
             margin-top: 5px;
+        }
+
+        .hint {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 6px;
         }
 
         .buttons {
@@ -279,22 +284,22 @@
 
     </aside>
 
-
     <!-- MAIN -->
     <main class="main">
 
         <header class="header">
+
             <h3>Edit Harga Tiket</h3>
 
             <div class="admin-info">
                 <strong>{{ session('admin_nama') }}</strong>
                 <span>{{ session('admin_pool_id') }}</span>
             </div>
+
         </header>
 
         <section class="content">
 
-            <!-- Tombol Kembali di Kiri Atas -->
             <a href="{{ route('harga-tiket.index') }}" class="btn-back">
                 &larr; Kembali ke Manajemen Tiket
             </a>
@@ -307,75 +312,100 @@
             <div class="card">
 
                 <form action="{{ route('harga-tiket.update', $hargaTiket->id) }}" method="POST">
+
                     @csrf
                     @method('PUT')
 
-                    <!-- POOL ID -->
-                    <div class="form-group">
-                        <label for="pool_id">Pool ID</label>
-                        <input
-                            type="text"
-                            id="pool_id"
-                            name="pool_id"
-                            value="{{ old('pool_id', $hargaTiket->pool_id) }}"
-                        >
-                        @error('pool_id')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <!-- KATEGORI -->
                     <div class="form-group">
-                        <label for="kategori">Kategori Tiket</label>
+
+                        <label for="kategori">
+                            Kategori Tiket
+                        </label>
+
                         <select id="kategori" name="kategori">
-                            <option value="Dewasa" {{ old('kategori', $hargaTiket->kategori) == 'Dewasa' ? 'selected' : '' }}>
+
+                            <option value="Dewasa"
+                                {{ old('kategori', $hargaTiket->kategori) == 'Dewasa' ? 'selected' : '' }}>
                                 Dewasa
                             </option>
-                            <option value="Anak" {{ old('kategori', $hargaTiket->kategori) == 'Anak' ? 'selected' : '' }}>
+
+                            <option value="Anak"
+                                {{ old('kategori', $hargaTiket->kategori) == 'Anak' ? 'selected' : '' }}>
                                 Anak
                             </option>
+
                         </select>
+
                         @error('kategori')
                             <div class="error">{{ $message }}</div>
                         @enderror
+
                     </div>
 
                     <!-- JENIS HARI -->
                     <div class="form-group">
-                        <label for="jenis_hari">Jenis Hari</label>
+
+                        <label for="jenis_hari">
+                            Jenis Hari
+                        </label>
+
                         <select id="jenis_hari" name="jenis_hari">
-                            <option value="Weekday" {{ old('jenis_hari', $hargaTiket->jenis_hari) == 'Weekday' ? 'selected' : '' }}>
+
+                            <option value="Weekday"
+                                {{ old('jenis_hari', $hargaTiket->jenis_hari) == 'Weekday' ? 'selected' : '' }}>
                                 Weekday
                             </option>
-                            <option value="Weekend" {{ old('jenis_hari', $hargaTiket->jenis_hari) == 'Weekend' ? 'selected' : '' }}>
+
+                            <option value="Weekend"
+                                {{ old('jenis_hari', $hargaTiket->jenis_hari) == 'Weekend' ? 'selected' : '' }}>
                                 Weekend
                             </option>
+
                         </select>
+
                         @error('jenis_hari')
                             <div class="error">{{ $message }}</div>
                         @enderror
+
                     </div>
 
                     <!-- HARGA -->
                     <div class="form-group">
-                        <label for="harga">Harga Tiket</label>
+
+                        <label for="harga">
+                            Harga Tiket
+                        </label>
+
                         <input
                             type="number"
                             id="harga"
                             name="harga"
                             value="{{ old('harga', $hargaTiket->harga) }}"
                             min="0"
+                            max="9999.99"
+                            step="0.01"
                         >
+
+                        <div class="hint">
+                            Maksimal harga yang dapat dimasukkan: Rp9.999,99
+                        </div>
+
                         @error('harga')
-                            <div class="error">{{ $message }}</div>
+                            <div class="error">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
 
-                    <!-- BUTTON UPDATE -->
+                    <!-- BUTTON -->
                     <div class="buttons">
+
                         <button type="submit" class="btn btn-primary">
                             Update Harga
                         </button>
+
                     </div>
 
                 </form>

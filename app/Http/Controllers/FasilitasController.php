@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule; // <-- Jangan lupa import Rule di sini
 
 class FasilitasController extends Controller
 {
@@ -24,17 +25,29 @@ class FasilitasController extends Controller
 
     public function store(Request $request)
     {
+        $poolId = session('admin_pool_id');
+
         $request->validate([
-            'nama_fasilitas' => 'required|string|regex:/^[a-zA-Z\s]+$/|max:255|unique:fasilitas,nama_fasilitas',
-            'deskripsi' => 'required|string|unique:fasilitas,deskripsi',
+            'nama_fasilitas' => [
+                'required',
+                'string',
+                'regex:/^[a-zA-Z\s]+$/',
+                'max:255',
+                // Validasi unik HANYA dalam pool_id yang sama
+                Rule::unique('fasilitas', 'nama_fasilitas')->where(function ($query) use ($poolId) {
+                    return $query->where('pool_id', $poolId);
+                }),
+            ],
+            // Jika deskripsi bebas sama antar fasilitas, hapus aturan unique-nya. 
+            // Jika harus unik global, biarkan atau sesuaikan dengan pool_id.
+            'deskripsi' => 'required|string', 
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ], [
             'nama_fasilitas.required' => 'Nama fasilitas wajib diisi.',
             'nama_fasilitas.regex' => 'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
-            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada, tidak boleh sama.',
+            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada di kolam renang ini, tidak boleh sama.',
             'deskripsi.required' => 'Deskripsi wajib diisi.',
-            'deskripsi.unique' => 'Deskripsi ini sudah digunakan oleh fasilitas lain, tidak boleh sama.',
         ]);
 
         $gambar = null;
@@ -44,7 +57,7 @@ class FasilitasController extends Controller
         }
 
         Fasilitas::create([
-            'pool_id' => session('admin_pool_id'),
+            'pool_id' => $poolId,
             'nama_fasilitas' => $request->nama_fasilitas,
             'deskripsi' => $request->deskripsi,
             'gambar' => $gambar,
@@ -80,17 +93,27 @@ class FasilitasController extends Controller
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
 
+        $poolId = session('admin_pool_id');
+
         $request->validate([
-            'nama_fasilitas' => 'required|string|regex:/^[a-zA-Z\s]+$/|max:255|unique:fasilitas,nama_fasilitas,' . $fasilita->id,
-            'deskripsi' => 'required|string|unique:fasilitas,deskripsi,' . $fasilita->id,
+            'nama_fasilitas' => [
+                'required',
+                'string',
+                'regex:/^[a-zA-Z\s]+$/',
+                'max:255',
+                // Validasi unik dalam pool_id yang sama dengan mengabaikan data yang sedang di-edit
+                Rule::unique('fasilitas', 'nama_fasilitas')->where(function ($query) use ($poolId) {
+                    return $query->where('pool_id', $poolId);
+                })->ignore($fasilita->id),
+            ],
+            'deskripsi' => 'required|string',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ], [
             'nama_fasilitas.required' => 'Nama fasilitas wajib diisi.',
             'nama_fasilitas.regex' => 'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
-            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada, tidak boleh sama.',
+            'nama_fasilitas.unique' => 'Nama fasilitas ini sudah ada di kolam renang ini, tidak boleh sama.',
             'deskripsi.required' => 'Deskripsi wajib diisi.',
-            'deskripsi.unique' => 'Deskripsi ini sudah digunakan oleh fasilitas lain, tidak boleh sama.',
         ]);
 
         $gambar = $fasilita->gambar;
