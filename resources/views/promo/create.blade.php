@@ -361,9 +361,7 @@
                                 <option value="Persentase" {{ old('jenis_diskon') == 'Persentase' ? 'selected' : '' }}>
                                     Persentase (%)
                                 </option>
-                                <option value="Nominal" {{ old('jenis_diskon') == 'Nominal' ? 'selected' : '' }}>
-                                    Nominal (Rp)
-                                </option>
+                                
                             </select>
                             @error('jenis_diskon')
                                 <div class="error">{{ $message }}</div>
