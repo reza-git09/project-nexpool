@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <title>Edit Fasilitas - NEXPOOL</title>
 
     <style>
@@ -11,141 +15,420 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
-            background: #f5f7fb;
-            color: #1f2937;
+            background: #f6f8fc;
+            color: #172033;
         }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
 
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 240px;
+            width: 255px;
             height: 100vh;
-            background: #14213d;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #101c36 0%,
+                    #14213d 55%,
+                    #101b32 100%
+                );
+
             color: white;
-            padding: 25px 15px;
+            padding: 24px 16px;
+            z-index: 1000;
+
+            box-shadow:
+                8px 0 30px rgba(15, 23, 42, 0.08);
         }
 
         .logo {
+            padding: 6px 10px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 25px;
             text-align: center;
-            margin-bottom: 35px;
         }
 
         .logo h2 {
-            font-size: 26px;
-        }
-
-        .logo p {
-            font-size: 12px;
-            color: #aeb9cc;
-            margin-top: 5px;
-        }
-
-        .menu-title {
-            font-size: 11px;
-            color: #8491a7;
-            margin: 20px 12px 10px;
-            text-transform: uppercase;
-        }
-
-        .menu a {
-            display: block;
-            text-decoration: none;
-            color: #dce3ef;
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .menu a:hover,
-        .menu a.active {
-            background: #2563eb;
+            font-size: 22px;
+            letter-spacing: 1px;
             color: white;
         }
 
+        .logo p {
+            margin-top: 4px;
+            font-size: 10px;
+            color: #91a0b9;
+            letter-spacing: 1.3px;
+        }
+
+        .menu-title {
+            padding: 0 12px;
+            margin-bottom: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #73819b;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu a {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 12px 13px;
+            border-radius: 10px;
+
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 500;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .menu a i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .menu a:hover {
+            background: rgba(255,255,255,0.07);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .menu a.active {
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            color: white;
+
+            box-shadow:
+                0 8px 20px rgba(37,99,235,0.25);
+        }
+
+        .menu a.active::before {
+            content: "";
+
+            position: absolute;
+            left: -16px;
+            top: 8px;
+
+            width: 3px;
+            height: calc(100% - 16px);
+
+            border-radius: 0 5px 5px 0;
+            background: #60a5fa;
+        }
+
+        /* =========================
+           LOGOUT
+        ========================= */
+
         .logout {
             position: absolute;
-            bottom: 25px;
-            left: 15px;
-            right: 15px;
+
+            bottom: 20px;
+            left: 16px;
+            right: 16px;
+
+            padding-top: 15px;
+
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
 
         .logout a {
-            display: block;
-            text-decoration: none;
-            color: #ffb4b4;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 12px 13px;
+            border-radius: 10px;
+
+            color: #fca5a5;
+            font-size: 13px;
+
+            transition: 0.2s;
         }
 
+        .logout a:hover {
+            background: rgba(239,68,68,0.12);
+            color: #fecaca;
+        }
+
+        .logout i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
         .main {
-            margin-left: 240px;
+            margin-left: 255px;
             min-height: 100vh;
         }
 
+        /* =========================
+           HEADER
+        ========================= */
+
         .header {
-            height: 75px;
-            background: white;
+            height: 76px;
+
+            background: rgba(255,255,255,0.96);
+
+            backdrop-filter: blur(10px);
+
             display: flex;
             align-items: center;
-            padding: 0 30px;
-            border-bottom: 1px solid #e5e7eb;
+            justify-content: space-between;
+
+            padding: 0 32px;
+
+            border-bottom: 1px solid #e8ecf3;
+
+            position: sticky;
+            top: 0;
+            z-index: 900;
         }
 
-        .header h3 {
-            font-size: 20px;
+        .header-left h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
         }
+
+        .header-left p {
+            margin-top: 3px;
+            font-size: 11px;
+            color: #8a94a6;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-text {
+            text-align: right;
+        }
+
+        .admin-text strong {
+            display: block;
+            font-size: 13px;
+            color: #172033;
+        }
+
+        .admin-text span {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            color: #8a94a6;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #38bdf8
+                );
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            box-shadow:
+                0 6px 15px rgba(37,99,235,0.2);
+        }
+
+        /* =========================
+           CONTENT
+        ========================= */
 
         .content {
-            padding: 30px;
+            padding: 32px;
+            max-width: 1700px;
         }
 
-        /* Back Button Style di Kiri Atas */
-        .btn-back {
+        .content-inner {
+            max-width: 900px;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-button {
             display: inline-flex;
             align-items: center;
-            background: #e5e7eb;
-            color: #374151;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 13px;
+            gap: 8px;
+
+            padding: 9px 13px;
+
+            background: #eef2f7;
+            color: #475569;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 9px;
+
+            font-size: 11px;
             font-weight: 600;
+
             margin-bottom: 20px;
-            transition: background 0.2s;
+
+            transition: 0.2s;
         }
 
-        .btn-back:hover {
-            background: #d1d5db;
+        .back-button:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: translateX(-2px);
         }
+
+        /* =========================
+           PAGE HEADER
+        ========================= */
 
         .page-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
             margin-bottom: 25px;
+        }
+
+        .page-icon {
+            width: 48px;
+            height: 48px;
+
+            flex-shrink: 0;
+
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #dbeafe,
+                    #eff6ff
+                );
+
+            color: #2563eb;
+            font-size: 19px;
         }
 
         .page-header h1 {
             font-size: 25px;
-            margin-bottom: 7px;
+            color: #111827;
+
+            margin-bottom: 6px;
         }
 
         .page-header p {
             color: #7b8494;
-            font-size: 14px;
+            font-size: 13px;
         }
+
+        /* =========================
+           FORM CARD
+        ========================= */
 
         .form-card {
             background: white;
-            border: 1px solid #e8ebf0;
-            border-radius: 12px;
+
+            border: 1px solid #e8ecf3;
+
+            border-radius: 16px;
+
             padding: 25px;
-            max-width: 750px;
+
+            box-shadow:
+                0 3px 12px rgba(15,23,42,0.025);
         }
+
+        .form-card-header {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            padding-bottom: 18px;
+
+            margin-bottom: 22px;
+
+            border-bottom: 1px solid #eef1f5;
+        }
+
+        .form-card-icon {
+            width: 32px;
+            height: 32px;
+
+            border-radius: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eef4ff;
+            color: #2563eb;
+
+            font-size: 12px;
+        }
+
+        .form-card-header h3 {
+            font-size: 14px;
+            color: #172033;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
 
         .form-group {
             margin-bottom: 20px;
@@ -153,218 +436,690 @@
 
         .form-group label {
             display: block;
-            font-size: 14px;
-            font-weight: bold;
+
+            font-size: 12px;
+            font-weight: 600;
+
             margin-bottom: 8px;
+
+            color: #374151;
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .required {
+            color: #dc2626;
+        }
+
+        .form-control {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d9dee7;
-            border-radius: 8px;
-            font-size: 14px;
+
+            min-height: 44px;
+
+            padding: 11px 13px;
+
+            border: 1px solid #d8dee8;
+
+            border-radius: 9px;
+
+            font-size: 12px;
+
+            background: white;
+            color: #334155;
+
             outline: none;
+
+            transition:
+                border 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
-        .form-group textarea {
-            min-height: 110px;
-            resize: vertical;
+        .form-control:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37,99,235,0.10);
         }
+
+        .form-control::placeholder {
+            color: #a0a9b8;
+        }
+
+        textarea.form-control {
+            min-height: 110px;
+
+            resize: vertical;
+
+            line-height: 1.5;
+        }
+
+        /* =========================
+           ERROR
+        ========================= */
 
         .error {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            margin-top: 6px;
+
             color: #dc2626;
-            font-size: 12px;
-            margin-top: 5px;
+            font-size: 10px;
         }
 
-        .buttons {
+        /* =========================
+           HINT
+        ========================= */
+
+        .form-hint {
             display: flex;
-            gap: 10px;
+            align-items: flex-start;
+
+            gap: 5px;
+
+            font-size: 10px;
+
+            color: #7b8494;
+
+            margin-top: 6px;
+
+            line-height: 1.5;
+        }
+
+        .form-hint i {
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+
+        /* =========================
+           DIVIDER
+        ========================= */
+
+        .divider {
+            height: 1px;
+
+            background: #eef1f5;
+
+            margin: 5px 0 22px;
+        }
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .button-group {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
             margin-top: 25px;
         }
 
         .btn {
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
+
+            border-radius: 9px;
+
+            padding: 10px 16px;
+
+            font-size: 11px;
+            font-weight: 600;
+
             cursor: pointer;
+
             text-decoration: none;
-            font-weight: bold;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
         .btn-primary {
-            background: #2563eb;
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
             color: white;
+
+            box-shadow:
+                0 6px 14px rgba(37,99,235,0.18);
         }
 
         .btn-primary:hover {
-            background: #1d4ed8;
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 9px 18px rgba(37,99,235,0.25);
+        }
+
+        .btn-secondary {
+            background: #eef2f7;
+
+            color: #475569;
+
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+
+            transform: translateY(-1px);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1000px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+
+            .logo {
+                padding-bottom: 20px;
+            }
+
+            .logo h2,
+            .logo p,
+            .menu-title,
+            .menu a span,
+            .logout span {
+                display: none;
+            }
+
+            .menu a {
+                justify-content: center;
+                padding: 13px 8px;
+            }
+
+            .menu a.active::before {
+                left: -10px;
+            }
+
+            .logout a {
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .admin-text {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
+
 </head>
 
 <body>
 
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
         <div class="logo">
+
             <h2>NEXPOOL</h2>
+
             <p>ADMINISTRATOR</p>
+
         </div>
 
-        <div class="menu-title">Menu Utama</div>
+        <div class="menu-title">
+            Menu Utama
+        </div>
 
         <div class="menu">
 
-            <a href="{{ url('/dashboard') }}">
-                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
+            <a href="{{ route('dashboard') }}">
+
+                <i class="fa-solid fa-gauge-high"
+                    style="color:#bfdbfe;">
+                </i>
+
+                <span>
+                    Dashboard
+                </span>
+
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
+
+                <i class="fa-solid fa-ticket"
+                    style="color:#fcd34d;">
+                </i>
+
+                <span>
+                    Manajemen Tiket
+                </span>
+
             </a>
 
-            <a href="{{ route('fasilitas.index') }}" class="active">
-                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
+            <a href="{{ route('fasilitas.index') }}"
+                class="active">
+
+                <i class="fa-solid fa-person-swimming"
+                    style="color:#67e8f9;">
+                </i>
+
+                <span>
+                    Fasilitas
+                </span>
+
             </a>
+
             <a href="{{ route('reservasi.index') }}">
-                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
+
+                <i class="fa-solid fa-calendar-check"
+                    style="color:#6ee7b7;">
+                </i>
+
+                <span>
+                    Reservasi
+                </span>
+
             </a>
 
             <a href="{{ route('promo.index') }}">
-                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
+
+                <i class="fa-solid fa-tags"
+                    style="color:#c4b5fd;">
+                </i>
+
+                <span>
+                    Promo
+                </span>
+
             </a>
 
-            <a href="#">
-                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
+            <a href="{{ route('review.index') }}">
+
+                <i class="fa-solid fa-star"
+                    style="color:#fde047;">
+                </i>
+
+                <span>
+                    Review
+                </span>
+
             </a>
 
         </div>
 
         <div class="logout">
+
             <a href="{{ route('logout') }}">
-                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
+
+                <i class="fa-solid fa-right-from-bracket"
+                    style="color:#f87171;">
+                </i>
+
+                <span>
+                    Logout
+                </span>
+
             </a>
+
         </div>
 
     </aside>
 
 
+    <!-- MAIN -->
+
     <main class="main">
 
+        <!-- HEADER -->
+
         <header class="header">
-            <h3>Edit Fasilitas</h3>
+
+            <div class="header-left">
+
+                <h3>
+                    Edit Fasilitas
+                </h3>
+
+                <p>
+                    Perbarui informasi fasilitas kolam renang
+                </p>
+
+            </div>
+
+            <div class="admin-info">
+
+                <div class="admin-text">
+
+                    <strong>
+                        {{ session('admin_pool_nama') }}
+                    </strong>
+
+                    <span>
+                        {{ session('admin_pool_id') }}
+                    </span>
+
+                </div>
+
+                <div class="avatar">
+
+                    {{ strtoupper(substr(session('admin_pool_nama'), 0, 1)) }}
+
+                </div>
+
+            </div>
+
         </header>
+
+
+        <!-- CONTENT -->
 
         <section class="content">
 
-            <!-- Tombol Kembali di Kiri Atas -->
-            <a href="{{ route('fasilitas.index') }}" class="btn-back">
-                &larr; Kembali ke Fasilitas
-            </a>
+            <div class="content-inner">
 
-            <div class="page-header">
-                <h1>Edit Fasilitas</h1>
-                <p>Perbarui informasi fasilitas.</p>
-            </div>
+                <!-- KEMBALI -->
 
-            <div class="form-card">
+                <a href="{{ route('fasilitas.index') }}"
+                    class="back-button">
 
-                <form
-                    action="{{ route('fasilitas.update', $fasilita->id) }}"
-                    method="POST"
-                >
+                    <i class="fa-solid fa-arrow-left"></i>
 
-                    @csrf
-                    @method('PUT')
+                    Kembali ke Manajemen Fasilitas
+
+                </a>
 
 
-                    <div class="form-group">
+                <!-- PAGE HEADER -->
 
-                        <label>Pool ID</label>
+                <div class="page-header">
 
-                        <input
-                            type="text"
-                            name="pool_id"
-                            value="{{ old('pool_id', $fasilita->pool_id) }}"
-                            required
-                        >
+                    <div class="page-icon">
 
-                        @error('pool_id')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
+                        <i class="fa-solid fa-pen-to-square"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h1>
+                            Edit Fasilitas
+                        </h1>
+
+                        <p>
+                            Perbarui informasi fasilitas kolam renang.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FORM CARD -->
+
+                <div class="form-card">
+
+                    <div class="form-card-header">
+
+                        <div class="form-card-icon">
+
+                            <i class="fa-solid fa-pen-to-square"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Form Edit Fasilitas
+                            </h3>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="form-group">
+                    <form
+                        action="{{ route('fasilitas.update', $fasilita->id) }}"
+                        method="POST">
 
-                        <label>Nama Fasilitas</label>
+                        @csrf
 
-                        <input
-                            type="text"
-                            name="nama_fasilitas"
-                            value="{{ old('nama_fasilitas', $fasilita->nama_fasilitas) }}"
-                            pattern="[A-Za-z\s]+"
-                            title="Hanya boleh menggunakan huruf dan spasi (tanpa angka/simbol)"
-                            required
-                        >
-
-                        @error('nama_fasilitas')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-
-                    </div>
+                        @method('PUT')
 
 
-                    <div class="form-group">
+                        <!-- NAMA FASILITAS -->
 
-                        <label>Deskripsi</label>
+                        <div class="form-group">
 
-                        <textarea name="deskripsi" required>{{ old('deskripsi', $fasilita->deskripsi) }}</textarea>
+                            <label for="nama_fasilitas">
 
-                        @error('deskripsi')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
+                                Nama Fasilitas
 
-                    </div>
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="nama_fasilitas"
+                                name="nama_fasilitas"
+                                class="form-control"
+                                value="{{ old('nama_fasilitas', $fasilita->nama_fasilitas) }}"
+                                pattern="[A-Za-z\s]+"
+                                title="Hanya boleh menggunakan huruf dan spasi (tanpa angka/simbol)"
+                                required>
+
+                            <div class="form-hint">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                <span>
+                                    Nama fasilitas hanya boleh menggunakan huruf dan spasi.
+                                </span>
+
+                            </div>
+
+                            @error('nama_fasilitas')
+
+                                <div class="error">
+
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
 
 
-                    <div class="form-group">
+                        <!-- DESKRIPSI -->
 
-                        <label>Status</label>
+                        <div class="form-group">
 
-                        <select name="status" required>
+                            <label for="deskripsi">
 
-                            <option value="1"
-                                {{ old('status', $fasilita->status) == 1 ? 'selected' : '' }}>
-                                Aktif
-                            </option>
+                                Deskripsi
 
-                            <option value="0"
-                                {{ old('status', $fasilita->status) == 0 ? 'selected' : '' }}>
-                                Nonaktif
-                            </option>
+                                <span class="required">
+                                    *
+                                </span>
 
-                        </select>
+                            </label>
 
-                    </div>
+                            <textarea
+                                id="deskripsi"
+                                name="deskripsi"
+                                class="form-control"
+                                required>{{ old('deskripsi', $fasilita->deskripsi) }}</textarea>
+
+                            <div class="form-hint">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                <span>
+                                    Deskripsi fasilitas wajib diisi.
+                                </span>
+
+                            </div>
+
+                            @error('deskripsi')
+
+                                <div class="error">
+
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
 
 
-                    <div class="buttons">
+                        <!-- STATUS -->
 
-                        <button type="submit" class="btn btn-primary">
-                            💾 Update
-                        </button>
+                        <div class="form-group">
 
-                    </div>
+                            <label for="status">
 
-                </form>
+                                Status
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <select
+                                id="status"
+                                name="status"
+                                class="form-control"
+                                required>
+
+                                <option
+                                    value="1"
+                                    {{ old('status', $fasilita->status) == 1 ? 'selected' : '' }}>
+                                    Aktif
+                                </option>
+
+                                <option
+                                    value="0"
+                                    {{ old('status', $fasilita->status) == 0 ? 'selected' : '' }}>
+                                    Nonaktif
+                                </option>
+
+                            </select>
+
+                            @error('status')
+
+                                <div class="error">
+
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+                        <!-- DIVIDER -->
+
+                        <div class="divider"></div>
+
+
+                        <!-- BUTTON -->
+
+                        <div class="button-group">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+
+                                <i class="fa-solid fa-floppy-disk"></i>
+
+                                Update Fasilitas
+
+                            </button>
+
+                            <a
+                                href="{{ route('fasilitas.index') }}"
+                                class="btn btn-secondary">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                                Batal
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -373,4 +1128,5 @@
     </main>
 
 </body>
+
 </html>

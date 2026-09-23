@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <title>Tambah Harga Tiket - NEXPOOL</title>
 
@@ -21,55 +23,79 @@
             color: #1f2937;
         }
 
+        /* ================= SIDEBAR ================= */
+
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 240px;
+            width: 255px;
             height: 100vh;
-            background: #14213d;
+            background: linear-gradient(180deg, #14213d 0%, #0f1b33 100%);
             color: white;
-            padding: 25px 15px;
+            padding: 30px 15px;
+            box-shadow: 4px 0 18px rgba(15, 27, 51, 0.08);
+            z-index: 1000;
         }
 
         .logo {
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 38px;
         }
 
         .logo h2 {
-            font-size: 26px;
+            font-size: 25px;
             letter-spacing: 1px;
         }
 
         .logo p {
-            font-size: 12px;
-            color: #aeb9cc;
+            font-size: 11px;
+            color: #9eabc1;
             margin-top: 5px;
+            letter-spacing: 1px;
         }
 
         .menu-title {
-            font-size: 11px;
-            color: #8491a7;
+            font-size: 10px;
+            color: #71809a;
             margin: 20px 12px 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
         }
 
         .menu a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
-            color: #dce3ef;
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
+            color: #d7deeb;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            border-radius: 10px;
             font-size: 14px;
+            transition: 0.2s;
         }
 
-        .menu a:hover,
-        .menu a.active {
-            background: #2563eb;
+        .menu a:hover {
+            background: rgba(255, 255, 255, 0.07);
             color: white;
+            transform: translateX(2px);
         }
+
+        .menu a.active {
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 7px 16px rgba(37, 99, 235, 0.22);
+        }
+
+        .menu a i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        /* ================= LOGOUT ================= */
 
         .logout {
             position: absolute;
@@ -79,18 +105,34 @@
         }
 
         .logout a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
             color: #ffb4b4;
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 12px 14px;
+            border-radius: 10px;
             font-size: 14px;
+            transition: 0.2s;
         }
 
+        .logout a:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .logout a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ================= MAIN ================= */
+
         .main {
-            margin-left: 240px;
+            margin-left: 255px;
             min-height: 100vh;
         }
+
+        /* ================= HEADER ================= */
 
         .header {
             height: 75px;
@@ -98,18 +140,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 0 32px;
+            border-bottom: 1px solid #e8ebf0;
         }
 
-        .header h3 {
-            font-size: 20px;
+        .header-left h3 {
+            font-size: 19px;
+            color: #111827;
+        }
+
+        .header-left p {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #8a94a6;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 11px;
         }
 
         .user-meta {
@@ -119,18 +168,20 @@
         .user-meta strong {
             display: block;
             color: #111827;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .user-meta span {
-            font-size: 12px;
-            color: #6b7280;
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            color: #7b8494;
         }
 
         .avatar {
-            width: 38px;
-            height: 38px;
-            background: #2563eb;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -138,341 +189,754 @@
             justify-content: center;
             font-weight: bold;
             font-size: 15px;
+            box-shadow: 0 5px 12px rgba(37, 99, 235, 0.2);
         }
+
+        /* ================= CONTENT ================= */
 
         .content {
-            padding: 30px;
+            padding: 32px;
+            max-width: 1050px;
         }
 
-        .page-header {
-            margin-bottom: 20px;
-        }
+        /* ================= BACK BUTTON ================= */
 
-        .page-header h1 {
-            font-size: 25px;
-            margin-bottom: 7px;
-        }
-
-        .page-header p {
-            color: #7b8494;
-            font-size: 14px;
-        }
-
-        /* TOMBOL KEMBALI */
         .btn-kembali {
-            display: inline-block;
-            margin-bottom: 18px;
-            padding: 10px 16px;
-            background: #e5e7eb;
-            color: #1e3c72;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            padding: 9px 14px;
+            background: white;
+            color: #475569;
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
             transition: 0.2s;
         }
 
         .btn-kembali:hover {
-            background: #d1d5db;
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #f8fbff;
         }
 
-        .form-card {
-            background: white;
-            border: 1px solid #e8ebf0;
+        /* ================= PAGE HEADER ================= */
+
+        .page-header {
+            margin-bottom: 22px;
+        }
+
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .title-icon {
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            padding: 25px;
-            max-width: 750px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
 
-        /* NOTIFIKASI */
+        .page-header h1 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #7b8494;
+            font-size: 13px;
+        }
+
+        /* ================= ALERT ================= */
+
         .alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             background: #fef2f2;
             color: #991b1b;
             border: 1px solid #fecaca;
             padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            font-size: 14px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+            font-size: 13px;
         }
 
+        /* ================= FORM CARD ================= */
+
+        .form-card {
+            background: white;
+            border: 1px solid #e8ebf0;
+            border-radius: 14px;
+            overflow: hidden;
+            max-width: 760px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .form-header {
+            padding: 19px 24px;
+            border-bottom: 1px solid #edf0f4;
+            background: #fcfdff;
+        }
+
+        .form-header h3 {
+            font-size: 15px;
+            color: #111827;
+        }
+
+        .form-header p {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #8a94a6;
+        }
+
+        .form-body {
+            padding: 25px;
+        }
+
+        /* ================= FORM ================= */
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 21px;
         }
 
         .form-group label {
             display: block;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
             margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #d9dee7;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 12px 14px 12px 42px;
+            border: 1px solid #dce2ea;
+            border-radius: 9px;
+            font-size: 13px;
+            color: #1f2937;
             outline: none;
             background: white;
+            transition: 0.2s;
+        }
+
+        .form-group input::placeholder {
+            color: #a8b0bd;
         }
 
         .form-group input:focus,
         .form-group select:focus {
             border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
         }
 
         .error {
             color: #dc2626;
             font-size: 12px;
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         .harga-info {
-            color: #6b7280;
-            font-size: 12px;
-            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #7b8494;
+            font-size: 11px;
+            margin-top: 7px;
         }
+
+        .harga-info i {
+            color: #2563eb;
+        }
+
+        /* ================= BUTTON ================= */
 
         .buttons {
             display: flex;
             gap: 10px;
-            margin-top: 25px;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #edf0f4;
         }
 
         .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 11px 19px;
+            border-radius: 9px;
+            font-size: 13px;
             cursor: pointer;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
+            transition: 0.2s;
         }
 
         .btn-primary {
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
+            box-shadow: 0 5px 12px rgba(37, 99, 235, 0.18);
         }
 
         .btn-primary:hover {
-            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(37, 99, 235, 0.25);
         }
 
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #f1f5f9;
+            color: #475569;
         }
 
         .btn-secondary:hover {
-            background: #d1d5db;
+            background: #e2e8f0;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+
+            .logo h2,
+            .logo p,
+            .menu-title,
+            .menu span,
+            .logout span {
+                display: none;
+            }
+
+            .menu a,
+            .logout a {
+                justify-content: center;
+                padding: 12px;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .header-left p {
+                display: none;
+            }
+
+            .user-meta {
+                display: none;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .form-body {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .header-left h3 {
+                font-size: 16px;
+            }
+
+            .page-header h1 {
+                font-size: 21px;
+            }
+
+            .title-icon {
+                width: 42px;
+                height: 42px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- SIDEBAR -->
+    <!-- ================= SIDEBAR ================= -->
+
     <aside class="sidebar">
 
         <div class="logo">
+
             <h2>NEXPOOL</h2>
+
             <p>ADMINISTRATOR</p>
+
         </div>
 
-        <div class="menu-title">Menu Utama</div>
+        <div class="menu-title">
+            Menu Utama
+        </div>
 
         <div class="menu">
 
+            <!-- DASHBOARD -->
+
             <a href="{{ url('/dashboard') }}">
-                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
+
+                <i class="fa-solid fa-gauge-high"
+                    style="color:#3b82f6;">
+                </i>
+
+                <span>Dashboard</span>
+
             </a>
 
-            <a href="{{ route('harga-tiket.index') }}" class="active">
-                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
+
+            <!-- MANAJEMEN TIKET -->
+
+            <a href="{{ route('harga-tiket.index') }}"
+                class="active">
+
+                <i class="fa-solid fa-ticket"
+                    style="color:#f59e0b;">
+                </i>
+
+                <span>Manajemen Tiket</span>
+
             </a>
+
+
+            <!-- FASILITAS -->
 
             <a href="{{ route('fasilitas.index') }}">
-                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
+
+                <i class="fa-solid fa-person-swimming"
+                    style="color:#06b6d4;">
+                </i>
+
+                <span>Fasilitas</span>
+
             </a>
 
-            <a href="#">
-                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
+
+            <!-- RESERVASI -->
+
+            <a href="{{ url('/reservasi') }}">
+
+                <i class="fa-solid fa-calendar-check"
+                    style="color:#10b981;">
+                </i>
+
+                <span>Reservasi</span>
+
             </a>
 
-            <a href="#">
-                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
+
+            <!-- PROMO -->
+
+            <a href="{{ url('/promo') }}">
+
+                <i class="fa-solid fa-tags"
+                    style="color:#8b5cf6;">
+                </i>
+
+                <span>Promo</span>
+
             </a>
 
-            <a href="#">
-                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
+
+            <!-- REVIEW -->
+
+            <a href="{{ url('/review') }}">
+
+                <i class="fa-solid fa-star"
+                    style="color:#eab308;">
+                </i>
+
+                <span>Review</span>
+
             </a>
 
         </div>
 
+
+        <!-- LOGOUT -->
+
         <div class="logout">
+
             <a href="{{ route('logout') }}">
-                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
+
+                <i class="fa-solid fa-right-from-bracket"
+                    style="color:#ef4444;">
+                </i>
+
+                <span>Logout</span>
+
             </a>
+
         </div>
 
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- ================= MAIN ================= -->
+
     <main class="main">
 
+        <!-- HEADER -->
+
         <header class="header">
-            <h3>Manajemen Harga Tiket</h3>
+
+            <div class="header-left">
+
+                <h3>
+                    Manajemen Harga Tiket
+                </h3>
+
+                <p>
+                    Pengelolaan harga tiket kolam renang
+                </p>
+
+            </div>
+
 
             <div class="user-profile">
+
                 <div class="user-meta">
-                    <strong>Admin Tiara Park</strong>
-                    <span>pool_id_01</span>
+
+                    <strong>
+                        {{ session('admin_pool_nama', 'Admin NEXPOOL') }}
+                    </strong>
+
+                    <span>
+                        {{ session('admin_pool_id', 'pool_id_01') }}
+                    </span>
+
                 </div>
 
+
                 <div class="avatar">
-                    A
+
+                    {{ strtoupper(substr(session('admin_pool_nama', 'Admin NEXPOOL'), 0, 1)) }}
+
                 </div>
+
             </div>
+
         </header>
 
 
+        <!-- ================= CONTENT ================= -->
+
         <section class="content">
 
-            <!-- TOMBOL KEMBALI -->
-            <a href="{{ route('harga-tiket.index') }}" class="btn-kembali">
-                ← Kembali ke Manajemen Tiket
+            <!-- KEMBALI -->
+
+            <a href="{{ route('harga-tiket.index') }}"
+                class="btn-kembali">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Kembali ke Manajemen Tiket
+
             </a>
 
 
+            <!-- PAGE HEADER -->
+
             <div class="page-header">
-                <h1>Tambah Harga Tiket</h1>
-                <p>Tambahkan harga tiket baru untuk kolam renang.</p>
+
+                <div class="title-wrapper">
+
+                    <div class="title-icon">
+
+                        <i class="fa-solid fa-circle-plus"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h1>
+                            Tambah Harga Tiket
+                        </h1>
+
+                        <p>
+                            Tambahkan harga tiket baru untuk kolam renang.
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
 
 
-            <!-- NOTIFIKASI VALIDASI -->
+            <!-- ERROR VALIDASI -->
+
             @if ($errors->any())
+
                 <div class="alert">
-                    ⚠️ {{ $errors->first() }}
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <span>
+                        {{ $errors->first() }}
+                    </span>
+
                 </div>
+
             @endif
 
-            <!-- FORM -->
+
+            <!-- FORM CARD -->
+
             <div class="form-card">
 
-                <form id="hargaForm"
-                    action="{{ route('harga-tiket.store') }}"
-                    method="POST">
+                <div class="form-header">
 
-                    @csrf
+                    <h3>
+                        Informasi Harga Tiket
+                    </h3>
+
+                    <p>
+                        Lengkapi data berikut untuk menambahkan harga tiket.
+                    </p>
+
+                </div>
 
 
-                    <!-- KATEGORI -->
-                    <div class="form-group">
+                <div class="form-body">
 
-                        <label>Kategori Tiket</label>
+                    <form id="hargaForm"
+                        action="{{ route('harga-tiket.store') }}"
+                        method="POST">
 
-                        <select name="kategori" required>
+                        @csrf
 
-                            <option value="">-- Pilih Kategori --</option>
 
-                            <option value="Dewasa"
-                                {{ old('kategori') == 'Dewasa' ? 'selected' : '' }}>
-                                Dewasa
-                            </option>
+                        <!-- KATEGORI -->
 
-                            <option value="Anak"
-                                {{ old('kategori') == 'Anak' ? 'selected' : '' }}>
-                                Anak
-                            </option>
+                        <div class="form-group">
 
-                        </select>
+                            <label>
+                                Kategori Tiket
+                            </label>
 
-                        @error('kategori')
-                            <div class="error">
-                                {{ $message }}
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-users input-icon"></i>
+
+                                <select name="kategori" required>
+
+                                    <option value="">
+                                        -- Pilih Kategori --
+                                    </option>
+
+                                    <option value="Dewasa"
+                                        {{ old('kategori') == 'Dewasa' ? 'selected' : '' }}>
+
+                                        Dewasa
+
+                                    </option>
+
+                                    <option value="Anak"
+                                        {{ old('kategori') == 'Anak' ? 'selected' : '' }}>
+
+                                        Anak
+
+                                    </option>
+
+                                </select>
+
                             </div>
-                        @enderror
-
-                    </div>
 
 
-                    <!-- JENIS HARI -->
-                    <div class="form-group">
+                            @error('kategori')
 
-                        <label>Jenis Hari</label>
+                                <div class="error">
+                                    {{ $message }}
+                                </div>
 
-                        <select name="jenis_hari" required>
+                            @enderror
 
-                            <option value="">-- Pilih Jenis Hari --</option>
-
-                            <option value="Weekday"
-                                {{ old('jenis_hari') == 'Weekday' ? 'selected' : '' }}>
-                                Weekday
-                            </option>
-
-                            <option value="Weekend"
-                                {{ old('jenis_hari') == 'Weekend' ? 'selected' : '' }}>
-                                Weekend
-                            </option>
-
-                        </select>
-
-                        @error('jenis_hari')
-                            <div class="error">
-                                {{ $message }}
-                            </div>
-                        @enderror
-
-                    </div>
-
-
-                    <!-- HARGA -->
-                    <div class="form-group">
-
-                        <label>Harga Tiket (Rp)</label>
-
-                        <input
-                            type="text"
-                            id="harga"
-                            name="harga"
-                            value="{{ old('harga') }}"
-                            placeholder="Contoh: 15000"
-                            maxlength="5"
-                            inputmode="numeric"
-                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
-                            required
-                        >
-                        <div class="harga-info">
-                            Harga tiket harus berupa angka 4 hingga 5 digit (Rp1.000 s/d Rp99.999).
                         </div>
-                        @error('harga')
-                            <div class="error">
-                                {{ $message }}
+
+
+                        <!-- JENIS HARI -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Jenis Hari
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-calendar-days input-icon"></i>
+
+                                <select name="jenis_hari" required>
+
+                                    <option value="">
+                                        -- Pilih Jenis Hari --
+                                    </option>
+
+                                    <option value="Weekday"
+                                        {{ old('jenis_hari') == 'Weekday' ? 'selected' : '' }}>
+
+                                        Weekday
+
+                                    </option>
+
+                                    <option value="Weekend"
+                                        {{ old('jenis_hari') == 'Weekend' ? 'selected' : '' }}>
+
+                                        Weekend
+
+                                    </option>
+
+                                </select>
+
                             </div>
-                        @enderror
-
-                    </div>
 
 
-                    <!-- BUTTON -->
-                    <div class="buttons">
+                            @error('jenis_hari')
 
-                        <button type="submit"
-                            class="btn btn-primary">
-                            <i class="fa-solid fa-floppy-disk"></i> Simpan
-                        </button>
+                                <div class="error">
+                                    {{ $message }}
+                                </div>
 
-                        <a href="{{ route('harga-tiket.index') }}"
-                            class="btn btn-secondary">
-                            Batal
-                        </a>
+                            @enderror
 
-                    </div>
+                        </div>
 
-                </form>
+
+                        <!-- HARGA -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Harga Tiket (Rp)
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-money-bill-wave input-icon"></i>
+
+                                <input
+                                    type="text"
+                                    id="harga"
+                                    name="harga"
+                                    value="{{ old('harga') }}"
+                                    placeholder="Contoh: 25000"
+                                    maxlength="5"
+                                    inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="harga-info">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                <span>
+                                    Masukkan harga dalam angka. Maksimal Rp99.999, contoh Rp25.000.
+                                </span>
+
+                            </div>
+
+
+                            @error('harga')
+
+                                <div class="error">
+                                    {{ $message }}
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+                        <!-- BUTTON -->
+
+                        <div class="buttons">
+
+                            <button type="submit"
+                                class="btn btn-primary">
+
+                                <i class="fa-solid fa-floppy-disk"></i>
+
+                                Simpan Harga
+
+                            </button>
+
+
+                            <a href="{{ route('harga-tiket.index') }}"
+                                class="btn btn-secondary">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                                Batal
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
 
             </div>
 
