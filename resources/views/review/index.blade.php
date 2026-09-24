@@ -2,7 +2,6 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,9 +12,7 @@
 
     <title>Review - NEXPOOL</title>
 
-
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +29,6 @@
             text-decoration: none;
         }
 
-
         /* =========================
            SIDEBAR
         ========================= */
@@ -43,7 +39,6 @@
             top: 0;
             width: 255px;
             height: 100vh;
-
             background:
                 linear-gradient(
                     180deg,
@@ -51,23 +46,18 @@
                     #14213d 55%,
                     #101b32 100%
                 );
-
             color: white;
             padding: 24px 16px;
             z-index: 1000;
-
             box-shadow:
                 8px 0 30px rgba(15, 23, 42, 0.08);
         }
 
         .logo {
             padding: 6px 10px 28px;
-
             border-bottom:
                 1px solid rgba(255, 255, 255, 0.08);
-
             margin-bottom: 25px;
-
             text-align: center;
         }
 
@@ -87,10 +77,8 @@
         .menu-title {
             padding: 0 12px;
             margin-bottom: 10px;
-
             font-size: 10px;
             font-weight: bold;
-
             color: #73819b;
             letter-spacing: 1.2px;
             text-transform: uppercase;
@@ -104,18 +92,14 @@
 
         .menu a {
             position: relative;
-
             display: flex;
             align-items: center;
             gap: 13px;
-
             padding: 12px 13px;
             border-radius: 10px;
-
             color: #cbd5e1;
             font-size: 13px;
             font-weight: 500;
-
             transition:
                 background 0.2s ease,
                 color 0.2s ease,
@@ -141,27 +125,21 @@
                     #2563eb,
                     #1d4ed8
                 );
-
             color: white;
-
             box-shadow:
                 0 8px 20px rgba(37, 99, 235, 0.25);
         }
 
         .menu a.active::before {
             content: "";
-
             position: absolute;
             left: -16px;
             top: 8px;
-
             width: 3px;
             height: calc(100% - 16px);
-
             border-radius: 0 5px 5px 0;
             background: #60a5fa;
         }
-
 
         /* =========================
            LOGOUT
@@ -169,13 +147,10 @@
 
         .logout {
             position: absolute;
-
             bottom: 20px;
             left: 16px;
             right: 16px;
-
             padding-top: 15px;
-
             border-top:
                 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -184,20 +159,16 @@
             display: flex;
             align-items: center;
             gap: 13px;
-
             padding: 12px 13px;
             border-radius: 10px;
-
             color: #fca5a5;
             font-size: 13px;
-
             transition: 0.2s;
         }
 
         .logout a:hover {
             background:
                 rgba(239, 68, 68, 0.12);
-
             color: #fecaca;
         }
 
@@ -205,7 +176,6 @@
             width: 20px;
             text-align: center;
         }
-
 
         /* =========================
            MAIN
@@ -216,28 +186,21 @@
             min-height: 100vh;
         }
 
-
         /* =========================
            HEADER
         ========================= */
 
         .header {
             height: 76px;
-
             background:
                 rgba(255, 255, 255, 0.96);
-
             backdrop-filter: blur(10px);
-
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 0 32px;
-
             border-bottom:
                 1px solid #e8ecf3;
-
             position: sticky;
             top: 0;
             z-index: 900;
@@ -281,29 +244,22 @@
         .avatar {
             width: 42px;
             height: 42px;
-
             border-radius: 12px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background:
                 linear-gradient(
                     135deg,
                     #2563eb,
                     #38bdf8
                 );
-
             color: white;
-
             font-size: 15px;
             font-weight: bold;
-
             box-shadow:
                 0 6px 15px rgba(37, 99, 235, 0.2);
         }
-
 
         /* =========================
            CONTENT
@@ -314,7 +270,6 @@
             max-width: 1700px;
         }
 
-
         /* =========================
            PAGE HEADER
         ========================= */
@@ -323,7 +278,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             margin-bottom: 25px;
         }
 
@@ -336,22 +290,17 @@
         .page-icon {
             width: 48px;
             height: 48px;
-
             flex-shrink: 0;
-
             border-radius: 13px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background:
                 linear-gradient(
                     135deg,
                     #dbeafe,
                     #eff6ff
                 );
-
             color: #2563eb;
             font-size: 19px;
         }
@@ -367,7 +316,6 @@
             font-size: 13px;
         }
 
-
         /* =========================
            ALERT
         ========================= */
@@ -376,22 +324,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
-
             background: #ecfdf5;
             color: #047857;
-
             border:
                 1px solid #bbf7d0;
-
             padding: 12px 15px;
-
             border-radius: 10px;
-
             margin-bottom: 20px;
-
             font-size: 12px;
         }
-
 
         /* =========================
            INFO BOX
@@ -399,20 +340,13 @@
 
         .info-box {
             background: #eff6ff;
-
             border:
                 1px solid #bfdbfe;
-
             color: #1e40af;
-
             padding: 14px 16px;
-
             border-radius: 10px;
-
             margin-bottom: 20px;
-
             font-size: 12px;
-
             line-height: 1.6;
         }
 
@@ -424,12 +358,9 @@
             display: flex;
             align-items: center;
             gap: 7px;
-
             margin-bottom: 4px;
-
             font-weight: 700;
         }
-
 
         /* =========================
            TABLE CARD
@@ -437,14 +368,10 @@
 
         .table-card {
             background: white;
-
             border:
                 1px solid #e8ecf3;
-
             border-radius: 16px;
-
             overflow: hidden;
-
             box-shadow:
                 0 3px 12px rgba(15, 23, 42, 0.025);
         }
@@ -453,9 +380,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-
             padding: 20px 21px;
-
             border-bottom:
                 1px solid #eef1f5;
         }
@@ -463,16 +388,12 @@
         .table-top-icon {
             width: 32px;
             height: 32px;
-
             border-radius: 9px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: #eef4ff;
             color: #2563eb;
-
             font-size: 12px;
         }
 
@@ -487,7 +408,6 @@
             color: #94a3b8;
         }
 
-
         /* =========================
            TABLE
         ========================= */
@@ -500,41 +420,29 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1050px;
+            min-width: 1150px;
         }
 
         th {
             background: #f8fafc;
-
             color: #64748b;
-
             font-size: 11px;
             font-weight: 700;
-
             text-align: left;
-
             padding: 13px 20px;
-
             border-bottom:
                 1px solid #e8ecf3;
-
             white-space: nowrap;
-
             text-transform: uppercase;
-
             letter-spacing: 0.3px;
         }
 
         td {
             padding: 14px 20px;
-
             font-size: 12px;
-
             color: #475569;
-
             border-bottom:
                 1px solid #eef1f5;
-
             vertical-align: middle;
         }
 
@@ -550,7 +458,6 @@
             background: #fafcff;
         }
 
-
         /* =========================
            REVIEW DATA
         ========================= */
@@ -564,7 +471,6 @@
             font-weight: 600;
             color: #334155;
         }
-
 
         /* =========================
            RATING
@@ -582,7 +488,6 @@
             margin-left: 4px;
         }
 
-
         /* =========================
            KOMENTAR
         ========================= */
@@ -593,6 +498,32 @@
             color: #475569;
         }
 
+        /* =========================
+           FOTO REVIEW
+        ========================= */
+
+        .foto-review {
+            width: 70px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .foto-review:hover {
+            transform: scale(1.05);
+            box-shadow:
+                0 5px 15px rgba(15, 23, 42, 0.15);
+        }
+
+        .tidak-ada-foto {
+            color: #94a3b8;
+            font-size: 11px;
+            font-style: italic;
+            white-space: nowrap;
+        }
 
         /* =========================
            BALASAN
@@ -610,7 +541,6 @@
             font-size: 11px;
         }
 
-
         /* =========================
            STATUS BADGE
         ========================= */
@@ -619,14 +549,10 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-
             padding: 6px 9px;
-
             border-radius: 20px;
-
             font-size: 10px;
             font-weight: 700;
-
             white-space: nowrap;
         }
 
@@ -645,7 +571,6 @@
             color: #475569;
         }
 
-
         /* =========================
            ACTION
         ========================= */
@@ -654,7 +579,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-
             white-space: nowrap;
         }
 
@@ -663,18 +587,12 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-
             gap: 5px;
-
             padding: 7px 10px;
-
             border-radius: 7px;
-
             font-size: 10px;
             font-weight: 600;
-
             text-decoration: none;
-
             transition:
                 background 0.2s ease,
                 transform 0.2s ease;
@@ -700,7 +618,6 @@
             transform: translateY(-1px);
         }
 
-
         /* =========================
            EMPTY
         ========================= */
@@ -714,18 +631,13 @@
         .empty-icon {
             width: 55px;
             height: 55px;
-
             margin: 0 auto 15px;
-
             border-radius: 15px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: #f1f5f9;
             color: #94a3b8;
-
             font-size: 22px;
         }
 
@@ -739,7 +651,6 @@
             font-size: 11px;
             color: #94a3b8;
         }
-
 
         /* =========================
            RESPONSIVE
@@ -758,7 +669,6 @@
             .content {
                 padding: 25px;
             }
-
         }
 
         @media (max-width: 800px) {
@@ -808,7 +718,6 @@
             .admin-text {
                 display: none;
             }
-
         }
 
         @media (max-width: 600px) {
@@ -832,39 +741,28 @@
             .table-top {
                 padding: 16px;
             }
-
         }
-
     </style>
-
 </head>
 
-
 <body>
-
 
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
         <div class="logo">
-
             <h2>NEXPOOL</h2>
-
             <p>ADMINISTRATOR</p>
-
         </div>
-
 
         <div class="menu-title">
             Menu Utama
         </div>
 
-
         <div class="menu">
 
             <a href="{{ route('dashboard') }}">
-
                 <i
                     class="fa-solid fa-gauge-high"
                     style="color:#bfdbfe;"
@@ -873,12 +771,9 @@
                 <span>
                     Dashboard
                 </span>
-
             </a>
 
-
             <a href="{{ route('harga-tiket.index') }}">
-
                 <i
                     class="fa-solid fa-ticket"
                     style="color:#fcd34d;"
@@ -887,12 +782,9 @@
                 <span>
                     Manajemen Tiket
                 </span>
-
             </a>
 
-
             <a href="{{ route('fasilitas.index') }}">
-
                 <i
                     class="fa-solid fa-person-swimming"
                     style="color:#67e8f9;"
@@ -901,12 +793,9 @@
                 <span>
                     Fasilitas
                 </span>
-
             </a>
 
-
             <a href="{{ route('reservasi.index') }}">
-
                 <i
                     class="fa-solid fa-calendar-check"
                     style="color:#6ee7b7;"
@@ -915,12 +804,9 @@
                 <span>
                     Reservasi
                 </span>
-
             </a>
 
-
             <a href="{{ route('promo.index') }}">
-
                 <i
                     class="fa-solid fa-tags"
                     style="color:#c4b5fd;"
@@ -929,15 +815,12 @@
                 <span>
                     Promo
                 </span>
-
             </a>
-
 
             <a
                 href="{{ route('review.index') }}"
                 class="active"
             >
-
                 <i
                     class="fa-solid fa-star"
                     style="color:#fde047;"
@@ -946,11 +829,9 @@
                 <span>
                     Review
                 </span>
-
             </a>
 
         </div>
-
 
         <div class="logout">
 
@@ -971,11 +852,9 @@
 
     </aside>
 
-
     <!-- MAIN -->
 
     <main class="main">
-
 
         <!-- HEADER -->
 
@@ -993,7 +872,6 @@
 
             </div>
 
-
             <div class="admin-info">
 
                 <div class="admin-text">
@@ -1007,7 +885,6 @@
                     </span>
 
                 </div>
-
 
                 <div class="avatar">
 
@@ -1025,11 +902,9 @@
 
         </header>
 
-
         <!-- CONTENT -->
 
         <section class="content">
-
 
             <!-- SUCCESS ALERT -->
 
@@ -1045,7 +920,6 @@
 
             @endif
 
-
             <!-- PAGE HEADER -->
 
             <div class="page-header">
@@ -1053,11 +927,8 @@
                 <div class="page-title">
 
                     <div class="page-icon">
-
                         <i class="fa-solid fa-star"></i>
-
                     </div>
-
 
                     <div>
 
@@ -1074,7 +945,6 @@
                 </div>
 
             </div>
-
 
             <!-- INFO -->
 
@@ -1093,14 +963,12 @@
 
                 </div>
 
-
                 Review berasal dari
                 <strong>
                     aplikasi mobile NEXPOOL
                 </strong>
                 setelah pengunjung melakukan kunjungan.
-
-                Admin dapat melihat rating dan komentar,
+                Admin dapat melihat rating, komentar, dan foto,
                 kemudian memberikan balasan terhadap review.
 
                 <br>
@@ -1113,11 +981,9 @@
 
             </div>
 
-
             <!-- TABLE CARD -->
 
             <div class="table-card">
-
 
                 <div class="table-top">
 
@@ -1126,7 +992,6 @@
                         <i class="fa-solid fa-star"></i>
 
                     </div>
-
 
                     <div>
 
@@ -1142,14 +1007,11 @@
 
                 </div>
 
-
                 @if($review->count() > 0)
-
 
                     <div class="table-wrapper">
 
                         <table>
-
 
                             <thead>
 
@@ -1175,6 +1037,12 @@
                                         Komentar
                                     </th>
 
+                                    <!-- TAMBAHAN FOTO -->
+
+                                    <th>
+                                        Foto
+                                    </th>
+
                                     <th>
                                         Balasan Admin
                                     </th>
@@ -1191,14 +1059,11 @@
 
                             </thead>
 
-
                             <tbody>
-
 
                                 @foreach($review as $item)
 
                                     <tr>
-
 
                                         <!-- NO -->
 
@@ -1206,24 +1071,17 @@
                                             {{ $loop->iteration }}
                                         </td>
 
-
                                         <!-- PENGUNJUNG -->
 
                                         <td class="nama">
-
                                             {{ $item->nama_pengunjung }}
-
                                         </td>
-
 
                                         <!-- KOLAM -->
 
                                         <td class="pool">
-
                                             {{ session('admin_pool_nama', '-') }}
-
                                         </td>
-
 
                                         <!-- RATING -->
 
@@ -1245,17 +1103,13 @@
 
                                                 @endfor
 
-
                                                 <span class="rating-number">
-
                                                     ({{ $item->rating }}/5)
-
                                                 </span>
 
                                             </div>
 
                                         </td>
-
 
                                         <!-- KOMENTAR -->
 
@@ -1264,23 +1118,41 @@
                                             @if($item->komentar)
 
                                                 <div class="komentar">
-
                                                     {{ $item->komentar }}
-
                                                 </div>
 
                                             @else
 
                                                 <span class="belum-dibalas">
-
                                                     Tidak ada komentar.
-
                                                 </span>
 
                                             @endif
 
                                         </td>
 
+                                        <!-- FOTO REVIEW -->
+
+                                        <td>
+
+                                            @if($item->foto)
+
+                                                <img
+                                                    src="{{ asset('storage/' . $item->foto) }}"
+                                                    alt="Foto Review"
+                                                    class="foto-review"
+                                                    onclick="window.open(this.src, '_blank')"
+                                                >
+
+                                            @else
+
+                                                <span class="tidak-ada-foto">
+                                                    Tidak ada foto
+                                                </span>
+
+                                            @endif
+
+                                        </td>
 
                                         <!-- BALASAN -->
 
@@ -1289,23 +1161,18 @@
                                             @if($item->balasan_admin)
 
                                                 <div class="balasan">
-
                                                     {{ $item->balasan_admin }}
-
                                                 </div>
 
                                             @else
 
                                                 <span class="belum-dibalas">
-
                                                     Belum ada balasan.
-
                                                 </span>
 
                                             @endif
 
                                         </td>
-
 
                                         <!-- STATUS -->
 
@@ -1334,22 +1201,18 @@
                                             @else
 
                                                 <span class="badge badge-default">
-
                                                     {{ $item->status ?? 'Menunggu' }}
-
                                                 </span>
 
                                             @endif
 
                                         </td>
 
-
                                         <!-- AKSI -->
 
                                         <td>
 
                                             <div class="actions">
-
 
                                                 @if($item->status === 'Menunggu')
 
@@ -1379,7 +1242,6 @@
 
                                                 @endif
 
-
                                                 <a
                                                     href="{{ route('review.show', $item->id) }}"
                                                     class="btn-detail"
@@ -1391,7 +1253,6 @@
 
                                                 </a>
 
-
                                             </div>
 
                                         </td>
@@ -1400,17 +1261,13 @@
 
                                 @endforeach
 
-
                             </tbody>
-
 
                         </table>
 
                     </div>
 
-
                 @else
-
 
                     <!-- EMPTY -->
 
@@ -1422,11 +1279,9 @@
 
                         </div>
 
-
                         <h3>
                             Belum Ada Review
                         </h3>
-
 
                         <p>
 
@@ -1443,15 +1298,11 @@
 
                 @endif
 
-
             </div>
-
 
         </section>
 
-
     </main>
-
 
 </body>
 

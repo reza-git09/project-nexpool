@@ -8,7 +8,7 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <title>Edit Review - NEXPOOL</title>
+    <title>Detail Review - NEXPOOL</title>
 
     <style>
         * {
@@ -226,44 +226,6 @@
             max-width: 1700px;
         }
 
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-        .page-title {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .page-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 13px;
-            background: linear-gradient(135deg, #fef3c7, #fffbeb);
-            color: #eab308;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 19px;
-        }
-
-        .page-header h1 {
-            font-size: 25px;
-            color: #172033;
-            margin-bottom: 6px;
-        }
-
-        .page-header p {
-            color: #7b8494;
-            font-size: 13px;
-        }
-
-        /* ================= BACK BUTTON ================= */
-
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -282,9 +244,44 @@
             background: #dce3ed;
         }
 
-        /* ================= FORM CARD ================= */
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-        .form-card {
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .page-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+        }
+
+        .page-header h1 {
+            font-size: 25px;
+            color: #172033;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #7b8494;
+            font-size: 13px;
+        }
+
+        /* ================= DETAIL CARD ================= */
+
+        .detail-card {
             background: white;
             border: 1px solid #e8ecf3;
             border-radius: 16px;
@@ -293,98 +290,162 @@
             box-shadow: 0 3px 12px rgba(15, 23, 42, .025);
         }
 
-        .form-grid {
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .detail-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .detail-header h3 {
+            font-size: 15px;
+            color: #172033;
+        }
+
+        .detail-header p {
+            font-size: 11px;
+            color: #7b8494;
+            margin-top: 3px;
+        }
+
+        /* ================= DETAIL ROW ================= */
+
+        .detail-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 18px 20px;
         }
 
-        .form-group {
-            margin-bottom: 0;
+        .detail-item {
+            background: #f8fafc;
+            border: 1px solid #edf0f5;
+            border-radius: 10px;
+            padding: 14px;
         }
 
-        .form-group.full {
+        .detail-item.full {
             grid-column: span 2;
         }
 
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: bold;
-            color: #172033;
-            margin-bottom: 7px;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 11px 13px;
-            border: 1px solid #d9dee7;
-            border-radius: 9px;
-            font-size: 12px;
-            color: #172033;
-            outline: none;
-            background: white;
-            transition: .2s ease;
-        }
-
-        .form-group input,
-        .form-group select {
-            height: 44px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-            line-height: 1.5;
-        }
-
-        /* ================= INFO REVIEW ================= */
-
-        .review-info {
-            background: #f8fafc;
-            border: 1px solid #e8ecf3;
-            border-radius: 10px;
-            padding: 13px 15px;
-            margin-bottom: 20px;
-        }
-
-        .review-info-title {
-            font-size: 11px;
-            font-weight: bold;
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
             color: #64748b;
-            margin-bottom: 5px;
-        }
-
-        .review-info-text {
-            font-size: 12px;
-            color: #172033;
-        }
-
-        /* ================= ERROR ================= */
-
-        .error-box {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 13px 15px;
-            border-radius: 9px;
-            margin-bottom: 20px;
             font-size: 11px;
-            border: 1px solid #fecaca;
+            font-weight: bold;
+            margin-bottom: 8px;
         }
 
-        .error-box strong {
-            display: block;
-            margin-bottom: 5px;
+        .detail-label i {
+            color: #2563eb;
             font-size: 12px;
+        }
+
+        .detail-value {
+            color: #172033;
+            font-size: 13px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .empty-text {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* ================= RATING ================= */
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .rating i {
+            color: #f59e0b;
+            font-size: 15px;
+        }
+
+        .rating-number {
+            margin-left: 7px;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-menunggu {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .status-dibalas {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        /* ================= PHOTO ================= */
+
+        .photo-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .photo-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #172033;
+            margin-bottom: 12px;
+        }
+
+        .photo-title i {
+            color: #2563eb;
+        }
+
+        .photo-empty {
+            background: #f8fafc;
+            border: 1px dashed #d9dee7;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        .photo-empty i {
+            display: block;
+            font-size: 25px;
+            margin-bottom: 8px;
+            color: #cbd5e1;
         }
 
         /* ================= BUTTON ================= */
@@ -475,11 +536,11 @@
                 padding: 25px 20px;
             }
 
-            .form-grid {
+            .detail-grid {
                 grid-template-columns: 1fr;
             }
 
-            .form-group.full {
+            .detail-item.full {
                 grid-column: span 1;
             }
 
@@ -493,7 +554,7 @@
                 padding: 20px 15px;
             }
 
-            .form-card {
+            .detail-card {
                 padding: 20px;
             }
 
@@ -503,10 +564,6 @@
 
             .btn {
                 width: 100%;
-            }
-
-            .page-title {
-                align-items: flex-start;
             }
         }
     </style>
@@ -567,15 +624,15 @@
 
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main class="main">
 
         <!-- HEADER -->
         <header class="header">
 
             <div class="header-left">
-                <h3>Edit Review</h3>
-                <p>Kelola balasan review pengunjung NEXPOOL</p>
+                <h3>Detail Review</h3>
+                <p>Melihat detail review pengunjung NEXPOOL</p>
             </div>
 
             <div class="admin-info">
@@ -596,7 +653,7 @@
         <!-- CONTENT -->
         <section class="content">
 
-            <!-- TOMBOL KEMBALI -->
+            <!-- KEMBALI -->
             <a href="{{ route('review.index') }}" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali ke Review
@@ -612,104 +669,211 @@
                     </div>
 
                     <div>
-                        <h1>Edit Review</h1>
-                        <p>Perbarui balasan admin dan status review pengunjung.</p>
+                        <h1>Detail Review</h1>
+                        <p>Informasi lengkap review dan penilaian dari pengunjung.</p>
                     </div>
 
                 </div>
 
             </div>
 
-            <!-- FORM CARD -->
-            <div class="form-card">
+            <!-- DETAIL CARD -->
+            <div class="detail-card">
 
-                @if ($errors->any())
-                    <div class="error-box">
-                        <strong>Terjadi kesalahan:</strong>
+                <div class="detail-header">
 
-                        @foreach ($errors->all() as $error)
-                            <div>{{ $error }}</div>
-                        @endforeach
-                    </div>
-                @endif
-
-                <!-- INFO REVIEW -->
-                <div class="review-info">
-                    <div class="review-info-title">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Informasi Review
+                    <div class="detail-icon">
+                        <i class="fa-solid fa-comment-dots"></i>
                     </div>
 
-                    <div class="review-info-text">
-                        Balasan admin dan status dapat diperbarui dari halaman ini.
+                    <div>
+                        <h3>Informasi Review</h3>
+                        <p>Detail data review yang diberikan oleh pengunjung.</p>
                     </div>
+
                 </div>
 
-                <form action="{{ route('review.update', $review->id) }}" method="POST">
+                <div class="detail-grid">
 
-                    @csrf
-                    @method('PUT')
+                    <!-- NAMA PENGUNJUNG -->
+                    <div class="detail-item">
 
-                    <div class="form-grid">
-
-                        <!-- BALASAN ADMIN -->
-                        <div class="form-group full">
-
-                            <label>Balasan Admin</label>
-
-                            <textarea
-                                name="balasan_admin"
-                                placeholder="Tuliskan balasan admin kepada pengunjung..."
-                            >{{ old('balasan_admin', $review->balasan_admin) }}</textarea>
-
-                            @error('balasan_admin')
-                                <div class="error-box" style="margin-top:7px;margin-bottom:0;">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-
+                        <div class="detail-label">
+                            <i class="fa-solid fa-user"></i>
+                            Nama Pengunjung
                         </div>
 
-                        <!-- STATUS -->
-                        <div class="form-group full">
+                        <div class="detail-value">
+                            {{ $review->nama_pengunjung }}
+                        </div>
 
-                            <label>Status</label>
+                    </div>
 
-                            <select name="status" required>
+                    <!-- POOL -->
+                    <div class="detail-item">
 
-                                <option value="Menunggu"
-                                    {{ old('status', $review->status) == 'Menunggu' ? 'selected' : '' }}>
-                                    Menunggu
-                                </option>
+                        <div class="detail-label">
+                            <i class="fa-solid fa-person-swimming"></i>
+                            Kolam Renang
+                        </div>
 
-                                <option value="Dibalas"
-                                    {{ old('status', $review->status) == 'Dibalas' ? 'selected' : '' }}>
-                                    Dibalas
-                                </option>
+                        <div class="detail-value">
+                            {{ $review->pool_id }}
+                        </div>
 
-                            </select>
+                    </div>
 
-                            @error('status')
-                                <div class="error-box" style="margin-top:7px;margin-bottom:0;">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                    <!-- RATING -->
+                    <div class="detail-item">
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-star"></i>
+                            Rating
+                        </div>
+
+                        <div class="rating">
+
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= $review->rating)
+                                    <i class="fa-solid fa-star"></i>
+                                @else
+                                    <i class="fa-regular fa-star"></i>
+                                @endif
+                            @endfor
+
+                            <span class="rating-number">
+                                ({{ $review->rating }}/5)
+                            </span>
 
                         </div>
 
                     </div>
 
-                    <!-- BUTTON -->
-                    <div class="buttons">
+                    <!-- STATUS -->
+                    <div class="detail-item">
 
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            Update Review
-                        </button>
+                        <div class="detail-label">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Status
+                        </div>
+
+                        @if ($review->status === 'Dibalas')
+
+                            <span class="status status-dibalas">
+                                <i class="fa-solid fa-check"></i>
+                                Dibalas
+                            </span>
+
+                        @else
+
+                            <span class="status status-menunggu">
+                                <i class="fa-solid fa-clock"></i>
+                                Menunggu
+                            </span>
+
+                        @endif
 
                     </div>
 
-                </form>
+                    <!-- KOMENTAR -->
+                    <div class="detail-item full">
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-comment"></i>
+                            Komentar Pengunjung
+                        </div>
+
+                        <div class="detail-value">
+
+                            @if ($review->komentar)
+                                {{ $review->komentar }}
+                            @else
+                                <span class="empty-text">
+                                    Tidak ada komentar dari pengunjung.
+                                </span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                    <!-- BALASAN ADMIN -->
+                    <div class="detail-item full">
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-reply"></i>
+                            Balasan Admin
+                        </div>
+
+                        <div class="detail-value">
+
+                            @if ($review->balasan_admin)
+                                {{ $review->balasan_admin }}
+                            @else
+                                <span class="empty-text">
+                                    Belum ada balasan dari admin.
+                                </span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                    <!-- TANGGAL -->
+                    <div class="detail-item">
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-calendar"></i>
+                            Tanggal Review
+                        </div>
+
+                        <div class="detail-value">
+                            {{ $review->created_at ? $review->created_at->format('d M Y, H:i') : '-' }}
+                        </div>
+
+                    </div>
+
+                    <!-- ID REVIEW -->
+                    <div class="detail-item">
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-hashtag"></i>
+                            ID Review
+                        </div>
+
+                        <div class="detail-value">
+                            #{{ $review->id }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FOTO REVIEW -->
+                <div class="photo-section">
+
+                    <div class="photo-title">
+                        <i class="fa-solid fa-image"></i>
+                        Foto Review
+                    </div>
+
+                    <div class="photo-empty">
+                        <i class="fa-regular fa-image"></i>
+                        Belum ada foto yang diunggah pada review ini.
+                    </div>
+
+                </div>
+
+                <!-- BUTTON -->
+                <div class="buttons">
+
+                    <a href="{{ route('review.edit', $review->id) }}"
+                        class="btn btn-primary">
+                        <i class="fa-solid fa-reply"></i>
+                        Balas / Ubah Balasan
+                    </a>
+
+                </div>
 
             </div>
 
@@ -718,4 +882,5 @@
     </main>
 
 </body>
+
 </html>
