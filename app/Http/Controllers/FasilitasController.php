@@ -9,9 +9,67 @@ use Illuminate\Validation\Rule;
 
 class FasilitasController extends Controller
 {
+    /* ---------- HELPER ---------- */
+
+    private function poolId(): int
+    {
+        return (int) session('admin_pool_id');
+    }
+
+    private function authorizePool(Fasilitas $fasilita): void
+    {
+        if ((int) $fasilita->pool_id !== $this->poolId()) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+    }
+
+    private function rules(?int $ignoreId = null): array
+    {
+        $unique = Rule::unique('fasilitas', 'nama_fasilitas')
+            ->where(fn ($q) => $q->where('pool_id', $this->poolId()));
+
+        if ($ignoreId) {
+            $unique->ignore($ignoreId);
+        }
+
+        return [
+            'nama_fasilitas' => [
+                'required',
+                'string',
+                'regex:/^[a-zA-Z\s]+$/',
+                'max:255',
+                $unique,
+            ],
+            'deskripsi' => ['required', 'string'],
+            'gambar'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ];
+    }
+
+    private function messages(): array
+    {
+        return [
+            'nama_fasilitas.required' => 'Nama fasilitas wajib diisi.',
+            'nama_fasilitas.regex'    => 'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
+            'nama_fasilitas.unique'   => 'Nama fasilitas ini sudah ada di kolam renang ini, tidak boleh sama.',
+            'deskripsi.required'      => 'Deskripsi wajib diisi.',
+            'gambar.image'            => 'File yang dipilih harus berupa gambar.',
+            'gambar.mimes'            => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'gambar.max'              => 'Ukuran gambar maksimal 2 MB.',
+        ];
+    }
+
+    private function deleteImage(?string $path): void
+    {
+        if (!empty($path) && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+    /* ---------- CRUD ---------- */
+
     public function index()
     {
-        $fasilitas = Fasilitas::where('pool_id', session('admin_pool_id'))
+        $fasilitas = Fasilitas::where('pool_id', $this->poolId())
             ->orderBy('nama_fasilitas')
             ->get();
 
@@ -25,77 +83,18 @@ class FasilitasController extends Controller
 
     public function store(Request $request)
     {
-        $poolId = session('admin_pool_id');
+        $request->validate($this->rules(), $this->messages());
 
-        $request->validate([
-            'nama_fasilitas' => [
-                'required',
-                'string',
-                'regex:/^[a-zA-Z\s]+$/',
-                'max:255',
-
-                Rule::unique('fasilitas', 'nama_fasilitas')
-                    ->where(function ($query) use ($poolId) {
-                        return $query->where('pool_id', $poolId);
-                    }),
-            ],
-
-            'deskripsi' => 'required|string',
-
-            'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-
-            'status' => 'required|boolean',
-        ], [
-            'nama_fasilitas.required' =>
-                'Nama fasilitas wajib diisi.',
-
-            'nama_fasilitas.regex' =>
-                'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
-
-            'nama_fasilitas.unique' =>
-                'Nama fasilitas ini sudah ada di kolam renang ini, tidak boleh sama.',
-
-            'deskripsi.required' =>
-                'Deskripsi wajib diisi.',
-
-            'gambar.image' =>
-                'File yang dipilih harus berupa gambar.',
-
-            'gambar.mimes' =>
-                'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
-
-            'gambar.max' =>
-                'Ukuran gambar maksimal 2 MB.',
-
-            'status.required' =>
-                'Status fasilitas wajib dipilih.',
-        ]);
-
-        $gambar = null;
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPLOAD GAMBAR BARU
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->hasFile('gambar')) {
-            $gambar = $request->file('gambar')
-                ->store('fasilitas', 'public');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN DATA FASILITAS
-        |--------------------------------------------------------------------------
-        */
+        $gambar = $request->hasFile('gambar')
+            ? $request->file('gambar')->store('fasilitas', 'public')
+            : null;
 
         Fasilitas::create([
-            'pool_id' => $poolId,
+            'pool_id'        => $this->poolId(),
             'nama_fasilitas' => $request->nama_fasilitas,
-            'deskripsi' => $request->deskripsi,
-            'gambar' => $gambar,
-            'status' => $request->status,
+            'deskripsi'      => $request->deskripsi,
+            'gambar'         => $gambar,
+            'status'         => 1,
         ]);
 
         return redirect()
@@ -105,149 +104,36 @@ class FasilitasController extends Controller
 
     public function show(Fasilitas $fasilita)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK AKSES POOL
-        |--------------------------------------------------------------------------
-        */
-
-        if ($fasilita->pool_id !== session('admin_pool_id')) {
-            abort(403, 'Anda tidak memiliki akses ke data ini.');
-        }
+        $this->authorizePool($fasilita);
 
         return view('fasilitas.show', compact('fasilita'));
     }
 
     public function edit(Fasilitas $fasilita)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK AKSES POOL
-        |--------------------------------------------------------------------------
-        */
-
-        if ($fasilita->pool_id !== session('admin_pool_id')) {
-            abort(403, 'Anda tidak memiliki akses ke data ini.');
-        }
+        $this->authorizePool($fasilita);
 
         return view('fasilitas.edit', compact('fasilita'));
     }
 
     public function update(Request $request, Fasilitas $fasilita)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK AKSES POOL
-        |--------------------------------------------------------------------------
-        */
+        $this->authorizePool($fasilita);
 
-        if ($fasilita->pool_id !== session('admin_pool_id')) {
-            abort(403, 'Anda tidak memiliki akses ke data ini.');
-        }
-
-        $poolId = session('admin_pool_id');
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI DATA
-        |--------------------------------------------------------------------------
-        |
-        | Pada halaman edit yang kamu kirim tidak ada input status.
-        | Jadi status tidak divalidasi dari request.
-        |
-        */
-
-        $request->validate([
-            'nama_fasilitas' => [
-                'required',
-                'string',
-                'regex:/^[a-zA-Z\s]+$/',
-                'max:255',
-
-                Rule::unique('fasilitas', 'nama_fasilitas')
-                    ->where(function ($query) use ($poolId) {
-                        return $query->where('pool_id', $poolId);
-                    })
-                    ->ignore($fasilita->id),
-            ],
-
-            'deskripsi' => 'required|string',
-
-            'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ], [
-            'nama_fasilitas.required' =>
-                'Nama fasilitas wajib diisi.',
-
-            'nama_fasilitas.regex' =>
-                'Nama fasilitas hanya boleh berisi huruf dan spasi (tidak boleh menggunakan angka atau simbol).',
-
-            'nama_fasilitas.unique' =>
-                'Nama fasilitas ini sudah ada di kolam renang ini, tidak boleh sama.',
-
-            'deskripsi.required' =>
-                'Deskripsi wajib diisi.',
-
-            'gambar.image' =>
-                'File yang dipilih harus berupa gambar.',
-
-            'gambar.mimes' =>
-                'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
-
-            'gambar.max' =>
-                'Ukuran gambar maksimal 2 MB.',
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN GAMBAR LAMA
-        |--------------------------------------------------------------------------
-        */
+        $request->validate($this->rules($fasilita->id), $this->messages());
 
         $gambar = $fasilita->gambar;
 
-        /*
-        |--------------------------------------------------------------------------
-        | JIKA USER MEMILIH GAMBAR BARU
-        |--------------------------------------------------------------------------
-        */
-
         if ($request->hasFile('gambar')) {
-
-            // Hapus gambar lama jika memang ada
-            if (
-                !empty($fasilita->gambar) &&
-                Storage::disk('public')->exists($fasilita->gambar)
-            ) {
-                Storage::disk('public')->delete(
-                    $fasilita->gambar
-                );
-            }
-
-            // Simpan gambar baru
-            $gambar = $request->file('gambar')
-                ->store('fasilitas', 'public');
+            $this->deleteImage($fasilita->gambar);
+            $gambar = $request->file('gambar')->store('fasilitas', 'public');
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE DATA
-        |--------------------------------------------------------------------------
-        */
 
         $fasilita->update([
             'nama_fasilitas' => $request->nama_fasilitas,
-            'deskripsi' => $request->deskripsi,
-            'gambar' => $gambar,
-
-            // Status lama tetap dipertahankan
-            'status' => $fasilita->status,
+            'deskripsi'      => $request->deskripsi,
+            'gambar'         => $gambar,
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
 
         return redirect()
             ->route('fasilitas.index')
@@ -256,37 +142,9 @@ class FasilitasController extends Controller
 
     public function destroy(Fasilitas $fasilita)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK AKSES POOL
-        |--------------------------------------------------------------------------
-        */
+        $this->authorizePool($fasilita);
 
-        if ($fasilita->pool_id !== session('admin_pool_id')) {
-            abort(403, 'Anda tidak memiliki akses ke data ini.');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | HAPUS GAMBAR
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            !empty($fasilita->gambar) &&
-            Storage::disk('public')->exists($fasilita->gambar)
-        ) {
-            Storage::disk('public')->delete(
-                $fasilita->gambar
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | HAPUS DATA
-        |--------------------------------------------------------------------------
-        */
-
+        $this->deleteImage($fasilita->gambar);
         $fasilita->delete();
 
         return redirect()
