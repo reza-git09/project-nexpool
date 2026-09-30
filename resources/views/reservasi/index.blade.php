@@ -11,6 +11,7 @@
     <title>Reservasi - NEXPOOL</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -56,12 +57,8 @@
 
         .logo {
             padding: 6px 10px 28px;
-
-            border-bottom:
-                1px solid rgba(255,255,255,0.08);
-
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             margin-bottom: 25px;
-
             text-align: center;
         }
 
@@ -639,6 +636,9 @@
 
             text-decoration: none;
 
+            border: none;
+            cursor: pointer;
+
             transition:
                 background 0.2s ease,
                 transform 0.2s ease;
@@ -701,6 +701,332 @@
         .empty p {
             font-size: 11px;
             color: #94a3b8;
+        }
+
+        /* =====================================================
+           MODAL / POPUP DETAIL RESERVASI
+        ===================================================== */
+
+        .modal {
+            display: none;
+
+            position: fixed;
+            z-index: 5000;
+
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: rgba(15, 23, 42, 0.55);
+
+            backdrop-filter: blur(4px);
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 720px;
+
+            max-height: 90vh;
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 25px 60px rgba(15,23,42,0.25);
+
+            animation: modalShow 0.2s ease;
+        }
+
+        @keyframes modalShow {
+
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+        }
+
+        /* MODAL HEADER */
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 20px 24px;
+
+            border-bottom:
+                1px solid #eef1f5;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 11px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #dbeafe,
+                    #eff6ff
+                );
+
+            color: #2563eb;
+
+            font-size: 17px;
+        }
+
+        .modal-title h2 {
+            font-size: 17px;
+            color: #172033;
+        }
+
+        .modal-title p {
+            margin-top: 3px;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #f1f5f9;
+
+            color: #64748b;
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* MODAL BODY */
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-grid {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 13px;
+        }
+
+        .modal-item {
+            background: #f8fafc;
+
+            border:
+                1px solid #e8ecf3;
+
+            border-radius: 11px;
+
+            padding: 14px;
+        }
+
+        .modal-item.full {
+            grid-column: span 2;
+        }
+
+        .modal-label {
+            display: flex;
+            align-items: center;
+
+            gap: 7px;
+
+            margin-bottom: 7px;
+
+            color: #64748b;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+        .modal-label i {
+            width: 15px;
+
+            color: #2563eb;
+
+            text-align: center;
+        }
+
+        .modal-value {
+            color: #172033;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            word-break: break-word;
+        }
+
+        /* TICKET */
+
+        .modal-ticket {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 8px;
+        }
+
+        .ticket-box {
+            background: white;
+
+            border:
+                1px solid #e2e8f0;
+
+            border-radius: 8px;
+
+            padding: 10px;
+        }
+
+        .ticket-box span {
+            display: block;
+
+            font-size: 9px;
+
+            color: #94a3b8;
+
+            margin-bottom: 4px;
+        }
+
+        .ticket-box strong {
+            font-size: 13px;
+
+            color: #172033;
+        }
+
+        /* TOTAL */
+
+        .modal-total {
+            background:
+                linear-gradient(
+                    135deg,
+                    #eff6ff,
+                    #f0f9ff
+                );
+
+            border:
+                1px solid #bfdbfe;
+        }
+
+        .modal-total .modal-label i {
+            color: #0ea5e9;
+        }
+
+        .total-price {
+            color: #0f6fc0;
+
+            font-size: 20px;
+
+            font-weight: 800;
+        }
+
+        /* MODAL FOOTER */
+
+        .modal-footer {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 8px;
+
+            padding: 17px 24px;
+
+            border-top:
+                1px solid #eef1f5;
+        }
+
+        .modal-btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            padding: 9px 14px;
+
+            border-radius: 8px;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            border: none;
+        }
+
+        .modal-btn-close {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .modal-btn-close:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-btn-edit {
+            background: #2563eb;
+            color: white;
+        }
+
+        .modal-btn-edit:hover {
+            background: #1d4ed8;
         }
 
         /* =========================
@@ -792,7 +1118,41 @@
             .table-top {
                 padding: 16px;
             }
+
+            .modal {
+                padding: 12px;
+            }
+
+            .modal-content {
+                max-height: 94vh;
+                border-radius: 15px;
+            }
+
+            .modal-header {
+                padding: 16px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-item.full {
+                grid-column: span 1;
+            }
+
+            .modal-ticket {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .modal-footer {
+                padding: 14px 16px;
+            }
         }
+
     </style>
 
 </head>
@@ -947,7 +1307,16 @@
 
                 <div class="avatar">
 
-                    {{ strtoupper(substr(session('admin_pool_nama', 'Admin NEXPOOL'), 0, 1)) }}
+                    {{ strtoupper(
+                        substr(
+                            session(
+                                'admin_pool_nama',
+                                'Admin NEXPOOL'
+                            ),
+                            0,
+                            1
+                        )
+                    ) }}
 
                 </div>
 
@@ -1272,6 +1641,8 @@
 
                                             <div class="actions">
 
+                                                <!-- KELOLA -->
+
                                                 <a
                                                     href="{{ route('reservasi.edit', $item->id) }}"
                                                     class="btn-edit"
@@ -1283,22 +1654,427 @@
 
                                                 </a>
 
-                                                <a
-                                                    href="{{ route('reservasi.show', $item->id) }}"
+
+                                                <!-- DETAIL POPUP -->
+
+                                                <button
+                                                    type="button"
                                                     class="btn-detail"
+                                                    onclick="openReservationModal(
+                                                        '{{ $item->id }}'
+                                                    )"
                                                 >
 
                                                     <i class="fa-solid fa-eye"></i>
 
                                                     Detail
 
-                                                </a>
+                                                </button>
 
                                             </div>
 
                                         </td>
 
                                     </tr>
+
+
+                                    <!-- =================================================
+                                         MODAL DETAIL
+                                    ================================================== -->
+
+                                    <div
+                                        id="reservationModal{{ $item->id }}"
+                                        class="modal"
+                                        onclick="closeReservationModalOutside(
+                                            event,
+                                            '{{ $item->id }}'
+                                        )"
+                                    >
+
+                                        <div
+                                            class="modal-content"
+                                            onclick="event.stopPropagation()"
+                                        >
+
+                                            <!-- MODAL HEADER -->
+
+                                            <div class="modal-header">
+
+                                                <div class="modal-title">
+
+                                                    <div class="modal-icon">
+
+                                                        <i class="fa-solid fa-ticket"></i>
+
+                                                    </div>
+
+                                                    <div>
+
+                                                        <h2>
+                                                            Detail Reservasi
+                                                        </h2>
+
+                                                        <p>
+                                                            Informasi lengkap reservasi pengunjung
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    class="modal-close"
+                                                    onclick="closeReservationModal(
+                                                        '{{ $item->id }}'
+                                                    )"
+                                                >
+
+                                                    <i class="fa-solid fa-xmark"></i>
+
+                                                </button>
+
+                                            </div>
+
+
+                                            <!-- MODAL BODY -->
+
+                                            <div class="modal-body">
+
+                                                <div class="modal-grid">
+
+                                                    <!-- KODE -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-hashtag"></i>
+
+                                                            Kode Reservasi
+
+                                                        </div>
+
+                                                        <div class="modal-value">
+
+                                                            {{ $item->kode_reservasi ?? '-' }}
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- NAMA -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-user"></i>
+
+                                                            Nama Pengunjung
+
+                                                        </div>
+
+                                                        <div class="modal-value">
+
+                                                            {{ $item->nama_pengunjung ?? '-' }}
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- NO HP -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-phone"></i>
+
+                                                            No. HP
+
+                                                        </div>
+
+                                                        <div class="modal-value">
+
+                                                            {{ $item->no_hp ?? '-' }}
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- KOLAM -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-person-swimming"></i>
+
+                                                            Kolam Renang
+
+                                                        </div>
+
+                                                        <div class="modal-value">
+
+                                                            {{ session(
+                                                                'admin_pool_nama',
+                                                                'Kolam Renang'
+                                                            ) }}
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- TANGGAL -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-calendar-days"></i>
+
+                                                            Tanggal Kunjungan
+
+                                                        </div>
+
+                                                        <div class="modal-value">
+
+                                                            @if($item->tanggal_kunjungan)
+
+                                                                {{ $item->tanggal_kunjungan->format('d-m-Y') }}
+
+                                                            @else
+
+                                                                -
+
+                                                            @endif
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- STATUS -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-circle-check"></i>
+
+                                                            Status Reservasi
+
+                                                        </div>
+
+
+                                                        @if($item->status_reservasi === 'Menunggu')
+
+                                                            <span class="badge badge-menunggu">
+
+                                                                <i class="fa-solid fa-clock"></i>
+
+                                                                Menunggu
+
+                                                            </span>
+
+                                                        @elseif($item->status_reservasi === 'Dikonfirmasi')
+
+                                                            <span class="badge badge-dikonfirmasi">
+
+                                                                <i class="fa-solid fa-check"></i>
+
+                                                                Dikonfirmasi
+
+                                                            </span>
+
+                                                        @elseif($item->status_reservasi === 'Selesai')
+
+                                                            <span class="badge badge-selesai">
+
+                                                                <i class="fa-solid fa-circle-check"></i>
+
+                                                                Selesai
+
+                                                            </span>
+
+                                                        @elseif($item->status_reservasi === 'Dibatalkan')
+
+                                                            <span class="badge badge-dibatalkan">
+
+                                                                <i class="fa-solid fa-xmark"></i>
+
+                                                                Dibatalkan
+
+                                                            </span>
+
+                                                        @else
+
+                                                            <span class="badge badge-default">
+
+                                                                {{ $item->status_reservasi ?? 'Tidak diketahui' }}
+
+                                                            </span>
+
+                                                        @endif
+
+                                                    </div>
+
+
+                                                    <!-- JUMLAH TIKET -->
+
+                                                    <div class="modal-item">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-users"></i>
+
+                                                            Jumlah Tiket
+
+                                                        </div>
+
+                                                        <div class="modal-ticket">
+
+                                                            <div class="ticket-box">
+
+                                                                <span>
+                                                                    Dewasa
+                                                                </span>
+
+                                                                <strong>
+
+                                                                    {{ $item->jumlah_dewasa ?? 0 }}
+
+                                                                    Tiket
+
+                                                                </strong>
+
+                                                            </div>
+
+                                                            <div class="ticket-box">
+
+                                                                <span>
+                                                                    Anak
+                                                                </span>
+
+                                                                <strong>
+
+                                                                    {{ $item->jumlah_anak ?? 0 }}
+
+                                                                    Tiket
+
+                                                                </strong>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- TOTAL -->
+
+                                                    <div class="modal-item modal-total">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-money-bill-wave"></i>
+
+                                                            Total Pembayaran
+
+                                                        </div>
+
+                                                        <div class="total-price">
+
+                                                            Rp{{ number_format(
+                                                                $item->total_harga ?? 0,
+                                                                0,
+                                                                ',',
+                                                                '.'
+                                                            ) }}
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- INFO -->
+
+                                                    <div class="modal-item full">
+
+                                                        <div class="modal-label">
+
+                                                            <i class="fa-solid fa-circle-info"></i>
+
+                                                            Informasi
+
+                                                        </div>
+
+                                                        <div class="modal-value"
+                                                            style="
+                                                                font-size:11px;
+                                                                font-weight:500;
+                                                                line-height:1.6;
+                                                                color:#64748b;
+                                                            ">
+
+                                                            Data reservasi berasal dari
+                                                            aplikasi mobile NEXPOOL.
+                                                            Admin dapat memeriksa dan
+                                                            memperbarui status reservasi
+                                                            melalui menu Kelola.
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- MODAL FOOTER -->
+
+                                            <div class="modal-footer">
+
+                                                <button
+                                                    type="button"
+                                                    class="modal-btn modal-btn-close"
+                                                    onclick="closeReservationModal(
+                                                        '{{ $item->id }}'
+                                                    )"
+                                                >
+
+                                                    <i class="fa-solid fa-xmark"></i>
+
+                                                    Tutup
+
+                                                </button>
+
+
+                                                <a
+                                                    href="{{ route(
+                                                        'reservasi.edit',
+                                                        $item->id
+                                                    ) }}"
+                                                    class="modal-btn modal-btn-edit"
+                                                >
+
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+
+                                                    Kelola Status
+
+                                                </a>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
 
                                 @endforeach
 
@@ -1329,7 +2105,10 @@
                             Belum ada reservasi yang masuk dari aplikasi mobile
                             untuk
                             <strong>
-                                {{ session('admin_pool_nama', 'kolam ini') }}
+                                {{ session(
+                                    'admin_pool_nama',
+                                    'kolam ini'
+                                ) }}
                             </strong>.
 
                         </p>
@@ -1343,6 +2122,86 @@
         </section>
 
     </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT MODAL
+    ====================================================== -->
+
+    <script>
+
+        function openReservationModal(id) {
+
+            const modal =
+                document.getElementById(
+                    'reservationModal' + id
+                );
+
+            if (modal) {
+
+                modal.classList.add('show');
+
+                document.body.style.overflow = 'hidden';
+
+            }
+
+        }
+
+
+        function closeReservationModal(id) {
+
+            const modal =
+                document.getElementById(
+                    'reservationModal' + id
+                );
+
+            if (modal) {
+
+                modal.classList.remove('show');
+
+                document.body.style.overflow = '';
+
+            }
+
+        }
+
+
+        function closeReservationModalOutside(event, id) {
+
+            if (event.target === event.currentTarget) {
+
+                closeReservationModal(id);
+
+            }
+
+        }
+
+
+        /* Tutup popup dengan tombol ESC */
+
+        document.addEventListener(
+            'keydown',
+            function(event) {
+
+                if (event.key === 'Escape') {
+
+                    const modals =
+                        document.querySelectorAll('.modal.show');
+
+                    modals.forEach(function(modal) {
+
+                        modal.classList.remove('show');
+
+                    });
+
+                    document.body.style.overflow = '';
+
+                }
+
+            }
+        );
+
+    </script>
 
 </body>
 

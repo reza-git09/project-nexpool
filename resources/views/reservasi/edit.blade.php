@@ -1,10 +1,14 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <title>Edit Reservasi - NEXPOOL</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <title>Pantau Reservasi - NEXPOOL</title>
 
     <style>
         * {
@@ -19,6 +23,7 @@
             color: #1f2937;
         }
 
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
             left: 0;
@@ -84,6 +89,7 @@
             font-size: 14px;
         }
 
+        /* MAIN */
         .main {
             margin-left: 240px;
             min-height: 100vh;
@@ -106,7 +112,7 @@
             padding: 30px;
         }
 
-        /* Back Button Style di Kiri Atas */
+        /* BACK BUTTON */
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -125,6 +131,7 @@
             background: #d1d5db;
         }
 
+        /* PAGE HEADER */
         .page-header {
             margin-bottom: 25px;
         }
@@ -139,6 +146,7 @@
             font-size: 14px;
         }
 
+        /* FORM CARD */
         .form-card {
             background: white;
             border: 1px solid #e8ebf0;
@@ -168,8 +176,8 @@
             margin-bottom: 8px;
         }
 
+        /* INPUT READONLY */
         .form-group input,
-        .form-group textarea,
         .form-group select {
             width: 100%;
             padding: 12px 14px;
@@ -180,12 +188,32 @@
             background: white;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
+        .form-group input[readonly] {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
         .form-group select:focus {
             border-color: #2563eb;
         }
 
+        /* INFO */
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+
+        .info-box i {
+            margin-right: 7px;
+        }
+
+        /* ERROR */
         .error-box {
             background: #fee2e2;
             color: #dc2626;
@@ -200,6 +228,7 @@
             margin-bottom: 5px;
         }
 
+        /* BUTTON */
         .buttons {
             display: flex;
             gap: 10px;
@@ -227,12 +256,29 @@
             background: #1d4ed8;
         }
 
+        /* STATUS INFO */
+        .status-note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 800px) {
             .form-grid {
                 grid-template-columns: 1fr;
             }
+
             .form-group.full {
                 grid-column: span 1;
+            }
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
             }
         }
     </style>
@@ -242,191 +288,329 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
+
         <div class="logo">
             <h2>NEXPOOL</h2>
             <p>ADMINISTRATOR</p>
         </div>
 
-        <div class="menu-title">Menu Utama</div>
+        <div class="menu-title">
+            Menu Utama
+        </div>
 
         <div class="menu">
+
+            <!-- DASHBOARD -->
             <a href="{{ route('dashboard') }}">
-                <i class="fa-solid fa-gauge-high" style="color:#3b82f6;width:18px;text-align:center;font-size:15px;"></i> <span>Dashboard</span>
+                <i class="fa-solid fa-gauge-high"
+                   style="color:#3b82f6;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Dashboard</span>
             </a>
 
+            <!-- MANAJEMEN TIKET -->
             <a href="{{ route('harga-tiket.index') }}">
-                <i class="fa-solid fa-ticket" style="color:#f59e0b;width:18px;text-align:center;font-size:15px;"></i> <span>Manajemen Tiket</span>
+                <i class="fa-solid fa-ticket"
+                   style="color:#f59e0b;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Manajemen Tiket</span>
             </a>
 
+            <!-- FASILITAS -->
             <a href="{{ route('fasilitas.index') }}">
-                <i class="fa-solid fa-person-swimming" style="color:#06b6d4;width:18px;text-align:center;font-size:15px;"></i> <span>Fasilitas</span>
+                <i class="fa-solid fa-person-swimming"
+                   style="color:#06b6d4;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Fasilitas</span>
             </a>
 
+            <!-- RESERVASI -->
             <a href="{{ route('reservasi.index') }}" class="active">
-                <i class="fa-solid fa-calendar-check" style="color:#10b981;width:18px;text-align:center;font-size:15px;"></i> <span>Reservasi</span>
+                <i class="fa-solid fa-calendar-check"
+                   style="color:#10b981;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Reservasi</span>
             </a>
 
+            <!-- PROMO -->
             <a href="{{ route('promo.index') }}">
-                <i class="fa-solid fa-tags" style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;"></i> <span>Promo</span>
+                <i class="fa-solid fa-tags"
+                   style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Promo</span>
             </a>
 
+            <!-- REVIEW -->
             <a href="{{ route('review.index') }}">
-                <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
+                <i class="fa-solid fa-star"
+                   style="color:#eab308;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Review</span>
             </a>
+
         </div>
 
+        <!-- LOGOUT -->
         <div class="logout">
             <a href="{{ route('logout') }}">
-                <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;width:18px;text-align:center;font-size:15px;"></i> <span>Logout</span>
+                <i class="fa-solid fa-right-from-bracket"
+                   style="color:#ef4444;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Logout</span>
             </a>
         </div>
+
     </aside>
+
 
     <!-- MAIN CONTENT -->
     <main class="main">
 
+        <!-- HEADER -->
         <header class="header">
-            <h3>Edit Reservasi</h3>
+            <h3>Pantau Reservasi</h3>
         </header>
 
+
+        <!-- CONTENT -->
         <section class="content">
 
-            <!-- Tombol Kembali di Kiri Atas -->
+            <!-- BACK -->
             <a href="{{ route('reservasi.index') }}" class="btn-back">
                 &larr; Kembali ke Reservasi
             </a>
 
+
+            <!-- PAGE HEADER -->
             <div class="page-header">
-                <h1>Edit Reservasi</h1>
-                <p>Perbarui data reservasi pengunjung kolam renang.</p>
+
+                <h1>Pantau Reservasi</h1>
+
+                <p>
+                    Pantau data reservasi pengunjung dan ubah status reservasi.
+                </p>
+
             </div>
 
+
+            <!-- FORM CARD -->
             <div class="form-card">
 
+                <!-- INFO -->
+                <div class="info-box">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    Data reservasi hanya dapat dipantau.
+                    Admin hanya dapat mengubah
+                    <strong>status reservasi</strong>.
+
+                </div>
+
+
+                <!-- ERROR -->
                 @if ($errors->any())
+
                     <div class="error-box">
+
                         <strong>Terjadi kesalahan:</strong>
+
                         @foreach ($errors->all() as $error)
+
                             <div>{{ $error }}</div>
+
                         @endforeach
+
                     </div>
+
                 @endif
 
-                <form action="{{ route('reservasi.update', $reservasi->id) }}" method="POST">
+
+                <!-- FORM -->
+                <form
+                    action="{{ route('reservasi.update', $reservasi->id) }}"
+                    method="POST"
+                >
+
                     @csrf
+
                     @method('PUT')
+
 
                     <div class="form-grid">
 
                         <!-- KODE RESERVASI -->
                         <div class="form-group">
-                            <label>Kode Reservasi</label>
+
+                            <label>
+                                Kode Reservasi
+                            </label>
+
                             <input
                                 type="text"
-                                name="kode_reservasi"
-                                value="{{ old('kode_reservasi', $reservasi->kode_reservasi) }}"
-                                required
+                                value="{{ $reservasi->kode_reservasi }}"
+                                readonly
                             >
+
                         </div>
 
-                        <!-- POOL ID -->
-                        <div class="form-group">
-                            <label>Pool ID</label>
-                            <input
-                                type="text"
-                                name="pool_id"
-                                value="{{ old('pool_id', $reservasi->pool_id) }}"
-                                required
-                            >
-                        </div>
 
                         <!-- NAMA PENGUNJUNG -->
                         <div class="form-group">
-                            <label>Nama Pengunjung</label>
+
+                            <label>
+                                Nama Pengunjung
+                            </label>
+
                             <input
                                 type="text"
-                                name="nama_pengunjung"
-                                value="{{ old('nama_pengunjung', $reservasi->nama_pengunjung) }}"
-                                required
+                                value="{{ $reservasi->nama_pengunjung }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- NO HP -->
                         <div class="form-group">
-                            <label>No. HP</label>
+
+                            <label>
+                                No. HP
+                            </label>
+
                             <input
                                 type="text"
-                                name="no_hp"
-                                value="{{ old('no_hp', $reservasi->no_hp) }}"
-                                required
+                                value="{{ $reservasi->no_hp }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- TANGGAL KUNJUNGAN -->
                         <div class="form-group">
-                            <label>Tanggal Kunjungan</label>
+
+                            <label>
+                                Tanggal Kunjungan
+                            </label>
+
                             <input
-                                type="date"
-                                name="tanggal_kunjungan"
-                                value="{{ old('tanggal_kunjungan', optional($reservasi->tanggal_kunjungan)->format('Y-m-d')) }}"
-                                required
+                                type="text"
+                                value="{{ optional($reservasi->tanggal_kunjungan)->format('d/m/Y') }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- TOTAL HARGA -->
                         <div class="form-group">
-                            <label>Total Harga</label>
+
+                            <label>
+                                Total Harga
+                            </label>
+
                             <input
-                                type="number"
-                                name="total_harga"
-                                min="0"
-                                value="{{ old('total_harga', $reservasi->total_harga) }}"
-                                required
+                                type="text"
+                                value="Rp{{ number_format($reservasi->total_harga, 0, ',', '.') }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- JUMLAH DEWASA -->
                         <div class="form-group">
-                            <label>Jumlah Dewasa</label>
+
+                            <label>
+                                Jumlah Dewasa
+                            </label>
+
                             <input
-                                type="number"
-                                name="jumlah_dewasa"
-                                min="0"
-                                value="{{ old('jumlah_dewasa', $reservasi->jumlah_dewasa) }}"
-                                required
+                                type="text"
+                                value="{{ $reservasi->jumlah_dewasa }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- JUMLAH ANAK -->
                         <div class="form-group">
-                            <label>Jumlah Anak</label>
+
+                            <label>
+                                Jumlah Anak
+                            </label>
+
                             <input
-                                type="number"
-                                name="jumlah_anak"
-                                min="0"
-                                value="{{ old('jumlah_anak', $reservasi->jumlah_anak) }}"
-                                required
+                                type="text"
+                                value="{{ $reservasi->jumlah_anak }}"
+                                readonly
                             >
+
                         </div>
+
 
                         <!-- STATUS RESERVASI -->
                         <div class="form-group full">
-                            <label>Status Reservasi</label>
-                            <select name="status_reservasi" required>
-                                <option value="Menunggu" {{ old('status_reservasi', $reservasi->status_reservasi) == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                                <option value="Dikonfirmasi" {{ old('status_reservasi', $reservasi->status_reservasi) == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
-                                <option value="Selesai" {{ old('status_reservasi', $reservasi->status_reservasi) == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                <option value="Dibatalkan" {{ old('status_reservasi', $reservasi->status_reservasi) == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+
+                            <label>
+                                Status Reservasi
+                            </label>
+
+                            <select
+                                name="status_reservasi"
+                                required
+                            >
+
+                                <option
+                                    value="Menunggu"
+                                    {{ old('status_reservasi', $reservasi->status_reservasi) == 'Menunggu' ? 'selected' : '' }}
+                                >
+                                    Menunggu
+                                </option>
+
+                                <option
+                                    value="Dikonfirmasi"
+                                    {{ old('status_reservasi', $reservasi->status_reservasi) == 'Dikonfirmasi' ? 'selected' : '' }}
+                                >
+                                    Dikonfirmasi
+                                </option>
+
+                                <option
+                                    value="Selesai"
+                                    {{ old('status_reservasi', $reservasi->status_reservasi) == 'Selesai' ? 'selected' : '' }}
+                                >
+                                    Selesai
+                                </option>
+
+                               
                             </select>
+
+                            <div class="status-note">
+                                Admin hanya dapat mengubah status reservasi.
+                            </div>
+
                         </div>
 
                     </div>
 
-                    <!-- BUTTONS (Hanya tombol Update saja sekarang karena tombol kembali sudah di atas) -->
+
+                    <!-- BUTTON -->
                     <div class="buttons">
-                        <button type="submit" class="btn btn-primary">
-                            💾 Update Reservasi
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            <i class="fa-solid fa-floppy-disk"
+                               style="margin-right:8px;">
+                            </i>
+
+                            Update Status Reservasi
+
                         </button>
+
                     </div>
 
                 </form>
@@ -439,3 +623,4 @@
 
 </body>
 </html>
+```

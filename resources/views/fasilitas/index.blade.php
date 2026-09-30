@@ -1,3 +1,4 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -751,38 +752,6 @@
         }
 
         /* =========================================================
-           BADGES
-        ========================================================= */
-
-        .badge {
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 5px;
-
-            padding: 6px 9px;
-
-            border-radius: 20px;
-
-            font-size: 10px;
-
-            font-weight: 600;
-        }
-
-        .badge-aktif {
-            background: #dcfce7;
-
-            color: #15803d;
-        }
-
-        .badge-nonaktif {
-            background: #fee2e2;
-
-            color: #dc2626;
-        }
-
-        /* =========================================================
            ACTION
         ========================================================= */
 
@@ -1272,8 +1241,8 @@
 
                     <br>
 
-                    Admin dapat menambahkan nama fasilitas,
-                    deskripsi, dan status fasilitas.
+                    Admin dapat menambahkan nama fasilitas
+                    dan deskripsi fasilitas.
 
                 </div>
 
@@ -1341,10 +1310,6 @@
                                     </th>
 
                                     <th>
-                                        Status
-                                    </th>
-
-                                    <th>
                                         Aksi
                                     </th>
 
@@ -1407,35 +1372,6 @@
                                         <td class="description">
 
                                             {{ $item->deskripsi ?? '-' }}
-
-                                        </td>
-
-
-                                        <!-- STATUS -->
-
-                                        <td>
-
-                                            @if($item->status == 'Aktif' || $item->status == 1)
-
-                                                <span class="badge badge-aktif">
-
-                                                    <i class="fa-solid fa-circle"></i>
-
-                                                    Aktif
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="badge badge-nonaktif">
-
-                                                    <i class="fa-solid fa-circle"></i>
-
-                                                    Tidak Aktif
-
-                                                </span>
-
-                                            @endif
 
                                         </td>
 
@@ -1529,3 +1465,4 @@
 </body>
 
 </html>
+```
