@@ -8,11 +8,14 @@ use Illuminate\Http\Request;
 class ReservasiController extends Controller
 {
     /**
-     * Menampilkan reservasi hanya milik pool admin yang sedang login.
+     * RESERVASI MENUNGGU
      */
     public function index()
     {
-        $reservasi = Reservasi::where('pool_id', session('admin_pool_id'))
+        $poolId = session('admin_pool_id');
+
+        $reservasi = Reservasi::where('pool_id', $poolId)
+            ->where('status_reservasi', 'Menunggu')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -20,12 +23,25 @@ class ReservasiController extends Controller
     }
 
     /**
-     * Menampilkan detail reservasi.
+     * RESERVASI DIKONFIRMASI
+     */
+    public function dikonfirmasi()
+    {
+        $poolId = session('admin_pool_id');
+
+        $reservasi = Reservasi::where('pool_id', $poolId)
+            ->where('status_reservasi', 'Dikonfirmasi')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('reservasi.dikonfirmasi', compact('reservasi'));
+    }
+
+    /**
+     * DETAIL RESERVASI
      */
     public function show(Reservasi $reservasi)
     {
-        // Pastikan reservasi hanya bisa dilihat oleh admin
-        // dari pool yang sesuai.
         if ($reservasi->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
@@ -34,11 +50,10 @@ class ReservasiController extends Controller
     }
 
     /**
-     * Menampilkan form untuk mengubah status reservasi.
+     * EDIT / KELOLA RESERVASI
      */
     public function edit(Reservasi $reservasi)
     {
-        // Pastikan reservasi milik pool admin yang login.
         if ($reservasi->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
@@ -47,27 +62,38 @@ class ReservasiController extends Controller
     }
 
     /**
-     * Memperbarui status reservasi.
-     *
-     * Data reservasi seperti nama pengunjung,
-     * nomor HP, jumlah tiket, dan total harga
-     * tidak diubah oleh admin.
+     * UPDATE STATUS RESERVASI
      */
     public function update(Request $request, Reservasi $reservasi)
     {
-        // Pastikan reservasi milik pool admin yang login.
+        // Cek akses berdasarkan pool admin
         if ($reservasi->pool_id !== session('admin_pool_id')) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
 
-        $request->validate([
-            'status_reservasi' => 'required|in:Menunggu,Dikonfirmasi,Selesai,Dibatalkan',
+        // Validasi status
+        $validated = $request->validate([
+            'status_reservasi' => [
+                'required',
+                'in:Menunggu,Dikonfirmasi,Selesai,Dibatalkan',
+            ],
+        ], [
+            'status_reservasi.required' => 'Status reservasi wajib dipilih.',
+            'status_reservasi.in' => 'Status reservasi tidak valid.',
         ]);
 
-        $reservasi->update([
-            'status_reservasi' => $request->status_reservasi,
-        ]);
+        // Simpan status baru
+        $reservasi->status_reservasi = $validated['status_reservasi'];
+        $reservasi->save();
 
+        // Jika dikonfirmasi
+        if ($reservasi->status_reservasi === 'Dikonfirmasi') {
+            return redirect()
+                ->route('reservasi.dikonfirmasi')
+                ->with('success', 'Reservasi berhasil dikonfirmasi.');
+        }
+
+        // Status selain Dikonfirmasi
         return redirect()
             ->route('reservasi.index')
             ->with('success', 'Status reservasi berhasil diperbarui.');

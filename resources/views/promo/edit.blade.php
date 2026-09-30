@@ -1,16 +1,13 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Edit Promo - NEXPOOL</title>
 
-    <style id="ud7wbj">
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -27,29 +24,23 @@
             text-decoration: none;
         }
 
-        /* ================= SIDEBAR ================= */
-
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             width: 255px;
             height: 100vh;
-            background: linear-gradient(
-                180deg,
-                #101c36 0%,
-                #14213d 55%,
-                #101b32 100%
-            );
+            background: linear-gradient(180deg,#101c36 0%,#14213d 55%,#101b32 100%);
             color: white;
             padding: 24px 16px;
             z-index: 1000;
-            box-shadow: 8px 0 30px rgba(15, 23, 42, .08);
+            box-shadow: 8px 0 30px rgba(15,23,42,.08);
         }
 
         .logo {
             padding: 6px 10px 28px;
-            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            border-bottom: 1px solid rgba(255,255,255,.08);
             margin-bottom: 25px;
             text-align: center;
         }
@@ -95,13 +86,13 @@
 
         .menu a:hover {
             transform: translateX(2px);
-            background: rgba(255, 255, 255, .05);
+            background: rgba(255,255,255,.05);
         }
 
         .menu a.active {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: linear-gradient(135deg,#2563eb,#1d4ed8);
             color: white;
-            box-shadow: 0 6px 18px rgba(37, 99, 235, .25);
+            box-shadow: 0 6px 18px rgba(37,99,235,.25);
         }
 
         .menu a.active::before {
@@ -127,7 +118,7 @@
             left: 16px;
             right: 16px;
             padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, .08);
+            border-top: 1px solid rgba(255,255,255,.08);
         }
 
         .logout a {
@@ -141,7 +132,7 @@
         }
 
         .logout a:hover {
-            background: rgba(255, 255, 255, .05);
+            background: rgba(255,255,255,.05);
         }
 
         .logout a i {
@@ -150,8 +141,7 @@
             font-size: 15px;
         }
 
-        /* ================= MAIN ================= */
-
+        /* MAIN */
         .main {
             margin-left: 255px;
             min-height: 100vh;
@@ -159,7 +149,7 @@
 
         .header {
             height: 76px;
-            background: rgba(255, 255, 255, .96);
+            background: rgba(255,255,255,.96);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
@@ -209,18 +199,17 @@
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            background: linear-gradient(135deg,#2563eb,#38bdf8);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 15px;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(37, 99, 235, .2);
+            box-shadow: 0 5px 15px rgba(37,99,235,.2);
         }
 
-        /* ================= CONTENT ================= */
-
+        /* CONTENT */
         .content {
             padding: 32px;
             max-width: 1700px;
@@ -243,7 +232,7 @@
             width: 48px;
             height: 48px;
             border-radius: 13px;
-            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            background: linear-gradient(135deg,#dbeafe,#eff6ff);
             color: #2563eb;
             display: flex;
             align-items: center;
@@ -262,8 +251,7 @@
             font-size: 13px;
         }
 
-        /* ================= BACK BUTTON ================= */
-
+        /* BACK BUTTON */
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -282,15 +270,14 @@
             background: #dce3ed;
         }
 
-        /* ================= FORM CARD ================= */
-
+        /* FORM */
         .form-card {
             background: white;
             border: 1px solid #e8ecf3;
             border-radius: 16px;
             padding: 25px;
             max-width: 900px;
-            box-shadow: 0 3px 12px rgba(15, 23, 42, .025);
+            box-shadow: 0 3px 12px rgba(15,23,42,.025);
         }
 
         .form-grid {
@@ -338,7 +325,7 @@
         .form-group textarea:focus,
         .form-group select:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.08);
         }
 
         .form-group textarea {
@@ -346,8 +333,6 @@
             resize: vertical;
             line-height: 1.5;
         }
-
-        /* ================= ERROR ================= */
 
         .error-box {
             background: #fee2e2;
@@ -365,8 +350,15 @@
             font-size: 12px;
         }
 
-        /* ================= BUTTON ================= */
+        .field-error {
+            color: #dc2626;
+            font-size: 11px;
+            margin-top: 5px;
+            line-height: 1.4;
+            display: none;
+        }
 
+        /* BUTTON */
         .buttons {
             display: flex;
             gap: 10px;
@@ -388,19 +380,28 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: linear-gradient(135deg,#2563eb,#1d4ed8);
             color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, .18);
+            box-shadow: 0 4px 12px rgba(37,99,235,.18);
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(37, 99, 235, .25);
+            box-shadow: 0 6px 15px rgba(37,99,235,.25);
         }
 
-        /* ================= RESPONSIVE ================= */
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
 
-        @media (max-width: 1000px) {
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width:1000px) {
             .sidebar {
                 width: 220px;
             }
@@ -410,7 +411,7 @@
             }
         }
 
-        @media (max-width: 800px) {
+        @media (max-width:800px) {
             .sidebar {
                 width: 70px;
                 padding: 20px 10px;
@@ -466,7 +467,7 @@
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width:600px) {
             .content {
                 padding: 20px 15px;
             }
@@ -494,7 +495,6 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-
         <div class="logo">
             <h2>NEXPOOL</h2>
             <p>ADMINISTRATOR</p>
@@ -503,7 +503,6 @@
         <div class="menu-title">Menu Utama</div>
 
         <div class="menu">
-
             <a href="{{ route('dashboard') }}">
                 <i class="fa-solid fa-gauge-high" style="color:#3b82f6;"></i>
                 <span>Dashboard</span>
@@ -533,7 +532,6 @@
                 <i class="fa-solid fa-star" style="color:#eab308;"></i>
                 <span>Review</span>
             </a>
-
         </div>
 
         <div class="logout">
@@ -542,22 +540,19 @@
                 <span>Logout</span>
             </a>
         </div>
-
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main class="main">
 
         <!-- HEADER -->
         <header class="header">
-
             <div class="header-left">
                 <h3>Edit Promo</h3>
                 <p>Kelola informasi promo NEXPOOL</p>
             </div>
 
             <div class="admin-info">
-
                 <div class="admin-text">
                     <strong>{{ session('admin_nama', 'Admin NEXPOOL') }}</strong>
                     <span>{{ session('admin_pool_id', 'Pool ID') }}</span>
@@ -566,25 +561,19 @@
                 <div class="avatar">
                     {{ strtoupper(substr(session('admin_nama', 'A'), 0, 1)) }}
                 </div>
-
             </div>
-
         </header>
 
         <!-- CONTENT -->
         <section class="content">
 
-            <!-- TOMBOL KEMBALI -->
             <a href="{{ route('promo.index') }}" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali ke Promo
             </a>
 
-            <!-- PAGE HEADER -->
             <div class="page-header">
-
                 <div class="page-title">
-
                     <div class="page-icon">
                         <i class="fa-solid fa-tags"></i>
                     </div>
@@ -593,52 +582,29 @@
                         <h1>Edit Promo</h1>
                         <p>Perbarui informasi promo dan diskon kolam renang.</p>
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- FORM CARD -->
             <div class="form-card">
 
                 @if ($errors->any())
                     <div class="error-box">
                         <strong>Terjadi kesalahan:</strong>
-
                         @foreach ($errors->all() as $error)
                             <div>{{ $error }}</div>
                         @endforeach
-
                     </div>
                 @endif
 
-                <form action="{{ route('promo.update', $promo->id) }}" method="POST">
-
+                <form id="formPromo" action="{{ route('promo.update', $promo->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
                     <div class="form-grid">
 
-                        <!-- POOL ID -->
-                        <div class="form-group">
-
-                            <label>Pool ID</label>
-
-                            <input
-                                type="text"
-                                name="pool_id"
-                                value="{{ old('pool_id', $promo->pool_id) }}"
-                                placeholder="Contoh: pool_id_01"
-                                required
-                            >
-
-                        </div>
-
                         <!-- NAMA PROMO -->
-                        <div class="form-group">
-
+                        <div class="form-group full">
                             <label>Nama Promo</label>
-
                             <input
                                 type="text"
                                 name="nama_promo"
@@ -646,94 +612,83 @@
                                 placeholder="Masukkan nama promo"
                                 required
                             >
-
                         </div>
 
                         <!-- DESKRIPSI -->
                         <div class="form-group full">
-
                             <label>Deskripsi Promo</label>
-
                             <textarea
                                 name="deskripsi"
                                 placeholder="Tuliskan detail deskripsi promo..."
                             >{{ old('deskripsi', $promo->deskripsi) }}</textarea>
-
                         </div>
 
                         <!-- JENIS DISKON -->
                         <div class="form-group">
-
                             <label>Jenis Diskon</label>
-
                             <select name="jenis_diskon" required>
-
-                                <option value="Persentase"
-                                    {{ old('jenis_diskon', $promo->jenis_diskon) == 'Persentase' ? 'selected' : '' }}>
+                                <option value="Persentase" selected>
                                     Persentase (%)
                                 </option>
-
-                                <option value="Nominal"
-                                    {{ old('jenis_diskon', $promo->jenis_diskon) == 'Nominal' ? 'selected' : '' }}>
-                                    Nominal (Rp)
-                                </option>
-
                             </select>
-
                         </div>
 
                         <!-- NILAI DISKON -->
                         <div class="form-group">
-
                             <label>Nilai Diskon</label>
 
                             <input
                                 type="number"
+                                id="nilai_diskon"
                                 name="nilai_diskon"
                                 value="{{ old('nilai_diskon', $promo->nilai_diskon) }}"
                                 min="0"
-                                step="0.01"
-                                placeholder="Masukkan nilai diskon"
+                                max="100"
+                                step="1"
+                                placeholder="Contoh: 20 (maks. 100%)"
                                 required
+                                oninput="validateDiskon(this)"
+                                onkeydown="blockSymbol(event)"
                             >
 
+                            <div id="error-diskon" class="field-error"></div>
                         </div>
 
                         <!-- TANGGAL MULAI -->
                         <div class="form-group">
-
                             <label>Tanggal Mulai</label>
 
                             <input
                                 type="date"
+                                id="tanggal_mulai"
                                 name="tanggal_mulai"
                                 value="{{ old('tanggal_mulai', optional($promo->tanggal_mulai)->format('Y-m-d')) }}"
                                 required
+                                onchange="validateTanggal()"
                             >
-
                         </div>
 
                         <!-- TANGGAL SELESAI -->
                         <div class="form-group">
-
                             <label>Tanggal Selesai</label>
 
                             <input
                                 type="date"
+                                id="tanggal_selesai"
                                 name="tanggal_selesai"
                                 value="{{ old('tanggal_selesai', optional($promo->tanggal_selesai)->format('Y-m-d')) }}"
                                 required
+                                onchange="validateTanggal()"
                             >
 
+                            <div id="error-tanggal" class="field-error"></div>
                         </div>
 
                         <!-- STATUS -->
                         <div class="form-group full">
-
                             <label>Status Promo</label>
 
                             <select name="status" required>
-
                                 <option value="1"
                                     {{ old('status', $promo->status ? '1' : '0') == '1' ? 'selected' : '' }}>
                                     Aktif
@@ -743,30 +698,156 @@
                                     {{ old('status', $promo->status ? '1' : '0') == '0' ? 'selected' : '' }}>
                                     Tidak Aktif
                                 </option>
-
                             </select>
-
                         </div>
 
                     </div>
 
-                    <!-- BUTTON -->
                     <div class="buttons">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Update Promo
                         </button>
 
+                        <a href="{{ route('promo.index') }}" class="btn btn-secondary">
+                            Batal
+                        </a>
                     </div>
-
                 </form>
 
             </div>
-
         </section>
-
     </main>
+
+    <script>
+        const nilaiDiskonEl = document.getElementById('nilai_diskon');
+        const errorDiskon = document.getElementById('error-diskon');
+
+        function blockSymbol(e) {
+            const blocked = ['+', '-', 'e', 'E', '.', ','];
+
+            if (blocked.includes(e.key)) {
+                e.preventDefault();
+
+                showDiskonError(
+                    'Nilai diskon tidak boleh mengandung simbol. Masukkan angka saja.'
+                );
+            } else {
+                hideDiskonError();
+            }
+        }
+
+        function validateDiskon(input) {
+            let value = input.value;
+
+            if (value === '') {
+                hideDiskonError();
+                return;
+            }
+
+            value = parseInt(value);
+
+            if (value > 100) {
+                showDiskonError(
+                    'Nilai diskon persentase tidak boleh melebihi 100%.'
+                );
+
+                input.value = 100;
+            } else if (value < 0) {
+                showDiskonError(
+                    'Nilai diskon tidak boleh negatif.'
+                );
+
+                input.value = 0;
+            } else {
+                hideDiskonError();
+            }
+        }
+
+        function showDiskonError(message) {
+            errorDiskon.textContent = message;
+            errorDiskon.style.display = 'block';
+        }
+
+        function hideDiskonError() {
+            errorDiskon.textContent = '';
+            errorDiskon.style.display = 'none';
+        }
+
+        // Validasi tanggal
+        const mulaiEl = document.getElementById('tanggal_mulai');
+        const selesaiEl = document.getElementById('tanggal_selesai');
+        const errorTgl = document.getElementById('error-tanggal');
+
+        function validateTanggal() {
+            const mulai = mulaiEl.value;
+            const selesai = selesaiEl.value;
+
+            if (!mulai || !selesai) {
+                hideTglError();
+                return;
+            }
+
+            const tMulai = new Date(mulai);
+            const tSelesai = new Date(selesai);
+
+            const diffMs = tSelesai - tMulai;
+            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+            const maxSelesai = new Date(tMulai);
+            maxSelesai.setMonth(maxSelesai.getMonth() + 1);
+
+            if (diffDays <= 0) {
+                showTglError(
+                    'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.'
+                );
+
+                selesaiEl.value = '';
+            } else if (tSelesai > maxSelesai) {
+                showTglError(
+                    'Tanggal Selesai tidak boleh lebih dari 1 bulan setelah Tanggal Mulai.'
+                );
+
+                selesaiEl.value = '';
+            } else {
+                hideTglError();
+            }
+        }
+
+        function showTglError(message) {
+            errorTgl.textContent = message;
+            errorTgl.style.display = 'block';
+        }
+
+        function hideTglError() {
+            errorTgl.textContent = '';
+            errorTgl.style.display = 'none';
+        }
+
+        // Validasi sebelum submit
+        document.getElementById('formPromo').addEventListener('submit', function(e) {
+
+            validateDiskon(nilaiDiskonEl);
+            validateTanggal();
+
+            if (
+                errorDiskon.style.display !== 'none' ||
+                errorTgl.style.display !== 'none'
+            ) {
+                e.preventDefault();
+
+                alert('Harap perbaiki data promo terlebih dahulu.');
+                return;
+            }
+
+            if (nilaiDiskonEl.value === '') {
+                e.preventDefault();
+                alert('Nilai diskon wajib diisi.');
+            }
+
+        });
+    </script>
 
 </body>
 </html>
+```

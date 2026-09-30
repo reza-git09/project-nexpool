@@ -1,3 +1,4 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -38,20 +39,18 @@
             width: 255px;
             height: 100vh;
 
-            background:
-                linear-gradient(
-                    180deg,
-                    #101c36 0%,
-                    #14213d 55%,
-                    #101b32 100%
-                );
+            background: linear-gradient(
+                180deg,
+                #101c36 0%,
+                #14213d 55%,
+                #101b32 100%
+            );
 
             color: white;
             padding: 24px 16px;
             z-index: 1000;
 
-            box-shadow:
-                8px 0 30px rgba(15, 23, 42, 0.08);
+            box-shadow: 8px 0 30px rgba(15, 23, 42, 0.08);
         }
 
         .logo {
@@ -123,12 +122,11 @@
         }
 
         .menu a.active {
-            background:
-                linear-gradient(
-                    90deg,
-                    #2563eb,
-                    #1d4ed8
-                );
+            background: linear-gradient(
+                90deg,
+                #2563eb,
+                #1d4ed8
+            );
 
             color: white;
 
@@ -147,6 +145,7 @@
             height: calc(100% - 16px);
 
             border-radius: 0 5px 5px 0;
+
             background: #60a5fa;
         }
 
@@ -172,6 +171,7 @@
             gap: 13px;
 
             padding: 12px 13px;
+
             border-radius: 10px;
 
             color: #fca5a5;
@@ -268,12 +268,11 @@
             align-items: center;
             justify-content: center;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #38bdf8
-                );
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #38bdf8
+            );
 
             color: white;
 
@@ -353,12 +352,11 @@
             align-items: center;
             justify-content: center;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #dbeafe,
-                    #eff6ff
-                );
+            background: linear-gradient(
+                135deg,
+                #dbeafe,
+                #eff6ff
+            );
 
             color: #2563eb;
             font-size: 19px;
@@ -367,7 +365,6 @@
         .page-header h1 {
             font-size: 25px;
             color: #111827;
-
             margin-bottom: 6px;
         }
 
@@ -492,6 +489,15 @@
         }
 
         /* =========================
+           FILE INPUT
+        ========================= */
+
+        .file-input {
+            padding: 9px;
+            min-height: auto;
+        }
+
+        /* =========================
            ERROR
         ========================= */
 
@@ -581,12 +587,11 @@
         }
 
         .btn-primary {
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #1d4ed8
-                );
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #1d4ed8
+            );
 
             color: white;
 
@@ -936,7 +941,8 @@
 
                     <form
                         action="{{ route('fasilitas.update', $fasilita->id) }}"
-                        method="POST">
+                        method="POST"
+                        enctype="multipart/form-data">
 
                         @csrf
 
@@ -1037,41 +1043,33 @@
                         </div>
 
 
-                        <!-- STATUS -->
+                        <!-- GAMBAR -->
 
                         <div class="form-group">
 
-                            <label for="status">
-
-                                Status
-
-                                <span class="required">
-                                    *
-                                </span>
-
+                            <label for="gambar">
+                                Gambar Fasilitas
                             </label>
 
-                            <select
-                                id="status"
-                                name="status"
-                                class="form-control"
-                                required>
+                            <input
+                                type="file"
+                                id="gambar"
+                                name="gambar"
+                                class="form-control file-input"
+                                accept="image/jpeg,image/png,image/jpg,image/webp">
 
-                                <option
-                                    value="1"
-                                    {{ old('status', $fasilita->status) == 1 ? 'selected' : '' }}>
-                                    Aktif
-                                </option>
+                            <div class="form-hint">
 
-                                <option
-                                    value="0"
-                                    {{ old('status', $fasilita->status) == 0 ? 'selected' : '' }}>
-                                    Nonaktif
-                                </option>
+                                <i class="fa-solid fa-circle-info"></i>
 
-                            </select>
+                                <span>
+                                    Kosongkan jika tidak ingin mengganti gambar.
+                                    Format JPG, JPEG, PNG, atau WEBP. Maksimal 2 MB.
+                                </span>
 
-                            @error('status')
+                            </div>
+
+                            @error('gambar')
 
                                 <div class="error">
 
@@ -1105,6 +1103,7 @@
 
                             </button>
 
+
                             <a
                                 href="{{ route('fasilitas.index') }}"
                                 class="btn btn-secondary">
@@ -1130,3 +1129,4 @@
 </body>
 
 </html>
+```

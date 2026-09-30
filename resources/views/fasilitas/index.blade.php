@@ -56,10 +56,6 @@
                 8px 0 30px rgba(15, 23, 42, 0.08);
         }
 
-        /* =========================================================
-           LOGO
-        ========================================================= */
-
         .logo {
             padding: 6px 10px 28px;
 
@@ -621,7 +617,7 @@
 
             border-collapse: collapse;
 
-            min-width: 900px;
+            min-width: 1050px;
         }
 
         /* =========================================================
@@ -749,6 +745,54 @@
             color: #64748b;
 
             line-height: 1.5;
+        }
+
+        /* =========================================================
+           GAMBAR FASILITAS
+        ========================================================= */
+
+        .facility-image {
+            width: 85px;
+            height: 65px;
+
+            object-fit: cover;
+
+            border-radius: 9px;
+
+            border: 1px solid #e2e8f0;
+
+            display: block;
+
+            background: #f1f5f9;
+        }
+
+        .no-image {
+            width: 85px;
+            height: 65px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #f1f5f9;
+
+            color: #94a3b8;
+
+            font-size: 9px;
+
+            border: 1px solid #e2e8f0;
+
+            gap: 4px;
+        }
+
+        .no-image i {
+            font-size: 17px;
         }
 
         /* =========================================================
@@ -983,13 +1027,11 @@
 
         </div>
 
-
         <!-- MENU TITLE -->
 
         <div class="menu-title">
             Menu Utama
         </div>
-
 
         <!-- MENU -->
 
@@ -1009,7 +1051,6 @@
 
             </a>
 
-
             <!-- MANAJEMEN TIKET -->
 
             <a href="{{ route('harga-tiket.index') }}">
@@ -1023,7 +1064,6 @@
                 </span>
 
             </a>
-
 
             <!-- FASILITAS -->
 
@@ -1040,7 +1080,6 @@
 
             </a>
 
-
             <!-- RESERVASI -->
 
             <a href="{{ route('reservasi.index') }}">
@@ -1055,7 +1094,6 @@
 
             </a>
 
-
             <!-- PROMO -->
 
             <a href="{{ route('promo.index') }}">
@@ -1069,7 +1107,6 @@
                 </span>
 
             </a>
-
 
             <!-- REVIEW -->
 
@@ -1086,7 +1123,6 @@
             </a>
 
         </div>
-
 
         <!-- LOGOUT -->
 
@@ -1107,7 +1143,6 @@
         </div>
 
     </aside>
-
 
     <!-- =========================================================
          MAIN
@@ -1131,7 +1166,6 @@
 
             </div>
 
-
             <!-- ADMIN INFO -->
 
             <div class="admin-info">
@@ -1148,7 +1182,6 @@
 
                 </div>
 
-
                 <div class="avatar">
 
                     {{ strtoupper(substr(session('admin_pool_nama'), 0, 1)) }}
@@ -1158,7 +1191,6 @@
             </div>
 
         </header>
-
 
         <!-- =====================================================
              CONTENT
@@ -1178,7 +1210,6 @@
 
                     </div>
 
-
                     <div>
 
                         <h1>
@@ -1193,7 +1224,6 @@
 
                 </div>
 
-
                 <!-- TAMBAH -->
 
                 <a href="{{ route('fasilitas.create') }}"
@@ -1206,7 +1236,6 @@
                 </a>
 
             </div>
-
 
             <!-- ALERT SUCCESS -->
 
@@ -1224,7 +1253,6 @@
 
             @endif
 
-
             <!-- INFO KOLAM -->
 
             <div class="info-box">
@@ -1241,13 +1269,12 @@
 
                     <br>
 
-                    Admin dapat menambahkan nama fasilitas
-                    dan deskripsi fasilitas.
+                    Admin dapat menambahkan nama fasilitas,
+                    deskripsi dan gambar fasilitas.
 
                 </div>
 
             </div>
-
 
             <!-- TABLE CARD -->
 
@@ -1271,7 +1298,6 @@
 
                     </div>
 
-
                     <div class="table-info">
 
                         {{ $fasilitas->count() }} data fasilitas
@@ -1279,7 +1305,6 @@
                     </div>
 
                 </div>
-
 
                 <!-- TABLE -->
 
@@ -1310,13 +1335,16 @@
                                     </th>
 
                                     <th>
+                                        Gambar
+                                    </th>
+
+                                    <th>
                                         Aksi
                                     </th>
 
                                 </tr>
 
                             </thead>
-
 
                             <tbody>
 
@@ -1332,7 +1360,6 @@
 
                                         </td>
 
-
                                         <!-- NAMA KOLAM -->
 
                                         <td class="pool-name">
@@ -1342,7 +1369,6 @@
                                                 : (session('admin_pool_nama') ?? '-') }}
 
                                         </td>
-
 
                                         <!-- NAMA FASILITAS -->
 
@@ -1366,7 +1392,6 @@
 
                                         </td>
 
-
                                         <!-- DESKRIPSI -->
 
                                         <td class="description">
@@ -1375,6 +1400,33 @@
 
                                         </td>
 
+                                        <!-- GAMBAR -->
+
+                                        <td>
+
+                                            @if($item->gambar)
+
+                                                <img
+                                                    src="{{ asset('storage/' . $item->gambar) }}"
+                                                    alt="{{ $item->nama_fasilitas }}"
+                                                    class="facility-image"
+                                                >
+
+                                            @else
+
+                                                <div class="no-image">
+
+                                                    <i class="fa-regular fa-image"></i>
+
+                                                    <span>
+                                                        Tidak ada
+                                                    </span>
+
+                                                </div>
+
+                                            @endif
+
+                                        </td>
 
                                         <!-- AKSI -->
 
@@ -1392,7 +1444,6 @@
                                                     Edit
 
                                                 </a>
-
 
                                                 <!-- HAPUS -->
 

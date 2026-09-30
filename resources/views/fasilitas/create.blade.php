@@ -1,3 +1,4 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -56,8 +57,7 @@
 
         .logo {
             padding: 6px 10px 28px;
-            border-bottom:
-                1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             margin-bottom: 25px;
             text-align: center;
         }
@@ -166,8 +166,7 @@
 
             padding-top: 15px;
 
-            border-top:
-                1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
 
         .logout a {
@@ -185,9 +184,7 @@
         }
 
         .logout a:hover {
-            background:
-                rgba(239,68,68,0.12);
-
+            background: rgba(239,68,68,0.12);
             color: #fecaca;
         }
 
@@ -212,8 +209,7 @@
         .header {
             height: 76px;
 
-            background:
-                rgba(255,255,255,0.96);
+            background: rgba(255,255,255,0.96);
 
             backdrop-filter: blur(10px);
 
@@ -223,8 +219,7 @@
 
             padding: 0 32px;
 
-            border-bottom:
-                1px solid #e8ecf3;
+            border-bottom: 1px solid #e8ecf3;
 
             position: sticky;
             top: 0;
@@ -243,6 +238,10 @@
             font-size: 11px;
             color: #8a94a6;
         }
+
+        /* =========================
+           ADMIN INFO
+        ========================= */
 
         .admin-info {
             display: flex;
@@ -323,8 +322,7 @@
             background: #eef2f7;
             color: #475569;
 
-            border:
-                1px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
 
             border-radius: 9px;
 
@@ -397,8 +395,7 @@
         .form-card {
             background: white;
 
-            border:
-                1px solid #e8ecf3;
+            border: 1px solid #e8ecf3;
 
             border-radius: 16px;
 
@@ -417,8 +414,7 @@
 
             margin-bottom: 22px;
 
-            border-bottom:
-                1px solid #eef1f5;
+            border-bottom: 1px solid #eef1f5;
         }
 
         .form-card-icon {
@@ -470,8 +466,7 @@
 
             padding: 11px 13px;
 
-            border:
-                1px solid #d8dee8;
+            border: 1px solid #d8dee8;
 
             border-radius: 9px;
 
@@ -521,8 +516,7 @@
         ========================= */
 
         .file-box {
-            border:
-                1px dashed #cbd5e1;
+            border: 1px dashed #cbd5e1;
 
             border-radius: 9px;
 
@@ -584,8 +578,7 @@
 
             padding-top: 20px;
 
-            border-top:
-                1px solid #eef1f5;
+            border-top: 1px solid #eef1f5;
         }
 
         .btn {
@@ -639,8 +632,7 @@
 
             color: #475569;
 
-            border:
-                1px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
         }
 
         .btn-secondary:hover {
@@ -666,7 +658,6 @@
             .content {
                 padding: 25px;
             }
-
         }
 
         @media (max-width: 800px) {
@@ -717,7 +708,6 @@
             .admin-text {
                 display: none;
             }
-
         }
 
         @media (max-width: 600px) {
@@ -741,7 +731,6 @@
             .btn {
                 width: 100%;
             }
-
         }
     </style>
 
@@ -860,7 +849,6 @@
 
     </aside>
 
-
     <!-- MAIN -->
 
     <main class="main">
@@ -905,7 +893,6 @@
 
         </header>
 
-
         <!-- CONTENT -->
 
         <section class="content">
@@ -922,7 +909,6 @@
                     Kembali ke Manajemen Fasilitas
 
                 </a>
-
 
                 <!-- PAGE HEADER -->
 
@@ -948,7 +934,6 @@
 
                 </div>
 
-
                 <!-- FORM CARD -->
 
                 <div class="form-card">
@@ -967,7 +952,6 @@
 
                     </div>
 
-
                     <form
                         action="{{ route('fasilitas.store') }}"
                         method="POST"
@@ -975,7 +959,6 @@
                     >
 
                         @csrf
-
 
                         <!-- NAMA FASILITAS -->
 
@@ -1024,7 +1007,6 @@
 
                         </div>
 
-
                         <!-- DESKRIPSI -->
 
                         <div class="form-group">
@@ -1068,15 +1050,12 @@
 
                         </div>
 
-
                         <!-- GAMBAR -->
 
                         <div class="form-group">
 
                             <label for="gambar">
-
                                 Gambar Fasilitas
-
                             </label>
 
                             <div class="file-box">
@@ -1113,59 +1092,6 @@
 
                         </div>
 
-
-                        <!-- STATUS -->
-
-                        <div class="form-group">
-
-                            <label for="status">
-
-                                Status
-
-                                <span class="required">
-                                    *
-                                </span>
-
-                            </label>
-
-                            <select
-                                id="status"
-                                name="status"
-                                class="form-control"
-                                required
-                            >
-
-                                <option
-                                    value="1"
-                                    {{ old('status', '1') == '1' ? 'selected' : '' }}
-                                >
-                                    Aktif
-                                </option>
-
-                                <option
-                                    value="0"
-                                    {{ old('status') == '0' ? 'selected' : '' }}
-                                >
-                                    Nonaktif
-                                </option>
-
-                            </select>
-
-                            @error('status')
-
-                                <div class="error">
-
-                                    <i class="fa-solid fa-circle-exclamation"></i>
-
-                                    {{ $message }}
-
-                                </div>
-
-                            @enderror
-
-                        </div>
-
-
                         <!-- BUTTON -->
 
                         <div class="button-group">
@@ -1180,7 +1106,6 @@
                                 Simpan Fasilitas
 
                             </button>
-
 
                             <a
                                 href="{{ route('fasilitas.index') }}"
@@ -1208,3 +1133,4 @@
 </body>
 
 </html>
+```

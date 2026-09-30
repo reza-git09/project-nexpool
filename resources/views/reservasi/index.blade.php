@@ -11,7 +11,6 @@
     <title>Reservasi - NEXPOOL</title>
 
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -38,21 +37,16 @@
             top: 0;
             width: 255px;
             height: 100vh;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #101c36 0%,
-                    #14213d 55%,
-                    #101b32 100%
-                );
-
+            background: linear-gradient(
+                180deg,
+                #101c36 0%,
+                #14213d 55%,
+                #101b32 100%
+            );
             color: white;
             padding: 24px 16px;
             z-index: 1000;
-
-            box-shadow:
-                8px 0 30px rgba(15, 23, 42, 0.08);
+            box-shadow: 8px 0 30px rgba(15, 23, 42, 0.08);
         }
 
         .logo {
@@ -78,10 +72,8 @@
         .menu-title {
             padding: 0 12px;
             margin-bottom: 10px;
-
             font-size: 10px;
             font-weight: bold;
-
             color: #73819b;
             letter-spacing: 1.2px;
             text-transform: uppercase;
@@ -95,18 +87,14 @@
 
         .menu a {
             position: relative;
-
             display: flex;
             align-items: center;
             gap: 13px;
-
             padding: 12px 13px;
             border-radius: 10px;
-
             color: #cbd5e1;
             font-size: 13px;
             font-weight: 500;
-
             transition:
                 background 0.2s ease,
                 color 0.2s ease,
@@ -126,29 +114,22 @@
         }
 
         .menu a.active {
-            background:
-                linear-gradient(
-                    90deg,
-                    #2563eb,
-                    #1d4ed8
-                );
-
+            background: linear-gradient(
+                90deg,
+                #2563eb,
+                #1d4ed8
+            );
             color: white;
-
-            box-shadow:
-                0 8px 20px rgba(37,99,235,0.25);
+            box-shadow: 0 8px 20px rgba(37,99,235,0.25);
         }
 
         .menu a.active::before {
             content: "";
-
             position: absolute;
             left: -16px;
             top: 8px;
-
             width: 3px;
             height: calc(100% - 16px);
-
             border-radius: 0 5px 5px 0;
             background: #60a5fa;
         }
@@ -159,35 +140,26 @@
 
         .logout {
             position: absolute;
-
             bottom: 20px;
             left: 16px;
             right: 16px;
-
             padding-top: 15px;
-
-            border-top:
-                1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
 
         .logout a {
             display: flex;
             align-items: center;
             gap: 13px;
-
             padding: 12px 13px;
             border-radius: 10px;
-
             color: #fca5a5;
             font-size: 13px;
-
             transition: 0.2s;
         }
 
         .logout a:hover {
-            background:
-                rgba(239,68,68,0.12);
-
+            background: rgba(239,68,68,0.12);
             color: #fecaca;
         }
 
@@ -211,21 +183,13 @@
 
         .header {
             height: 76px;
-
-            background:
-                rgba(255,255,255,0.96);
-
+            background: rgba(255,255,255,0.96);
             backdrop-filter: blur(10px);
-
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 0 32px;
-
-            border-bottom:
-                1px solid #e8ecf3;
-
+            border-bottom: 1px solid #e8ecf3;
             position: sticky;
             top: 0;
             z-index: 900;
@@ -269,27 +233,19 @@
         .avatar {
             width: 42px;
             height: 42px;
-
             border-radius: 12px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #38bdf8
-                );
-
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #38bdf8
+            );
             color: white;
-
             font-size: 15px;
             font-weight: bold;
-
-            box-shadow:
-                0 6px 15px rgba(37,99,235,0.2);
+            box-shadow: 0 6px 15px rgba(37,99,235,0.2);
         }
 
         /* =========================
@@ -309,8 +265,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .page-title {
@@ -322,22 +277,16 @@
         .page-icon {
             width: 48px;
             height: 48px;
-
             flex-shrink: 0;
-
             border-radius: 13px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #dbeafe,
-                    #eff6ff
-                );
-
+            background: linear-gradient(
+                135deg,
+                #dbeafe,
+                #eff6ff
+            );
             color: #2563eb;
             font-size: 19px;
         }
@@ -354,6 +303,54 @@
         }
 
         /* =========================
+           RESERVATION TABS
+        ========================= */
+
+        .reservation-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+            background: white;
+            border: 1px solid #e8ecf3;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 28px;
+            box-shadow: 0 3px 12px rgba(15,23,42,0.03);
+        }
+
+        .reservation-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 16px;
+            border-radius: 9px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .reservation-tab i {
+            font-size: 13px;
+        }
+
+        .reservation-tab:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .reservation-tab.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 5px 14px rgba(37,99,235,0.20);
+        }
+
+        .reservation-tab.active i {
+            color: white;
+        }
+
+        /* =========================
            ALERT
         ========================= */
 
@@ -361,19 +358,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-
             background: #ecfdf5;
             color: #047857;
-
-            border:
-                1px solid #bbf7d0;
-
+            border: 1px solid #bbf7d0;
             padding: 12px 15px;
-
             border-radius: 10px;
-
             margin-bottom: 20px;
-
             font-size: 12px;
         }
 
@@ -383,20 +373,12 @@
 
         .info-box {
             background: #eff6ff;
-
-            border:
-                1px solid #bfdbfe;
-
+            border: 1px solid #bfdbfe;
             color: #1e40af;
-
             padding: 14px 16px;
-
             border-radius: 10px;
-
             margin-bottom: 20px;
-
             font-size: 12px;
-
             line-height: 1.6;
         }
 
@@ -408,9 +390,7 @@
             display: flex;
             align-items: center;
             gap: 7px;
-
             margin-bottom: 4px;
-
             font-weight: 700;
         }
 
@@ -420,42 +400,29 @@
 
         .table-card {
             background: white;
-
-            border:
-                1px solid #e8ecf3;
-
+            border: 1px solid #e8ecf3;
             border-radius: 16px;
-
             overflow: hidden;
-
-            box-shadow:
-                0 3px 12px rgba(15,23,42,0.025);
+            box-shadow: 0 3px 12px rgba(15,23,42,0.025);
         }
 
         .table-top {
             display: flex;
             align-items: center;
             gap: 10px;
-
             padding: 20px 21px;
-
-            border-bottom:
-                1px solid #eef1f5;
+            border-bottom: 1px solid #eef1f5;
         }
 
         .table-top-icon {
             width: 32px;
             height: 32px;
-
             border-radius: 9px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: #eef4ff;
             color: #2563eb;
-
             font-size: 12px;
         }
 
@@ -483,36 +450,22 @@
 
         th {
             background: #f8fafc;
-
             color: #64748b;
-
             font-size: 11px;
             font-weight: 700;
-
             text-align: left;
-
             padding: 13px 20px;
-
-            border-bottom:
-                1px solid #e8ecf3;
-
+            border-bottom: 1px solid #e8ecf3;
             white-space: nowrap;
-
             text-transform: uppercase;
-
             letter-spacing: 0.3px;
         }
 
         td {
             padding: 14px 20px;
-
             font-size: 12px;
-
             color: #475569;
-
-            border-bottom:
-                1px solid #eef1f5;
-
+            border-bottom: 1px solid #eef1f5;
             vertical-align: middle;
         }
 
@@ -571,14 +524,10 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-
             padding: 6px 9px;
-
             border-radius: 20px;
-
             font-size: 10px;
             font-weight: 700;
-
             white-space: nowrap;
         }
 
@@ -615,7 +564,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-
             white-space: nowrap;
         }
 
@@ -624,21 +572,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-
             gap: 5px;
-
             padding: 7px 10px;
-
             border-radius: 7px;
-
             font-size: 10px;
             font-weight: 600;
-
             text-decoration: none;
-
             border: none;
             cursor: pointer;
-
             transition:
                 background 0.2s ease,
                 transform 0.2s ease;
@@ -677,18 +618,13 @@
         .empty-icon {
             width: 55px;
             height: 55px;
-
             margin: 0 auto 15px;
-
             border-radius: 15px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: #f1f5f9;
             color: #94a3b8;
-
             font-size: 22px;
         }
 
@@ -703,29 +639,22 @@
             color: #94a3b8;
         }
 
-        /* =====================================================
-           MODAL / POPUP DETAIL RESERVASI
-        ===================================================== */
+        /* =========================
+           MODAL
+        ========================= */
 
         .modal {
             display: none;
-
             position: fixed;
             z-index: 5000;
-
             left: 0;
             top: 0;
-
             width: 100%;
             height: 100%;
-
             background: rgba(15, 23, 42, 0.55);
-
             backdrop-filter: blur(4px);
-
             align-items: center;
             justify-content: center;
-
             padding: 20px;
         }
 
@@ -736,23 +665,15 @@
         .modal-content {
             width: 100%;
             max-width: 720px;
-
             max-height: 90vh;
-
             overflow-y: auto;
-
             background: white;
-
             border-radius: 18px;
-
-            box-shadow:
-                0 25px 60px rgba(15,23,42,0.25);
-
+            box-shadow: 0 25px 60px rgba(15,23,42,0.25);
             animation: modalShow 0.2s ease;
         }
 
         @keyframes modalShow {
-
             from {
                 opacity: 0;
                 transform: translateY(-15px) scale(0.98);
@@ -762,20 +683,14 @@
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
-
         }
-
-        /* MODAL HEADER */
 
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 20px 24px;
-
-            border-bottom:
-                1px solid #eef1f5;
+            border-bottom: 1px solid #eef1f5;
         }
 
         .modal-title {
@@ -787,22 +702,16 @@
         .modal-icon {
             width: 42px;
             height: 42px;
-
             border-radius: 11px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #dbeafe,
-                    #eff6ff
-                );
-
+            background: linear-gradient(
+                135deg,
+                #dbeafe,
+                #eff6ff
+            );
             color: #2563eb;
-
             font-size: 17px;
         }
 
@@ -820,23 +729,15 @@
         .modal-close {
             width: 34px;
             height: 34px;
-
             border: none;
-
             border-radius: 9px;
-
             background: #f1f5f9;
-
             color: #64748b;
-
             cursor: pointer;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             font-size: 14px;
-
             transition: 0.2s;
         }
 
@@ -845,28 +746,20 @@
             color: #dc2626;
         }
 
-        /* MODAL BODY */
-
         .modal-body {
             padding: 24px;
         }
 
         .modal-grid {
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 13px;
         }
 
         .modal-item {
             background: #f8fafc;
-
-            border:
-                1px solid #e8ecf3;
-
+            border: 1px solid #e8ecf3;
             border-radius: 11px;
-
             padding: 14px;
         }
 
@@ -877,87 +770,59 @@
         .modal-label {
             display: flex;
             align-items: center;
-
             gap: 7px;
-
             margin-bottom: 7px;
-
             color: #64748b;
-
             font-size: 10px;
-
             font-weight: 700;
-
             text-transform: uppercase;
         }
 
         .modal-label i {
             width: 15px;
-
             color: #2563eb;
-
             text-align: center;
         }
 
         .modal-value {
             color: #172033;
-
             font-size: 13px;
-
             font-weight: 700;
-
             word-break: break-word;
         }
 
-        /* TICKET */
-
         .modal-ticket {
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 8px;
         }
 
         .ticket-box {
             background: white;
-
-            border:
-                1px solid #e2e8f0;
-
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-
             padding: 10px;
         }
 
         .ticket-box span {
             display: block;
-
             font-size: 9px;
-
             color: #94a3b8;
-
             margin-bottom: 4px;
         }
 
         .ticket-box strong {
             font-size: 13px;
-
             color: #172033;
         }
 
-        /* TOTAL */
-
         .modal-total {
-            background:
-                linear-gradient(
-                    135deg,
-                    #eff6ff,
-                    #f0f9ff
-                );
-
-            border:
-                1px solid #bfdbfe;
+            background: linear-gradient(
+                135deg,
+                #eff6ff,
+                #f0f9ff
+            );
+            border: 1px solid #bfdbfe;
         }
 
         .modal-total .modal-label i {
@@ -966,48 +831,29 @@
 
         .total-price {
             color: #0f6fc0;
-
             font-size: 20px;
-
             font-weight: 800;
         }
 
-        /* MODAL FOOTER */
-
         .modal-footer {
             display: flex;
-
             align-items: center;
-
             justify-content: flex-end;
-
             gap: 8px;
-
             padding: 17px 24px;
-
-            border-top:
-                1px solid #eef1f5;
+            border-top: 1px solid #eef1f5;
         }
 
         .modal-btn {
             display: inline-flex;
-
             align-items: center;
-
             justify-content: center;
-
             gap: 7px;
-
             padding: 9px 14px;
-
             border-radius: 8px;
-
             font-size: 11px;
-
             font-weight: 600;
-
             cursor: pointer;
-
             border: none;
         }
 
@@ -1111,6 +957,17 @@
                 line-height: 1.5;
             }
 
+            .reservation-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .reservation-tab {
+                white-space: nowrap;
+                flex: 1;
+                justify-content: center;
+            }
+
             .info-box {
                 font-size: 11px;
             }
@@ -1152,23 +1009,17 @@
                 padding: 14px 16px;
             }
         }
-
     </style>
-
 </head>
 
 <body>
 
     <!-- SIDEBAR -->
-
     <aside class="sidebar">
 
         <div class="logo">
-
             <h2>NEXPOOL</h2>
-
             <p>ADMINISTRATOR</p>
-
         </div>
 
         <div class="menu-title">
@@ -1178,76 +1029,40 @@
         <div class="menu">
 
             <a href="{{ route('dashboard') }}">
-
                 <i class="fa-solid fa-gauge-high"
-                    style="color:#bfdbfe;">
-                </i>
-
-                <span>
-                    Dashboard
-                </span>
-
+                    style="color:#bfdbfe;"></i>
+                <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-
                 <i class="fa-solid fa-ticket"
-                    style="color:#fcd34d;">
-                </i>
-
-                <span>
-                    Manajemen Tiket
-                </span>
-
+                    style="color:#fcd34d;"></i>
+                <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}">
-
                 <i class="fa-solid fa-person-swimming"
-                    style="color:#67e8f9;">
-                </i>
-
-                <span>
-                    Fasilitas
-                </span>
-
+                    style="color:#67e8f9;"></i>
+                <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}"
                 class="active">
-
                 <i class="fa-solid fa-calendar-check"
-                    style="color:#6ee7b7;">
-                </i>
-
-                <span>
-                    Reservasi
-                </span>
-
+                    style="color:#6ee7b7;"></i>
+                <span>Reservasi</span>
             </a>
 
             <a href="{{ route('promo.index') }}">
-
                 <i class="fa-solid fa-tags"
-                    style="color:#c4b5fd;">
-                </i>
-
-                <span>
-                    Promo
-                </span>
-
+                    style="color:#c4b5fd;"></i>
+                <span>Promo</span>
             </a>
 
             <a href="{{ route('review.index') }}">
-
                 <i class="fa-solid fa-star"
-                    style="color:#fde047;">
-                </i>
-
-                <span>
-                    Review
-                </span>
-
+                    style="color:#fde047;"></i>
+                <span>Review</span>
             </a>
 
         </div>
@@ -1255,15 +1070,9 @@
         <div class="logout">
 
             <a href="{{ route('logout') }}">
-
                 <i class="fa-solid fa-right-from-bracket"
-                    style="color:#f87171;">
-                </i>
-
-                <span>
-                    Logout
-                </span>
-
+                    style="color:#f87171;"></i>
+                <span>Logout</span>
             </a>
 
         </div>
@@ -1272,11 +1081,9 @@
 
 
     <!-- MAIN -->
-
     <main class="main">
 
         <!-- HEADER -->
-
         <header class="header">
 
             <div class="header-left">
@@ -1326,11 +1133,9 @@
 
 
         <!-- CONTENT -->
-
         <section class="content">
 
             <!-- SUCCESS ALERT -->
-
             @if(session('success'))
 
                 <div class="alert">
@@ -1345,7 +1150,6 @@
 
 
             <!-- PAGE HEADER -->
-
             <div class="page-header">
 
                 <div class="page-title">
@@ -1373,8 +1177,37 @@
             </div>
 
 
-            <!-- INFO -->
+            <!-- =================================================
+                 2 TAB RESERVASI
+            ================================================== -->
 
+            <div class="reservation-tabs">
+
+                <!-- RESERVASI MENUNGGU -->
+                <a href="{{ url('/reservasi') }}"
+                    class="reservation-tab active">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                    Reservasi Menunggu
+
+                </a>
+
+
+                <!-- RESERVASI DIKONFIRMASI -->
+                <a href="{{ url('/reservasi/dikonfirmasi') }}"
+                    class="reservation-tab">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    Reservasi Dikonfirmasi
+
+                </a>
+
+            </div>
+
+
+            <!-- INFO -->
             <div class="info-box">
 
                 <div class="info-title">
@@ -1404,7 +1237,6 @@
 
 
             <!-- TABLE CARD -->
-
             <div class="table-card">
 
                 <div class="table-top">
@@ -1418,11 +1250,11 @@
                     <div>
 
                         <h3>
-                            Daftar Reservasi
+                            Daftar Reservasi Menunggu
                         </h3>
 
                         <p>
-                            Data reservasi pengunjung yang masuk
+                            Reservasi pengunjung yang menunggu konfirmasi admin
                         </p>
 
                     </div>
@@ -1430,7 +1262,14 @@
                 </div>
 
 
-                @if($reservasi->count() > 0)
+                @php
+
+                    $dataReservasi = $reservasi ?? [];
+
+                @endphp
+
+
+                @if(count($dataReservasi) > 0)
 
                     <div class="table-wrapper">
 
@@ -1440,9 +1279,7 @@
 
                                 <tr>
 
-                                    <th>
-                                        No
-                                    </th>
+                                    <th>No</th>
 
                                     <th>
                                         Kode Reservasi
@@ -1484,54 +1321,62 @@
 
                             </thead>
 
+
                             <tbody>
 
-                                @foreach($reservasi as $item)
+                                @foreach($dataReservasi as $item)
 
                                     <tr>
 
                                         <!-- NO -->
-
                                         <td>
                                             {{ $loop->iteration }}
                                         </td>
 
 
                                         <!-- KODE -->
-
                                         <td class="kode">
-                                            {{ $item->kode_reservasi }}
+
+                                            {{ $item->kode_reservasi ?? '-' }}
+
                                         </td>
 
 
                                         <!-- KOLAM -->
-
                                         <td class="pool">
-                                            {{ session('admin_pool_nama', '-') }}
+
+                                            {{ session(
+                                                'admin_pool_nama',
+                                                '-'
+                                            ) }}
+
                                         </td>
 
 
                                         <!-- PENGUNJUNG -->
-
                                         <td class="nama-pengunjung">
-                                            {{ $item->nama_pengunjung }}
+
+                                            {{ $item->nama_pengunjung ?? '-' }}
+
                                         </td>
 
 
                                         <!-- NO HP -->
-
                                         <td>
-                                            {{ $item->no_hp }}
+
+                                            {{ $item->no_hp ?? '-' }}
+
                                         </td>
 
 
                                         <!-- TANGGAL -->
-
                                         <td>
 
                                             @if($item->tanggal_kunjungan)
 
-                                                {{ $item->tanggal_kunjungan->format('d-m-Y') }}
+                                                {{ \Carbon\Carbon::parse(
+                                                    $item->tanggal_kunjungan
+                                                )->format('d-m-Y') }}
 
                                             @else
 
@@ -1543,14 +1388,13 @@
 
 
                                         <!-- JUMLAH TIKET -->
-
                                         <td class="jumlah-tiket">
 
                                             <span>
                                                 Dewasa:
                                             </span>
 
-                                            {{ $item->jumlah_dewasa }}
+                                            {{ $item->jumlah_dewasa ?? 0 }}
 
                                             <br>
 
@@ -1558,18 +1402,16 @@
                                                 Anak:
                                             </span>
 
-                                            {{ $item->jumlah_anak }}
+                                            {{ $item->jumlah_anak ?? 0 }}
 
                                         </td>
 
 
                                         <!-- TOTAL HARGA -->
-
                                         <td class="harga">
 
-                                            Rp
-                                            {{ number_format(
-                                                $item->total_harga,
+                                            Rp{{ number_format(
+                                                $item->total_harga ?? 0,
                                                 0,
                                                 ',',
                                                 '.'
@@ -1579,10 +1421,9 @@
 
 
                                         <!-- STATUS -->
-
                                         <td>
 
-                                            @if($item->status_reservasi === 'Menunggu')
+                                            @if(($item->status_reservasi ?? '') === 'Menunggu')
 
                                                 <span class="badge badge-menunggu">
 
@@ -1592,7 +1433,7 @@
 
                                                 </span>
 
-                                            @elseif($item->status_reservasi === 'Dikonfirmasi')
+                                            @elseif(($item->status_reservasi ?? '') === 'Dikonfirmasi')
 
                                                 <span class="badge badge-dikonfirmasi">
 
@@ -1602,7 +1443,7 @@
 
                                                 </span>
 
-                                            @elseif($item->status_reservasi === 'Selesai')
+                                            @elseif(($item->status_reservasi ?? '') === 'Selesai')
 
                                                 <span class="badge badge-selesai">
 
@@ -1612,7 +1453,7 @@
 
                                                 </span>
 
-                                            @elseif($item->status_reservasi === 'Dibatalkan')
+                                            @elseif(($item->status_reservasi ?? '') === 'Dibatalkan')
 
                                                 <span class="badge badge-dibatalkan">
 
@@ -1636,15 +1477,16 @@
 
 
                                         <!-- AKSI -->
-
                                         <td>
 
                                             <div class="actions">
 
                                                 <!-- KELOLA -->
-
                                                 <a
-                                                    href="{{ route('reservasi.edit', $item->id) }}"
+                                                    href="{{ route(
+                                                        'reservasi.edit',
+                                                        $item->id
+                                                    ) }}"
                                                     class="btn-edit"
                                                 >
 
@@ -1655,14 +1497,11 @@
                                                 </a>
 
 
-                                                <!-- DETAIL POPUP -->
-
+                                                <!-- DETAIL -->
                                                 <button
                                                     type="button"
                                                     class="btn-detail"
-                                                    onclick="openReservationModal(
-                                                        '{{ $item->id }}'
-                                                    )"
+                                                    onclick="openReservationModal('{{ $item->id }}')"
                                                 >
 
                                                     <i class="fa-solid fa-eye"></i>
@@ -1677,405 +1516,6 @@
 
                                     </tr>
 
-
-                                    <!-- =================================================
-                                         MODAL DETAIL
-                                    ================================================== -->
-
-                                    <div
-                                        id="reservationModal{{ $item->id }}"
-                                        class="modal"
-                                        onclick="closeReservationModalOutside(
-                                            event,
-                                            '{{ $item->id }}'
-                                        )"
-                                    >
-
-                                        <div
-                                            class="modal-content"
-                                            onclick="event.stopPropagation()"
-                                        >
-
-                                            <!-- MODAL HEADER -->
-
-                                            <div class="modal-header">
-
-                                                <div class="modal-title">
-
-                                                    <div class="modal-icon">
-
-                                                        <i class="fa-solid fa-ticket"></i>
-
-                                                    </div>
-
-                                                    <div>
-
-                                                        <h2>
-                                                            Detail Reservasi
-                                                        </h2>
-
-                                                        <p>
-                                                            Informasi lengkap reservasi pengunjung
-                                                        </p>
-
-                                                    </div>
-
-                                                </div>
-
-                                                <button
-                                                    type="button"
-                                                    class="modal-close"
-                                                    onclick="closeReservationModal(
-                                                        '{{ $item->id }}'
-                                                    )"
-                                                >
-
-                                                    <i class="fa-solid fa-xmark"></i>
-
-                                                </button>
-
-                                            </div>
-
-
-                                            <!-- MODAL BODY -->
-
-                                            <div class="modal-body">
-
-                                                <div class="modal-grid">
-
-                                                    <!-- KODE -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-hashtag"></i>
-
-                                                            Kode Reservasi
-
-                                                        </div>
-
-                                                        <div class="modal-value">
-
-                                                            {{ $item->kode_reservasi ?? '-' }}
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- NAMA -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-user"></i>
-
-                                                            Nama Pengunjung
-
-                                                        </div>
-
-                                                        <div class="modal-value">
-
-                                                            {{ $item->nama_pengunjung ?? '-' }}
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- NO HP -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-phone"></i>
-
-                                                            No. HP
-
-                                                        </div>
-
-                                                        <div class="modal-value">
-
-                                                            {{ $item->no_hp ?? '-' }}
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- KOLAM -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-person-swimming"></i>
-
-                                                            Kolam Renang
-
-                                                        </div>
-
-                                                        <div class="modal-value">
-
-                                                            {{ session(
-                                                                'admin_pool_nama',
-                                                                'Kolam Renang'
-                                                            ) }}
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- TANGGAL -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-calendar-days"></i>
-
-                                                            Tanggal Kunjungan
-
-                                                        </div>
-
-                                                        <div class="modal-value">
-
-                                                            @if($item->tanggal_kunjungan)
-
-                                                                {{ $item->tanggal_kunjungan->format('d-m-Y') }}
-
-                                                            @else
-
-                                                                -
-
-                                                            @endif
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- STATUS -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-circle-check"></i>
-
-                                                            Status Reservasi
-
-                                                        </div>
-
-
-                                                        @if($item->status_reservasi === 'Menunggu')
-
-                                                            <span class="badge badge-menunggu">
-
-                                                                <i class="fa-solid fa-clock"></i>
-
-                                                                Menunggu
-
-                                                            </span>
-
-                                                        @elseif($item->status_reservasi === 'Dikonfirmasi')
-
-                                                            <span class="badge badge-dikonfirmasi">
-
-                                                                <i class="fa-solid fa-check"></i>
-
-                                                                Dikonfirmasi
-
-                                                            </span>
-
-                                                        @elseif($item->status_reservasi === 'Selesai')
-
-                                                            <span class="badge badge-selesai">
-
-                                                                <i class="fa-solid fa-circle-check"></i>
-
-                                                                Selesai
-
-                                                            </span>
-
-                                                        @elseif($item->status_reservasi === 'Dibatalkan')
-
-                                                            <span class="badge badge-dibatalkan">
-
-                                                                <i class="fa-solid fa-xmark"></i>
-
-                                                                Dibatalkan
-
-                                                            </span>
-
-                                                        @else
-
-                                                            <span class="badge badge-default">
-
-                                                                {{ $item->status_reservasi ?? 'Tidak diketahui' }}
-
-                                                            </span>
-
-                                                        @endif
-
-                                                    </div>
-
-
-                                                    <!-- JUMLAH TIKET -->
-
-                                                    <div class="modal-item">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-users"></i>
-
-                                                            Jumlah Tiket
-
-                                                        </div>
-
-                                                        <div class="modal-ticket">
-
-                                                            <div class="ticket-box">
-
-                                                                <span>
-                                                                    Dewasa
-                                                                </span>
-
-                                                                <strong>
-
-                                                                    {{ $item->jumlah_dewasa ?? 0 }}
-
-                                                                    Tiket
-
-                                                                </strong>
-
-                                                            </div>
-
-                                                            <div class="ticket-box">
-
-                                                                <span>
-                                                                    Anak
-                                                                </span>
-
-                                                                <strong>
-
-                                                                    {{ $item->jumlah_anak ?? 0 }}
-
-                                                                    Tiket
-
-                                                                </strong>
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- TOTAL -->
-
-                                                    <div class="modal-item modal-total">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-money-bill-wave"></i>
-
-                                                            Total Pembayaran
-
-                                                        </div>
-
-                                                        <div class="total-price">
-
-                                                            Rp{{ number_format(
-                                                                $item->total_harga ?? 0,
-                                                                0,
-                                                                ',',
-                                                                '.'
-                                                            ) }}
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <!-- INFO -->
-
-                                                    <div class="modal-item full">
-
-                                                        <div class="modal-label">
-
-                                                            <i class="fa-solid fa-circle-info"></i>
-
-                                                            Informasi
-
-                                                        </div>
-
-                                                        <div class="modal-value"
-                                                            style="
-                                                                font-size:11px;
-                                                                font-weight:500;
-                                                                line-height:1.6;
-                                                                color:#64748b;
-                                                            ">
-
-                                                            Data reservasi berasal dari
-                                                            aplikasi mobile NEXPOOL.
-                                                            Admin dapat memeriksa dan
-                                                            memperbarui status reservasi
-                                                            melalui menu Kelola.
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <!-- MODAL FOOTER -->
-
-                                            <div class="modal-footer">
-
-                                                <button
-                                                    type="button"
-                                                    class="modal-btn modal-btn-close"
-                                                    onclick="closeReservationModal(
-                                                        '{{ $item->id }}'
-                                                    )"
-                                                >
-
-                                                    <i class="fa-solid fa-xmark"></i>
-
-                                                    Tutup
-
-                                                </button>
-
-
-                                                <a
-                                                    href="{{ route(
-                                                        'reservasi.edit',
-                                                        $item->id
-                                                    ) }}"
-                                                    class="modal-btn modal-btn-edit"
-                                                >
-
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-
-                                                    Kelola Status
-
-                                                </a>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
                                 @endforeach
 
                             </tbody>
@@ -2083,6 +1523,7 @@
                         </table>
 
                     </div>
+
 
                 @else
 
@@ -2104,11 +1545,14 @@
 
                             Belum ada reservasi yang masuk dari aplikasi mobile
                             untuk
+
                             <strong>
+
                                 {{ session(
                                     'admin_pool_nama',
                                     'kolam ini'
                                 ) }}
+
                             </strong>.
 
                         </p>
@@ -2122,6 +1566,416 @@
         </section>
 
     </main>
+
+
+    <!-- =====================================================
+         MODAL DETAIL RESERVASI
+    ====================================================== -->
+
+    @foreach($dataReservasi as $item)
+
+        <div
+            id="reservationModal{{ $item->id }}"
+            class="modal"
+            onclick="closeReservationModalOutside(
+                event,
+                '{{ $item->id }}'
+            )"
+        >
+
+            <div
+                class="modal-content"
+                onclick="event.stopPropagation()"
+            >
+
+                <!-- MODAL HEADER -->
+
+                <div class="modal-header">
+
+                    <div class="modal-title">
+
+                        <div class="modal-icon">
+
+                            <i class="fa-solid fa-ticket"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Detail Reservasi
+                            </h2>
+
+                            <p>
+                                Informasi lengkap reservasi pengunjung
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="modal-close"
+                        onclick="closeReservationModal(
+                            '{{ $item->id }}'
+                        )"
+                    >
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                    </button>
+
+                </div>
+
+
+                <!-- MODAL BODY -->
+
+                <div class="modal-body">
+
+                    <div class="modal-grid">
+
+                        <!-- KODE -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-hashtag"></i>
+
+                                Kode Reservasi
+
+                            </div>
+
+                            <div class="modal-value">
+
+                                {{ $item->kode_reservasi ?? '-' }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NAMA -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                Nama Pengunjung
+
+                            </div>
+
+                            <div class="modal-value">
+
+                                {{ $item->nama_pengunjung ?? '-' }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NO HP -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-phone"></i>
+
+                                No. HP
+
+                            </div>
+
+                            <div class="modal-value">
+
+                                {{ $item->no_hp ?? '-' }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- KOLAM -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-person-swimming"></i>
+
+                                Kolam Renang
+
+                            </div>
+
+                            <div class="modal-value">
+
+                                {{ session(
+                                    'admin_pool_nama',
+                                    'Kolam Renang'
+                                ) }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TANGGAL -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-calendar-days"></i>
+
+                                Tanggal Kunjungan
+
+                            </div>
+
+                            <div class="modal-value">
+
+                                @if($item->tanggal_kunjungan)
+
+                                    {{ \Carbon\Carbon::parse(
+                                        $item->tanggal_kunjungan
+                                    )->format('d-m-Y') }}
+
+                                @else
+
+                                    -
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                                Status Reservasi
+
+                            </div>
+
+
+                            @if(($item->status_reservasi ?? '') === 'Menunggu')
+
+                                <span class="badge badge-menunggu">
+
+                                    <i class="fa-solid fa-clock"></i>
+
+                                    Menunggu
+
+                                </span>
+
+                            @elseif(($item->status_reservasi ?? '') === 'Dikonfirmasi')
+
+                                <span class="badge badge-dikonfirmasi">
+
+                                    <i class="fa-solid fa-check"></i>
+
+                                    Dikonfirmasi
+
+                                </span>
+
+                            @elseif(($item->status_reservasi ?? '') === 'Selesai')
+
+                                <span class="badge badge-selesai">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    Selesai
+
+                                </span>
+
+                            @elseif(($item->status_reservasi ?? '') === 'Dibatalkan')
+
+                                <span class="badge badge-dibatalkan">
+
+                                    <i class="fa-solid fa-xmark"></i>
+
+                                    Dibatalkan
+
+                                </span>
+
+                            @else
+
+                                <span class="badge badge-default">
+
+                                    {{ $item->status_reservasi ?? 'Tidak diketahui' }}
+
+                                </span>
+
+                            @endif
+
+                        </div>
+
+
+                        <!-- JUMLAH TIKET -->
+
+                        <div class="modal-item">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-users"></i>
+
+                                Jumlah Tiket
+
+                            </div>
+
+
+                            <div class="modal-ticket">
+
+                                <div class="ticket-box">
+
+                                    <span>
+                                        Dewasa
+                                    </span>
+
+                                    <strong>
+
+                                        {{ $item->jumlah_dewasa ?? 0 }}
+
+                                        Tiket
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="ticket-box">
+
+                                    <span>
+                                        Anak
+                                    </span>
+
+                                    <strong>
+
+                                        {{ $item->jumlah_anak ?? 0 }}
+
+                                        Tiket
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TOTAL -->
+
+                        <div class="modal-item modal-total">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-money-bill-wave"></i>
+
+                                Total Pembayaran
+
+                            </div>
+
+                            <div class="total-price">
+
+                                Rp{{ number_format(
+                                    $item->total_harga ?? 0,
+                                    0,
+                                    ',',
+                                    '.'
+                                ) }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INFORMASI -->
+
+                        <div class="modal-item full">
+
+                            <div class="modal-label">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                Informasi
+
+                            </div>
+
+                            <div
+                                class="modal-value"
+                                style="
+                                    font-size:11px;
+                                    font-weight:500;
+                                    line-height:1.6;
+                                    color:#64748b;
+                                "
+                            >
+
+                                Data reservasi berasal dari
+                                aplikasi mobile NEXPOOL.
+                                Admin dapat memeriksa dan
+                                memperbarui status reservasi
+                                melalui menu Kelola.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MODAL FOOTER -->
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="modal-btn modal-btn-close"
+                        onclick="closeReservationModal(
+                            '{{ $item->id }}'
+                        )"
+                    >
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Tutup
+
+                    </button>
+
+
+                    <a
+                        href="{{ route(
+                            'reservasi.edit',
+                            $item->id
+                        ) }}"
+                        class="modal-btn modal-btn-edit"
+                    >
+
+                        <i class="fa-solid fa-pen-to-square"></i>
+
+                        Kelola Status
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
 
 
     <!-- =====================================================
@@ -2144,7 +1998,6 @@
                 document.body.style.overflow = 'hidden';
 
             }
-
         }
 
 
@@ -2162,13 +2015,15 @@
                 document.body.style.overflow = '';
 
             }
-
         }
 
 
         function closeReservationModalOutside(event, id) {
 
-            if (event.target === event.currentTarget) {
+            if (
+                event.target ===
+                event.currentTarget
+            ) {
 
                 closeReservationModal(id);
 
@@ -2186,13 +2041,17 @@
                 if (event.key === 'Escape') {
 
                     const modals =
-                        document.querySelectorAll('.modal.show');
+                        document.querySelectorAll(
+                            '.modal.show'
+                        );
 
-                    modals.forEach(function(modal) {
+                    modals.forEach(
+                        function(modal) {
 
-                        modal.classList.remove('show');
+                            modal.classList.remove('show');
 
-                    });
+                        }
+                    );
 
                     document.body.style.overflow = '';
 

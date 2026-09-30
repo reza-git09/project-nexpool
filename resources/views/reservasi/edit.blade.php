@@ -1,12 +1,13 @@
 ```blade
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <title>Pantau Reservasi - NEXPOOL</title>
 
@@ -176,7 +177,6 @@
             margin-bottom: 8px;
         }
 
-        /* INPUT READONLY */
         .form-group input,
         .form-group select {
             width: 100%;
@@ -228,6 +228,17 @@
             margin-bottom: 5px;
         }
 
+        /* SUCCESS */
+        .success-box {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
         /* BUTTON */
         .buttons {
             display: flex;
@@ -256,7 +267,6 @@
             background: #1d4ed8;
         }
 
-        /* STATUS INFO */
         .status-note {
             margin-top: 8px;
             font-size: 12px;
@@ -303,7 +313,7 @@
             <!-- DASHBOARD -->
             <a href="{{ route('dashboard') }}">
                 <i class="fa-solid fa-gauge-high"
-                   style="color:#3b82f6;width:18px;text-align:center;font-size:15px;">
+                    style="color:#3b82f6;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Dashboard</span>
             </a>
@@ -311,7 +321,7 @@
             <!-- MANAJEMEN TIKET -->
             <a href="{{ route('harga-tiket.index') }}">
                 <i class="fa-solid fa-ticket"
-                   style="color:#f59e0b;width:18px;text-align:center;font-size:15px;">
+                    style="color:#f59e0b;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Manajemen Tiket</span>
             </a>
@@ -319,7 +329,7 @@
             <!-- FASILITAS -->
             <a href="{{ route('fasilitas.index') }}">
                 <i class="fa-solid fa-person-swimming"
-                   style="color:#06b6d4;width:18px;text-align:center;font-size:15px;">
+                    style="color:#06b6d4;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Fasilitas</span>
             </a>
@@ -327,7 +337,7 @@
             <!-- RESERVASI -->
             <a href="{{ route('reservasi.index') }}" class="active">
                 <i class="fa-solid fa-calendar-check"
-                   style="color:#10b981;width:18px;text-align:center;font-size:15px;">
+                    style="color:#10b981;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Reservasi</span>
             </a>
@@ -335,7 +345,7 @@
             <!-- PROMO -->
             <a href="{{ route('promo.index') }}">
                 <i class="fa-solid fa-tags"
-                   style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;">
+                    style="color:#8b5cf6;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Promo</span>
             </a>
@@ -343,7 +353,7 @@
             <!-- REVIEW -->
             <a href="{{ route('review.index') }}">
                 <i class="fa-solid fa-star"
-                   style="color:#eab308;width:18px;text-align:center;font-size:15px;">
+                    style="color:#eab308;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Review</span>
             </a>
@@ -354,7 +364,7 @@
         <div class="logout">
             <a href="{{ route('logout') }}">
                 <i class="fa-solid fa-right-from-bracket"
-                   style="color:#ef4444;width:18px;text-align:center;font-size:15px;">
+                    style="color:#ef4444;width:18px;text-align:center;font-size:15px;">
                 </i>
                 <span>Logout</span>
             </a>
@@ -363,7 +373,7 @@
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main class="main">
 
         <!-- HEADER -->
@@ -426,6 +436,17 @@
                 @endif
 
 
+                <!-- SUCCESS -->
+                @if (session('success'))
+
+                    <div class="success-box">
+                        <i class="fa-solid fa-circle-check"></i>
+                        {{ session('success') }}
+                    </div>
+
+                @endif
+
+
                 <!-- FORM -->
                 <form
                     action="{{ route('reservasi.update', $reservasi->id) }}"
@@ -433,7 +454,6 @@
                 >
 
                     @csrf
-
                     @method('PUT')
 
 
@@ -442,9 +462,7 @@
                         <!-- KODE RESERVASI -->
                         <div class="form-group">
 
-                            <label>
-                                Kode Reservasi
-                            </label>
+                            <label>Kode Reservasi</label>
 
                             <input
                                 type="text"
@@ -455,12 +473,10 @@
                         </div>
 
 
-                        <!-- NAMA PENGUNJUNG -->
+                        <!-- NAMA -->
                         <div class="form-group">
 
-                            <label>
-                                Nama Pengunjung
-                            </label>
+                            <label>Nama Pengunjung</label>
 
                             <input
                                 type="text"
@@ -474,9 +490,7 @@
                         <!-- NO HP -->
                         <div class="form-group">
 
-                            <label>
-                                No. HP
-                            </label>
+                            <label>No. HP</label>
 
                             <input
                                 type="text"
@@ -487,12 +501,10 @@
                         </div>
 
 
-                        <!-- TANGGAL KUNJUNGAN -->
+                        <!-- TANGGAL -->
                         <div class="form-group">
 
-                            <label>
-                                Tanggal Kunjungan
-                            </label>
+                            <label>Tanggal Kunjungan</label>
 
                             <input
                                 type="text"
@@ -503,12 +515,10 @@
                         </div>
 
 
-                        <!-- TOTAL HARGA -->
+                        <!-- TOTAL -->
                         <div class="form-group">
 
-                            <label>
-                                Total Harga
-                            </label>
+                            <label>Total Harga</label>
 
                             <input
                                 type="text"
@@ -519,12 +529,10 @@
                         </div>
 
 
-                        <!-- JUMLAH DEWASA -->
+                        <!-- DEWASA -->
                         <div class="form-group">
 
-                            <label>
-                                Jumlah Dewasa
-                            </label>
+                            <label>Jumlah Dewasa</label>
 
                             <input
                                 type="text"
@@ -535,12 +543,10 @@
                         </div>
 
 
-                        <!-- JUMLAH ANAK -->
+                        <!-- ANAK -->
                         <div class="form-group">
 
-                            <label>
-                                Jumlah Anak
-                            </label>
+                            <label>Jumlah Anak</label>
 
                             <input
                                 type="text"
@@ -551,12 +557,10 @@
                         </div>
 
 
-                        <!-- STATUS RESERVASI -->
+                        <!-- STATUS -->
                         <div class="form-group full">
 
-                            <label>
-                                Status Reservasi
-                            </label>
+                            <label>Status Reservasi</label>
 
                             <select
                                 name="status_reservasi"
@@ -577,14 +581,9 @@
                                     Dikonfirmasi
                                 </option>
 
-                                <option
-                                    value="Selesai"
-                                    {{ old('status_reservasi', $reservasi->status_reservasi) == 'Selesai' ? 'selected' : '' }}
-                                >
-                                    Selesai
-                                </option>
+                                
 
-                               
+                                
                             </select>
 
                             <div class="status-note">
@@ -603,8 +602,10 @@
                             type="submit"
                             class="btn btn-primary"
                         >
-                            <i class="fa-solid fa-floppy-disk"
-                               style="margin-right:8px;">
+
+                            <i
+                                class="fa-solid fa-floppy-disk"
+                                style="margin-right:8px;">
                             </i>
 
                             Update Status Reservasi
@@ -622,5 +623,6 @@
     </main>
 
 </body>
+
 </html>
 ```
