@@ -11,14 +11,14 @@ class FasilitasController extends Controller
 {
     /* ---------- HELPER ---------- */
 
-    private function poolId(): int
+    private function poolId(): string
     {
-        return (int) session('admin_pool_id');
+        return (string) session('admin_pool_id');
     }
 
     private function authorizePool(Fasilitas $fasilita): void
     {
-        if ((int) $fasilita->pool_id !== $this->poolId()) {
+        if ((string) $fasilita->pool_id !== $this->poolId()) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
     }
@@ -120,7 +120,10 @@ class FasilitasController extends Controller
     {
         $this->authorizePool($fasilita);
 
-        $request->validate($this->rules($fasilita->id), $this->messages());
+        $request->validate(
+            $this->rules($fasilita->id),
+            $this->messages()
+        );
 
         $gambar = $fasilita->gambar;
 

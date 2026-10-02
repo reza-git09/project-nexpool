@@ -612,7 +612,7 @@
                     </div>
 
                     <div>
-                        <h1>Edit Review</h1>
+                        <h1>Balasan Review</h1>
                         <p>Perbarui balasan admin dan status review pengunjung.</p>
                     </div>
 

@@ -1147,13 +1147,7 @@
                                     Persentase (%)
                                 </option>
 
-                                <option
-                                    value="Nominal"
-                                    {{ old('jenis_diskon') == 'Nominal' ? 'selected' : '' }}
-                                >
-                                    Nominal (Rp)
-                                </option>
-
+                               
                             </select>
 
                             @error('jenis_diskon')
