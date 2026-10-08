@@ -417,6 +417,19 @@
 
             <h3>Dashboard</h3>
 
+
+                <h3>
+                    Dashboard
+                </h3>
+
+                <p>
+                    Ringkasan aktivitas kolam renang
+                </p>
+
+            </div> 
+
+            <!-- ADMIN INFO -->
+
             <div class="admin-info">
 
                 <div class="admin-text">
