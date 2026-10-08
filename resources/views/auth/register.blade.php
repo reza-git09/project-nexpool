@@ -261,21 +261,6 @@
                 </div>
             </div>
 
-            <!-- Kode Registrasi Wisata -->
-            <div class="form-group">
-                <label for="registration_code">Kode Registrasi Wisata</label>
-                <input
-                    type="text"
-                    id="registration_code"
-                    name="registration_code"
-                    placeholder="Masukkan kode rahasia wisata"
-                    required
-                >
-                @error('registration_code')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
             <!-- Submit Button -->
             <button type="submit" id="submitBtn" class="btn-register">
                 Daftar

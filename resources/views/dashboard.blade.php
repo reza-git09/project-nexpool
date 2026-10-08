@@ -902,7 +902,7 @@
                     Ringkasan aktivitas kolam renang
                 </p>
 
-            </div>
+            </div> 
 
             <!-- ADMIN INFO -->
             <div class="admin-info">
