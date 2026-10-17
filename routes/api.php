@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\KolamRenangApiController;
 use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ReservasiApiController;
 use App\Http\Controllers\Api\PengunjungApiController;
+use App\Http\Controllers\Api\FasilitasApiController;
 
 // =========================================================
 // TEST API
@@ -98,3 +99,6 @@ Route::post('/login', [
     PengunjungApiController::class,
     'login'
 ]);
+
+Route::get('/fasilitas', [FasilitasApiController::class, 'index']);
+Route::get('/fasilitas/{id}', [FasilitasApiController::class, 'show']);

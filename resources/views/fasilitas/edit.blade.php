@@ -1,4 +1,3 @@
-```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -1043,6 +1042,79 @@
                         </div>
 
 
+                        <!-- JENIS -->
+
+                        <div class="form-group">
+
+                            <label for="jenis">
+                                Jenis
+                                <span class="required">*</span>
+                            </label>
+
+                            @php($jenisNow = old('jenis', $fasilita->jenis ?? 'fasilitas'))
+
+                            <select id="jenis" name="jenis" class="form-control" required>
+                                <option value="fasilitas" {{ $jenisNow === 'fasilitas' ? 'selected' : '' }}>
+                                    Fasilitas (Mushola, Gazebo, Kantin, dll)
+                                </option>
+                                <option value="kolam" {{ $jenisNow === 'kolam' ? 'selected' : '' }}>
+                                    Kolam (punya halaman detail di aplikasi)
+                                </option>
+                            </select>
+
+                            @error('jenis')
+                                <div class="error">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+
+
+                        <!-- DETAIL KOLAM (hanya jika jenis = kolam) -->
+
+                        <div id="detail-kolam" style="display:none;">
+
+                            <div class="form-group">
+                                <label for="kedalaman">Kedalaman</label>
+                                <input
+                                    type="text"
+                                    id="kedalaman"
+                                    name="kedalaman"
+                                    class="form-control"
+                                    value="{{ old('kedalaman', $fasilita->kedalaman) }}"
+                                    placeholder="Contoh: 1.2m - 1.5m"
+                                    maxlength="50">
+                                @error('kedalaman')
+                                    <div class="error">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="usia">Usia</label>
+                                <input
+                                    type="text"
+                                    id="usia"
+                                    name="usia"
+                                    class="form-control"
+                                    value="{{ old('usia', $fasilita->usia) }}"
+                                    placeholder="Contoh: Dewasa / Anak-anak / Semua usia"
+                                    maxlength="50">
+                                @error('usia')
+                                    <div class="error">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                        </div>
+
+
                         <!-- GAMBAR -->
 
                         <div class="form-group">
@@ -1126,7 +1198,20 @@
 
     </main>
 
+    <script>
+        (function () {
+            var jenis = document.getElementById('jenis');
+            var detail = document.getElementById('detail-kolam');
+
+            function toggleDetail() {
+                detail.style.display = jenis.value === 'kolam' ? 'block' : 'none';
+            }
+
+            jenis.addEventListener('change', toggleDetail);
+            toggleDetail();
+        })();
+    </script>
+
 </body>
 
 </html>
-```

@@ -13,6 +13,9 @@ class Fasilitas extends Model
         'nama_fasilitas',
         'deskripsi',
         'gambar',
+        'jenis',
+        'kedalaman',
+        'usia',
         'status',
     ];
 
