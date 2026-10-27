@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\FasilitasApiController;
 // =========================================================
 Route::post('/register', [PengunjungApiController::class, 'register']);
 Route::post('/login', [PengunjungApiController::class, 'login']);
+Route::post('/check-account', [PengunjungApiController::class, 'checkAccount']);
+Route::post('/reset-password', [PengunjungApiController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     return response()->json([

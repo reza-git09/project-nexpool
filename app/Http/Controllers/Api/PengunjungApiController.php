@@ -86,4 +86,62 @@ class PengunjungApiController extends Controller
             ],
         ], 200);
     }
+
+    /**
+     * CEK KEBERADAAN AKUN (untuk alur lupa password)
+     * POST /api/check-account
+     */
+    public function checkAccount(Request $request)
+    {
+        $request->validate(['login' => 'required|string']);
+
+        $login = trim($request->input('login'));
+
+        $pengunjung = Pengunjung::where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
+
+        if (!$pengunjung) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun dengan username/email tersebut tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Akun ditemukan.'], 200);
+    }
+
+    /**
+     * RESET PASSWORD PENGUNJUNG
+     * POST /api/reset-password
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'login'                 => 'required|string',
+            'password'              => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required|string',
+        ]);
+
+        $login = trim($request->input('login'));
+
+        $pengunjung = Pengunjung::where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
+
+        if (!$pengunjung) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun tidak ditemukan.',
+            ], 404);
+        }
+
+        $pengunjung->password = Hash::make($request->input('password'));
+        $pengunjung->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil diperbarui.',
+        ], 200);
+    }
 }
