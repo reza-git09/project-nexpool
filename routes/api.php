@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -5,6 +6,12 @@ use App\Http\Controllers\Api\HargaTiketApiController;
 use App\Http\Controllers\Api\KolamRenangApiController;
 use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ReservasiApiController;
+use App\Http\Controllers\Api\PengunjungApiController;
+use App\Http\Controllers\Api\FasilitasApiController;
+
+// =========================================================
+// TEST API
+// =========================================================
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +63,28 @@ Route::get('/test', function () {
     ]);
 });
 
+// =========================================================
+// HARGA TIKET
+// =========================================================
+
+Route::get('/harga-tiket', [
+    HargaTiketApiController::class,
+    'index'
+]);
+
+Route::get('/harga-tiket/{pool_id}', [
+    HargaTiketApiController::class,
+    'showByPool'
+]);
+
+// =========================================================
+// KOLAM RENANG
+// =========================================================
+
+Route::get('/kolam-renang', [
+    KolamRenangApiController::class,
+    'index'
+]);
 Route::get('/harga-tiket', [HargaTiketApiController::class, 'index']);
 Route::get('/kolam-renang', [KolamRenangApiController::class, 'index']);
 

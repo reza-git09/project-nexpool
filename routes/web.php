@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\HargaTiketController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\KolamRenangController;
@@ -13,16 +14,19 @@ use App\Http\Controllers\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
-| LOGIN
+| AUTHENTICATION (LOGIN & REGISTER)
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')
     ->name('login.process');
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register'])
+    ->middleware('throttle:5,1')
+    ->name('register.process');
 
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');

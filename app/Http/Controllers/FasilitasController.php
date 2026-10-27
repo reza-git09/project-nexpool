@@ -11,14 +11,14 @@ class FasilitasController extends Controller
 {
     /* ---------- HELPER ---------- */
 
-    private function poolId(): int
+    private function poolId(): string
     {
-        return (int) session('admin_pool_id');
+        return (string) session('admin_pool_id');
     }
 
     private function authorizePool(Fasilitas $fasilita): void
     {
-        if ((int) $fasilita->pool_id !== $this->poolId()) {
+        if ((string) $fasilita->pool_id !== $this->poolId()) {
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
     }
@@ -42,6 +42,9 @@ class FasilitasController extends Controller
             ],
             'deskripsi' => ['required', 'string'],
             'gambar'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'jenis'     => ['required', Rule::in(['kolam', 'fasilitas'])],
+            'kedalaman' => ['nullable', 'string', 'max:50'],
+            'usia'      => ['nullable', 'string', 'max:50'],
         ];
     }
 
@@ -55,6 +58,8 @@ class FasilitasController extends Controller
             'gambar.image'            => 'File yang dipilih harus berupa gambar.',
             'gambar.mimes'            => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
             'gambar.max'              => 'Ukuran gambar maksimal 2 MB.',
+            'jenis.required'          => 'Jenis wajib dipilih.',
+            'jenis.in'                => 'Jenis harus Kolam atau Fasilitas.',
         ];
     }
 
@@ -94,6 +99,9 @@ class FasilitasController extends Controller
             'nama_fasilitas' => $request->nama_fasilitas,
             'deskripsi'      => $request->deskripsi,
             'gambar'         => $gambar,
+            'jenis'          => $request->jenis,
+            'kedalaman'      => $request->jenis === 'kolam' ? $request->kedalaman : null,
+            'usia'           => $request->jenis === 'kolam' ? $request->usia : null,
             'status'         => 1,
         ]);
 
@@ -120,7 +128,10 @@ class FasilitasController extends Controller
     {
         $this->authorizePool($fasilita);
 
-        $request->validate($this->rules($fasilita->id), $this->messages());
+        $request->validate(
+            $this->rules($fasilita->id),
+            $this->messages()
+        );
 
         $gambar = $fasilita->gambar;
 
@@ -133,6 +144,9 @@ class FasilitasController extends Controller
             'nama_fasilitas' => $request->nama_fasilitas,
             'deskripsi'      => $request->deskripsi,
             'gambar'         => $gambar,
+            'jenis'          => $request->jenis,
+            'kedalaman'      => $request->jenis === 'kolam' ? $request->kedalaman : null,
+            'usia'           => $request->jenis === 'kolam' ? $request->usia : null,
         ]);
 
         return redirect()

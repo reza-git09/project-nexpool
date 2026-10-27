@@ -1147,13 +1147,7 @@
                                     Persentase (%)
                                 </option>
 
-                                <option
-                                    value="Nominal"
-                                    {{ old('jenis_diskon') == 'Nominal' ? 'selected' : '' }}
-                                >
-                                    Nominal (Rp)
-                                </option>
-
+                               
                             </select>
 
                             @error('jenis_diskon')
@@ -1225,6 +1219,7 @@
                                 id="tanggal_mulai"
                                 name="tanggal_mulai"
                                 value="{{ old('tanggal_mulai') }}"
+                                min="{{ date('Y-m-d') }}"
                                 required
                                 onchange="validateTanggal()"
                             >
@@ -1500,8 +1495,11 @@
 
         const selesai = selesaiEl.value;
 
+        const today   = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        if (!mulai || !selesai) {
+
+        if (!mulai) {
 
             hideTglError();
 
@@ -1510,7 +1508,34 @@
         }
 
 
-        const tMulai   = new Date(mulai);
+        const tMulai = new Date(mulai);
+
+
+        // Cek tanggal mulai tidak boleh di masa lalu
+
+        if (tMulai < today) {
+
+            showTglError(
+                'Tanggal Mulai tidak boleh sebelum hari ini.'
+            );
+
+            mulaiEl.value = '';
+
+            selesaiEl.value = '';
+
+            return;
+
+        }
+
+
+        if (!selesai) {
+
+            hideTglError();
+
+            return;
+
+        }
+
 
         const tSelesai = new Date(selesai);
 

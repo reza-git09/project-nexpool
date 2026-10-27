@@ -21,10 +21,12 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 20px;
         }
 
         .login-container {
-            width: 400px;
+            width: 100%;
+            max-width: 400px;
             background: white;
             padding: 40px;
             border-radius: 15px;
@@ -47,6 +49,28 @@
             font-size: 14px;
         }
 
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
         .form-group {
             margin-bottom: 18px;
         }
@@ -56,18 +80,23 @@
             margin-bottom: 7px;
             color: #333;
             font-weight: bold;
+            font-size: 13px;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
             outline: none;
+            background: white;
+            transition: border-color 0.2s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: #1e3c72;
         }
 
@@ -108,10 +137,34 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
         }
 
         .btn-login:hover {
             background: #16315f;
+        }
+
+        .btn-login:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .register-link a {
+            color: #1e3c72;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
         }
 
         .footer {
@@ -132,31 +185,49 @@
             <p>Website Management System</p>
         </div>
 
-        <form action="{{ route('login.process') }}" method="POST">
+        @if(session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <form id="loginForm" action="{{ route('login.process') }}" method="POST">
              @csrf
 
+            <!-- Username -->
             <div class="form-group">
                 <label for="username">Username</label>
                 <input
                     type="text"
                     id="username"
                     name="username"
+                    value="{{ session('registered_username', old('username')) }}"
                     placeholder="Masukkan username"
                     required
                 >
             </div>
 
+            <!-- Pool ID -->
             <div class="form-group">
-                <label for="pool_id">Pool ID</label>
-                <input
-                    type="text"
-                    id="pool_id"
-                    name="pool_id"
-                    placeholder="Contoh: pool_id_01"
-                    required
-                >
+                <label for="pool_id">Wisata / Pool ID</label>
+                <select id="pool_id" name="pool_id" required>
+                    <option value="">Pilih Wisata Kolam Renang</option>
+                    @foreach($pools as $pool)
+                        <option value="{{ $pool->pool_id }}"
+                            {{ (session('registered_pool_id', old('pool_id')) == $pool->pool_id) ? 'selected' : '' }}>
+                            {{ $pool->name }} ({{ $pool->pool_id }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
+            <!-- Password -->
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-wrapper">
@@ -173,11 +244,15 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-login">
+            <button type="submit" id="loginBtn" class="btn-login">
                 Login
             </button>
 
         </form>
+
+        <div class="register-link">
+            Belum punya akun? <a href="{{ route('register') }}">Daftar</a>
+        </div>
 
         <div class="footer">
             NEXPOOL &copy; 2026
@@ -186,6 +261,7 @@
     </div>
 
 <script>
+    // 1. Password Visibility Toggle
     const toggleBtn = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('togglePasswordIcon');
@@ -195,6 +271,15 @@
         passwordInput.type = isPassword ? 'text' : 'password';
         toggleIcon.classList.toggle('fa-eye', !isPassword);
         toggleIcon.classList.toggle('fa-eye-slash', isPassword);
+    });
+
+    // 2. Disable Submit Button on Submission
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+
+    loginForm.addEventListener('submit', function () {
+        loginBtn.disabled = true;
+        loginBtn.innerText = 'Memproses...';
     });
 </script>
 

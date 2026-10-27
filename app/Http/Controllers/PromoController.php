@@ -38,7 +38,7 @@ class PromoController extends Controller
                 'min:0',
                 $jenisDiskon === 'Persentase' ? 'max:100' : 'max:999999999',
             ],
-            'tanggal_mulai'   => 'required|date',
+            'tanggal_mulai'   => 'required|date|after_or_equal:today',
             'tanggal_selesai' => [
                 'required',
                 'date',
@@ -54,6 +54,7 @@ class PromoController extends Controller
             'status'          => 'required|boolean',
         ], [
             'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
+            'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
             'tanggal_selesai.after'    => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
         ]);
 
@@ -112,7 +113,7 @@ class PromoController extends Controller
                 'min:0',
                 $jenisDiskon === 'Persentase' ? 'max:100' : 'max:999999999',
             ],
-            'tanggal_mulai'   => 'required|date',
+            'tanggal_mulai'   => 'required|date|after_or_equal:today',
             'tanggal_selesai' => [
                 'required',
                 'date',
@@ -128,6 +129,7 @@ class PromoController extends Controller
             'status'          => 'required|boolean',
         ], [
             'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
+            'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
             'tanggal_selesai.after'    => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
         ]);
 
