@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ReservasiApiController;
 use App\Http\Controllers\Api\PengunjungApiController;
 use App\Http\Controllers\Api\FasilitasApiController;
+use App\Http\Controllers\Api\PromoApiController;
 
 // =========================================================
 // AUTH PENGUNJUNG (tabel: pengunjung)
@@ -44,6 +45,17 @@ Route::get('/harga-tiket/{pool_id}', [HargaTiketApiController::class, 'showByPoo
 // KOLAM RENANG
 // =========================================================
 Route::get('/kolam-renang', [KolamRenangApiController::class, 'index']);
+
+// =========================================================
+// FASILITAS (diisi lewat admin, tampil di aplikasi)
+// =========================================================
+Route::get('/fasilitas', [FasilitasApiController::class, 'index']);
+Route::get('/fasilitas/{id}', [FasilitasApiController::class, 'show']);
+
+// =========================================================
+// PROMO (diisi lewat admin, tampil di aplikasi)
+// =========================================================
+Route::get('/promo', [PromoApiController::class, 'index']);
 
 // =========================================================
 // REVIEW
