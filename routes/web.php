@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -10,7 +11,7 @@ use App\Http\Controllers\KolamRenangController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ReviewController;
-
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,11 +20,13 @@ use App\Http\Controllers\ReviewController;
 */
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+
 Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login.process');
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+
 Route::post('/register', [RegisterController::class, 'register'])
     ->middleware('throttle:5,1')
     ->name('register.process');
@@ -31,19 +34,15 @@ Route::post('/register', [RegisterController::class, 'register'])
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
-
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('admin')
     ->name('dashboard');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +53,6 @@ Route::get('/dashboard', function () {
 Route::resource('harga-tiket', HargaTiketController::class)
     ->middleware('admin');
 
-
 /*
 |--------------------------------------------------------------------------
 | FASILITAS
@@ -64,7 +62,6 @@ Route::resource('harga-tiket', HargaTiketController::class)
 Route::resource('fasilitas', FasilitasController::class)
     ->middleware('admin');
 
-
 /*
 |--------------------------------------------------------------------------
 | KOLAM RENANG
@@ -73,7 +70,6 @@ Route::resource('fasilitas', FasilitasController::class)
 
 Route::resource('kolam-renang', KolamRenangController::class)
     ->middleware('admin');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -90,7 +86,6 @@ Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi
 Route::resource('reservasi', ReservasiController::class)
     ->middleware('admin');
 
-
 /*
 |--------------------------------------------------------------------------
 | PROMO
@@ -99,7 +94,6 @@ Route::resource('reservasi', ReservasiController::class)
 
 Route::resource('promo', PromoController::class)
     ->middleware('admin');
-
 
 /*
 |--------------------------------------------------------------------------
