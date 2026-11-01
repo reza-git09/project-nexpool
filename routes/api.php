@@ -9,11 +9,20 @@ use App\Http\Controllers\Api\ReservasiApiController;
 use App\Http\Controllers\Api\PengunjungApiController;
 use App\Http\Controllers\Api\FasilitasApiController;
 use App\Http\Controllers\Api\PromoApiController;
+use App\Http\Controllers\Api\OtpApiController;
+use App\Http\Middleware\EnsurePhoneVerified;
+
+// =========================================================
+// OTP WHATSAPP (verifikasi nomor HP saat registrasi)
+// =========================================================
+Route::post('/otp/send', [OtpApiController::class, 'send'])->middleware('throttle:5,1');
+Route::post('/otp/verify', [OtpApiController::class, 'verify'])->middleware('throttle:10,1');
 
 // =========================================================
 // AUTH PENGUNJUNG (tabel: pengunjung)
 // =========================================================
-Route::post('/register', [PengunjungApiController::class, 'register']);
+// Registrasi hanya lolos kalau nomor HP sudah diverifikasi lewat OTP
+Route::post('/register', [PengunjungApiController::class, 'register'])->middleware(EnsurePhoneVerified::class);
 Route::post('/login', [PengunjungApiController::class, 'login']);
 Route::post('/check-account', [PengunjungApiController::class, 'checkAccount']);
 Route::post('/reset-password', [PengunjungApiController::class, 'resetPassword']);

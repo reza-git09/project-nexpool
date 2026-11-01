@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // OTP WhatsApp: token gateway Fonnte (isi di .env)
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+    ],
+
+    // OTP: 'log' = mode tes (kode ke laravel.log), 'fonnte' = kirim WA sungguhan
+    'otp' => [
+        'driver' => env('OTP_DRIVER', 'log'),
+    ],
+
 ];
