@@ -205,7 +205,7 @@ class ReservasiApiController extends Controller
      * Contoh:
      * /api/reservasi/1
      */
-    public function show($id): JsonResponse
+    public function show(string|int $id): JsonResponse
     {
         try {
 
@@ -241,7 +241,7 @@ class ReservasiApiController extends Controller
      * Contoh:
      * /api/reservasi/kode/RSV-20260924-ABC123
      */
-    public function showByKode($kode): JsonResponse
+    public function showByKode(string|int $kode): JsonResponse
     {
         try {
 

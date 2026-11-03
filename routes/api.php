@@ -11,6 +11,10 @@ use App\Http\Controllers\Api\FasilitasApiController;
 use App\Http\Controllers\Api\PromoApiController;
 use App\Http\Controllers\Api\OtpApiController;
 use App\Http\Middleware\EnsurePhoneVerified;
+use App\Http\Controllers\Api\PaymentApiController;
+
+// MITRANS PAYMENT GATEWAY
+Route::post('/midtrans/create-payment', [PaymentApiController::class, 'createPayment']);
 
 // =========================================================
 // OTP WHATSAPP (verifikasi nomor HP saat registrasi)
