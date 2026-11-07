@@ -18,6 +18,12 @@ class Reservasi extends Model
         'jumlah_anak',
         'total_harga',
         'status_reservasi',
+        'status_pembayaran',
+        'payment_method',
+        'midtrans_order_id',
+        'midtrans_transaction_id',
+        'midtrans_qr_url',
+        'paid_at',
     ];
 
     protected $casts = [
@@ -25,5 +31,6 @@ class Reservasi extends Model
         'jumlah_dewasa' => 'integer',
         'jumlah_anak' => 'integer',
         'total_harga' => 'decimal:2',
+        'paid_at' => 'datetime',
     ];
 }

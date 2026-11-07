@@ -15,6 +15,10 @@ use App\Http\Controllers\Api\PaymentApiController;
 
 // MITRANS PAYMENT GATEWAY
 Route::post('/midtrans/create-payment', [PaymentApiController::class, 'createPayment']);
+Route::post('/midtrans/create-qris', [PaymentApiController::class, 'createQris']);
+Route::get('/midtrans/qr/{orderId}', [PaymentApiController::class, 'qrImage']);
+Route::get('/midtrans/status/{orderId}', [PaymentApiController::class, 'status']);
+Route::post('/midtrans/notification', [PaymentApiController::class, 'notification']);
 
 // =========================================================
 // OTP WHATSAPP (verifikasi nomor HP saat registrasi)

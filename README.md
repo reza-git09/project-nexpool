@@ -56,3 +56,20 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Pembayaran QRIS Midtrans
+
+Atur `MIDTRANS_SERVER_KEY` dan `MIDTRANS_IS_PRODUCTION` di `.env` backend. Jangan
+menyimpan Server Key di aplikasi Flutter. Setelah konfigurasi database siap,
+jalankan migrasi:
+
+```bash
+php artisan migrate
+```
+
+Di dashboard Midtrans, set URL notifikasi pembayaran ke
+`https://<domain-api>/api/midtrans/notification`. Endpoint ini harus dapat
+dijangkau Midtrans melalui HTTPS; alamat localhost atau IP jaringan lokal tidak
+dapat menerima notifikasi. Aplikasi juga memeriksa status transaksi melalui
+`GET /api/midtrans/status/{orderId}` agar pembayaran tetap terkonfirmasi saat
+notifikasi terlambat.
