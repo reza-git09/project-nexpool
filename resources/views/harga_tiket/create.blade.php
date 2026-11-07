@@ -607,6 +607,16 @@
 
             </a>
 
+            <a href="{{ route('admin.laporan.penjualan') }}">
+
+                <i class="fa-solid fa-chart-column"
+                    style="color:#60a5fa;">
+                </i>
+
+                <span>Laporan Penjualan Tiket</span>
+
+            </a>
+
         </div>
 
 
@@ -762,54 +772,6 @@
                         method="POST">
 
                         @csrf
-
-
-                        <!-- KATEGORI -->
-
-                        <div class="form-group">
-
-                            <label>
-                                Kategori Tiket
-                            </label>
-
-                            <div class="input-wrapper">
-
-                                <i class="fa-solid fa-users input-icon"></i>
-
-                                <select name="kategori" required>
-
-                                    <option value="">
-                                        -- Pilih Kategori --
-                                    </option>
-
-                                    <option value="Dewasa"
-                                        {{ old('kategori') == 'Dewasa' ? 'selected' : '' }}>
-
-                                        Dewasa
-
-                                    </option>
-
-                                    <option value="Anak"
-                                        {{ old('kategori') == 'Anak' ? 'selected' : '' }}>
-
-                                        Anak
-
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            @error('kategori')
-
-                                <div class="error">
-                                    {{ $message }}
-                                </div>
-
-                            @enderror
-
-                        </div>
 
 
                         <!-- JENIS HARI -->

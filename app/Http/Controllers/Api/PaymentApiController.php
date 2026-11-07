@@ -28,7 +28,7 @@ class PaymentApiController extends Controller
         $this->configureMidtrans();
 
         try {
-            $orderId = 'NEXPOOL-' . now()->format('YmdHis');
+            $orderId = 'NEXPOOL-'.now()->format('YmdHis');
             $transaction = Snap::createTransaction([
                 'transaction_details' => [
                     'order_id' => $orderId,
@@ -96,7 +96,7 @@ class PaymentApiController extends Controller
         $this->configureMidtrans();
 
         try {
-            $orderId = $reservation->kode_reservasi . '-' . strtoupper(Str::random(6));
+            $orderId = $reservation->kode_reservasi.'-'.strtoupper(Str::random(6));
             $transaction = CoreApi::charge([
                 'payment_type' => 'qris',
                 'transaction_details' => [
@@ -131,7 +131,7 @@ class PaymentApiController extends Controller
 
             if (
                 ($transactionData['status_code'] ?? null) !== '201'
-                || !is_string($qrUrl)
+                || ! is_string($qrUrl)
                 || $qrUrl === ''
             ) {
                 throw new \RuntimeException('Midtrans tidak mengembalikan URL QRIS.');
@@ -222,9 +222,9 @@ class PaymentApiController extends Controller
         $this->assertMidtransConfigured();
 
         $url = Config::getBaseUrl()
-            . '/v2/qris/'
-            . rawurlencode($reservation->midtrans_transaction_id)
-            . '/qr-code';
+            .'/v2/qris/'
+            .rawurlencode($reservation->midtrans_transaction_id)
+            .'/qr-code';
 
         try {
             $response = Http::withBasicAuth(
@@ -235,7 +235,7 @@ class PaymentApiController extends Controller
                 ->timeout(15)
                 ->get($url);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('Midtrans QR image request failed.', [
                     'order_id' => $orderId,
                     'http_status' => $response->status(),
@@ -262,7 +262,7 @@ class PaymentApiController extends Controller
 
             $image = $response->body();
             $pngSignature = "\x89PNG\r\n\x1a\n";
-            if (!str_starts_with($image, $pngSignature)) {
+            if (! str_starts_with($image, $pngSignature)) {
                 $signatureOffset = strpos($image, $pngSignature);
                 if (
                     $signatureOffset === false
@@ -310,12 +310,12 @@ class PaymentApiController extends Controller
         $expectedSignature = hash(
             'sha512',
             $validated['order_id']
-                . $validated['status_code']
-                . $validated['gross_amount']
-                . $serverKey,
+                .$validated['status_code']
+                .$validated['gross_amount']
+                .$serverKey,
         );
 
-        if (!$serverKey || !hash_equals($expectedSignature, $validated['signature_key'])) {
+        if (! $serverKey || ! hash_equals($expectedSignature, $validated['signature_key'])) {
             return response()->json(['message' => 'Notifikasi Midtrans tidak valid.'], 403);
         }
 
@@ -324,7 +324,7 @@ class PaymentApiController extends Controller
             $validated['order_id'],
         )->first();
 
-        if (!$reservation) {
+        if (! $reservation) {
             return response()->json(['message' => 'Reservasi tidak ditemukan.'], 404);
         }
 
@@ -398,7 +398,7 @@ class PaymentApiController extends Controller
 
             if (
                 $lockedReservation->status_pembayaran === 'paid'
-                && !in_array($paymentStatus, ['paid', 'refunded'], true)
+                && ! in_array($paymentStatus, ['paid', 'refunded'], true)
             ) {
                 return;
             }

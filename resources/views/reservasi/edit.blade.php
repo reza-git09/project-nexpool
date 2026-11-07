@@ -357,6 +357,12 @@
                 </i>
                 <span>Review</span>
             </a>
+            <a href="{{ route('admin.laporan.penjualan') }}">
+                <i class="fa-solid fa-chart-column"
+                    style="color:#60a5fa;width:18px;text-align:center;font-size:15px;">
+                </i>
+                <span>Laporan Penjualan Tiket</span>
+            </a>
 
         </div>
 

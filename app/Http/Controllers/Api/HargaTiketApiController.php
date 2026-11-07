@@ -18,7 +18,6 @@ class HargaTiketApiController extends Controller
     {
         try {
             $data = HargaTiket::orderBy('pool_id')
-                ->orderBy('kategori')
                 ->orderBy('jenis_hari')
                 ->get();
 
@@ -38,7 +37,6 @@ class HargaTiketApiController extends Controller
         }
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | AMBIL HARGA TIKET BERDASARKAN POOL
@@ -50,7 +48,6 @@ class HargaTiketApiController extends Controller
         try {
 
             $data = HargaTiket::where('pool_id', $pool_id)
-                ->orderBy('kategori')
                 ->orderBy('jenis_hari')
                 ->get();
 

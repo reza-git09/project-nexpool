@@ -1,17 +1,16 @@
-
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\LaporanPenjualanController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\HargaTiketController;
-use App\Http\Controllers\FasilitasController;
-use App\Http\Controllers\KolamRenangController;
-use App\Http\Controllers\ReservasiController;
-use App\Http\Controllers\PromoController;
-use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\HargaTiketController;
+use App\Http\Controllers\KolamRenangController;
+use App\Http\Controllers\PromoController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ReservasiController;
+use App\Http\Controllers\ReviewController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +42,20 @@ Route::get('/logout', [AuthController::class, 'logout'])
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('admin')
     ->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| LAPORAN PENJUALAN
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])
+    ->middleware('admin')
+    ->name('admin.laporan.penjualan');
+
+Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'export'])
+    ->middleware('admin')
+    ->name('admin.laporan.penjualan.export');
 
 /*
 |--------------------------------------------------------------------------

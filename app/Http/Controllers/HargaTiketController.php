@@ -11,7 +11,6 @@ class HargaTiketController extends Controller
     public function index()
     {
         $hargaTiket = HargaTiket::where('pool_id', session('admin_pool_id'))
-            ->orderBy('kategori')
             ->orderBy('jenis_hari')
             ->get();
 
@@ -29,7 +28,6 @@ class HargaTiketController extends Controller
     {
         // 1. Validasi ketat: Murni angka, 4-5 digit, rentang Rp1.000 - Rp99.999
         $request->validate([
-            'kategori' => 'required|in:Dewasa,Anak',
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
@@ -40,8 +38,6 @@ class HargaTiketController extends Controller
                 'max:99999',
             ],
         ], [
-            'kategori.required' => 'Kategori tiket wajib dipilih.',
-            'kategori.in' => 'Kategori tiket tidak valid.',
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
@@ -52,22 +48,20 @@ class HargaTiketController extends Controller
             'harga.max' => 'Harga tiket maksimal Rp99.999.',
         ]);
 
-        // 2. Cek kombinasi ganda (pool_id + kategori + jenis_hari)
+        // 2. Cek kombinasi ganda (pool_id + jenis_hari)
         $isDuplicate = HargaTiket::where('pool_id', session('admin_pool_id'))
-            ->where('kategori', $request->kategori)
             ->where('jenis_hari', $request->jenis_hari)
             ->exists();
 
         if ($isDuplicate) {
             return back()
                 ->withInput()
-                ->withErrors(['kategori' => "Data harga tiket untuk kategori '{$request->kategori}' pada hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
+                ->withErrors(['jenis_hari' => "Data harga tiket untuk hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
         }
 
         // 3. Simpan data
         HargaTiket::create([
             'pool_id' => session('admin_pool_id'),
-            'kategori' => $request->kategori,
             'jenis_hari' => $request->jenis_hari,
             'harga' => (int) $request->harga,
         ]);
@@ -99,7 +93,6 @@ class HargaTiketController extends Controller
 
         // 1. Validasi ketat input edit
         $request->validate([
-            'kategori' => 'required|in:Dewasa,Anak',
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
@@ -110,8 +103,6 @@ class HargaTiketController extends Controller
                 'max:99999',
             ],
         ], [
-            'kategori.required' => 'Kategori tiket wajib dipilih.',
-            'kategori.in' => 'Kategori tiket tidak valid.',
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
@@ -122,9 +113,8 @@ class HargaTiketController extends Controller
             'harga.max' => 'Harga tiket maksimal Rp99.999.',
         ]);
 
-        // 2. Cek apakah kombinasi baru sudah ada di record lain (kecuali data ini sendiri)
+        // 2. Cek apakah jenis hari baru sudah ada di record lain (kecuali data ini sendiri)
         $isDuplicate = HargaTiket::where('pool_id', session('admin_pool_id'))
-            ->where('kategori', $request->kategori)
             ->where('jenis_hari', $request->jenis_hari)
             ->where('id', '!=', $hargaTiket->id)
             ->exists();
@@ -132,12 +122,11 @@ class HargaTiketController extends Controller
         if ($isDuplicate) {
             return back()
                 ->withInput()
-                ->withErrors(['kategori' => "Data harga tiket untuk kategori '{$request->kategori}' pada hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
+                ->withErrors(['jenis_hari' => "Data harga tiket untuk hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
         }
 
         // 3. Update database
         $hargaTiket->update([
-            'kategori' => $request->kategori,
             'jenis_hari' => $request->jenis_hari,
             'harga' => (int) $request->harga,
         ]);

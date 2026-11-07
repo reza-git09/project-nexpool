@@ -167,6 +167,7 @@ tbody tr:hover{background:#fafcff}
         ['reservasi.index',     'fa-calendar-check',   '#6ee7b7', 'Reservasi'],
         ['promo.index',         'fa-tags',             '#c4b5fd', 'Promo'],
         ['review.index',        'fa-star',             '#fde047', 'Review'],
+        ['admin.laporan.penjualan', 'fa-chart-column', '#60a5fa', 'Laporan Penjualan Tiket'],
     ];
 @endphp
 

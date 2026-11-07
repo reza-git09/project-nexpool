@@ -1122,6 +1122,18 @@
 
             </a>
 
+            <a href="{{ route('admin.laporan.penjualan') }}">
+
+                <i class="fa-solid fa-chart-column"
+                    style="color:#60a5fa;">
+                </i>
+
+                <span>
+                    Laporan Penjualan Tiket
+                </span>
+
+            </a>
+
         </div>
 
         <!-- LOGOUT -->

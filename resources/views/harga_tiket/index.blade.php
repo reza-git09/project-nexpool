@@ -651,51 +651,6 @@
         }
 
         /* =========================================================
-           CATEGORY
-        ========================================================= */
-
-        .category-wrapper {
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-        }
-
-        .category-icon {
-            width: 31px;
-            height: 31px;
-
-            border-radius: 9px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 11px;
-        }
-
-        .category-icon.dewasa {
-            background: #dbeafe;
-
-            color: #2563eb;
-        }
-
-        .category-icon.anak {
-            background: #fef3c7;
-
-            color: #d97706;
-        }
-
-        .category-name {
-            font-weight: 600;
-
-            color: #334155;
-        }
-
-        /* =========================================================
            BADGES
         ========================================================= */
 
@@ -1071,6 +1026,18 @@
 
             </a>
 
+            <a href="{{ route('admin.laporan.penjualan') }}">
+
+                <i class="fa-solid fa-chart-column"
+                    style="color:#60a5fa;">
+                </i>
+
+                <span>
+                    Laporan Penjualan Tiket
+                </span>
+
+            </a>
+
         </div>
 
 
@@ -1172,7 +1139,7 @@
                         </h1>
 
                         <p>
-                            Kelola harga tiket berdasarkan kategori dan jenis hari.
+                            Kelola satu harga tiket berdasarkan jenis hari.
                         </p>
 
                     </div>
@@ -1187,7 +1154,7 @@
 
                     <i class="fa-solid fa-plus"></i>
 
-                    Tambah Harga
+                    Tambah tiket
 
                 </a>
 
@@ -1260,10 +1227,6 @@
                                     </th>
 
                                     <th>
-                                        Kategori
-                                    </th>
-
-                                    <th>
                                         Jenis Hari
                                     </th>
 
@@ -1291,43 +1254,6 @@
                                         <td class="number">
 
                                             {{ $loop->iteration }}
-
-                                        </td>
-
-
-                                        <!-- KATEGORI -->
-
-                                        <td>
-
-                                            <div class="category-wrapper">
-
-                                                @if($item->kategori == 'Dewasa')
-
-                                                    <div class="category-icon dewasa">
-
-                                                        <i class="fa-solid fa-user"></i>
-
-                                                    </div>
-
-                                                    <span class="category-name">
-                                                        Dewasa
-                                                    </span>
-
-                                                @else
-
-                                                    <div class="category-icon anak">
-
-                                                        <i class="fa-solid fa-child"></i>
-
-                                                    </div>
-
-                                                    <span class="category-name">
-                                                        Anak
-                                                    </span>
-
-                                                @endif
-
-                                            </div>
 
                                         </td>
 

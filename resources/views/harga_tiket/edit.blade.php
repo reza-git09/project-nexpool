@@ -798,6 +798,18 @@
 
             </a>
 
+            <a href="{{ route('admin.laporan.penjualan') }}">
+
+                <i class="fa-solid fa-chart-column"
+                    style="color:#60a5fa;">
+                </i>
+
+                <span>
+                    Laporan Penjualan Tiket
+                </span>
+
+            </a>
+
         </div>
 
         <div class="logout">
@@ -937,55 +949,6 @@
                         @csrf
 
                         @method('PUT')
-
-
-                        <!-- KATEGORI TIKET -->
-
-                        <div class="form-group">
-
-                            <label for="kategori">
-
-                                Kategori Tiket
-
-                                <span class="required">
-                                    *
-                                </span>
-
-                            </label>
-
-                            <select
-                                id="kategori"
-                                name="kategori"
-                                class="form-control"
-                                required>
-
-                                <option
-                                    value="Dewasa"
-                                    {{ old('kategori', $hargaTiket->kategori) == 'Dewasa' ? 'selected' : '' }}>
-                                    Dewasa
-                                </option>
-
-                                <option
-                                    value="Anak"
-                                    {{ old('kategori', $hargaTiket->kategori) == 'Anak' ? 'selected' : '' }}>
-                                    Anak
-                                </option>
-
-                            </select>
-
-                            @error('kategori')
-
-                                <div class="error">
-
-                                    <i class="fa-solid fa-circle-exclamation"></i>
-
-                                    {{ $message }}
-
-                                </div>
-
-                            @enderror
-
-                        </div>
 
 
                         <!-- JENIS HARI -->
