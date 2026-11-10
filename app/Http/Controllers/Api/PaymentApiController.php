@@ -410,25 +410,29 @@ class PaymentApiController extends Controller
     }
 
     private function configureMidtrans(): void
-    {
-        $this->assertMidtransConfigured();
+{
+    $this->assertMidtransConfigured();
 
-        Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = (bool) config('services.midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
+    Config::$serverKey = config('services.midtrans.server_key');
+    Config::$isProduction = (bool) config('services.midtrans.is_production');
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
 
-        $caPath = storage_path('cacert.pem');
-        if (file_exists($caPath)) {
-            Config::$curlOptions[CURLOPT_CAINFO] = $caPath;
-        }
+    // Wajib ada: library Midtrans membaca key ini saat curlOptions tidak kosong.
+    Config::$curlOptions = [
+        CURLOPT_HTTPHEADER => [],
+    ];
 
-        if (! Config::$isProduction || app()->isLocal()) {
-            Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
-            Config::$curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
-        }
+    $caPath = storage_path('cacert.pem');
+    if (file_exists($caPath)) {
+        Config::$curlOptions[CURLOPT_CAINFO] = $caPath;
     }
 
+    if (! Config::$isProduction || app()->isLocal()) {
+        Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
+        Config::$curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
+    }
+}
     private function assertMidtransConfigured(): void
     {
         abort_unless(
