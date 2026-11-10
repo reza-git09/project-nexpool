@@ -1,17 +1,17 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\FasilitasApiController;
 use App\Http\Controllers\Api\HargaTiketApiController;
 use App\Http\Controllers\Api\KolamRenangApiController;
-use App\Http\Controllers\Api\ReviewApiController;
-use App\Http\Controllers\Api\ReservasiApiController;
-use App\Http\Controllers\Api\PengunjungApiController;
-use App\Http\Controllers\Api\FasilitasApiController;
-use App\Http\Controllers\Api\PromoApiController;
 use App\Http\Controllers\Api\OtpApiController;
-use App\Http\Middleware\EnsurePhoneVerified;
 use App\Http\Controllers\Api\PaymentApiController;
+use App\Http\Controllers\Api\PengunjungApiController;
+use App\Http\Controllers\Api\PromoApiController;
+use App\Http\Controllers\Api\ReservasiApiController;
+use App\Http\Controllers\Api\ReviewApiController;
+use App\Http\Middleware\EnsurePhoneVerified;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 // MITRANS PAYMENT GATEWAY
 Route::post('/midtrans/create-payment', [PaymentApiController::class, 'createPayment']);
@@ -32,13 +32,13 @@ Route::post('/otp/verify', [OtpApiController::class, 'verify'])->middleware('thr
 // Registrasi hanya lolos kalau nomor HP sudah diverifikasi lewat OTP
 Route::post('/register', [PengunjungApiController::class, 'register'])->middleware(EnsurePhoneVerified::class);
 Route::post('/login', [PengunjungApiController::class, 'login']);
-Route::post('/check-account', [PengunjungApiController::class, 'checkAccount']);
-Route::post('/reset-password', [PengunjungApiController::class, 'resetPassword']);
+Route::post('/check-account', [PengunjungApiController::class, 'checkAccount'])->middleware('throttle:5,1');
+Route::post('/reset-password', [PengunjungApiController::class, 'resetPassword'])->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     return response()->json([
         'status' => 'success',
-        'data'   => $request->user()
+        'data' => $request->user(),
     ]);
 });
 
@@ -48,7 +48,7 @@ Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
 Route::get('/test', function () {
     return response()->json([
         'success' => true,
-        'message' => 'API berhasil'
+        'message' => 'API berhasil',
     ]);
 });
 
