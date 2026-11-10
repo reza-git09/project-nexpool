@@ -62,6 +62,7 @@ class PoolSeeder extends Seeder
                     'name' => $admin->nama_admin,
                     'email' => $admin->username . '@nexpool.test',
                     'password' => $admin->password, // Already hashed
+                    'role' => $admin->username === 'admin_tiara' ? 'admin_master' : 'admin_pool',
                 ]
             );
         }

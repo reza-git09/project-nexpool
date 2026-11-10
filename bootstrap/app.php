@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
 )
     ->withMiddleware(function (Middleware $middleware): void {
     $middleware->alias([
-        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'admin'               => \App\Http\Middleware\AdminMiddleware::class,
+        'admin.master'        => \App\Http\Middleware\AdminMasterMiddleware::class,
+        'must.change.password'=> \App\Http\Middleware\MustChangePassword::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {

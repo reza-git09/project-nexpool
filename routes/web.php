@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\LaporanPenjualanController;
+use App\Http\Controllers\AdminApplicationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\HargaTiketController;
@@ -24,9 +26,11 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login.process');
 
+// Halaman Form Pengajuan Admin
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 
-Route::post('/register', [RegisterController::class, 'register'])
+// Proses submit pengajuan (rate limit: 5 request per menit per IP)
+Route::post('/register', [AdminApplicationController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('register.process');
 
@@ -35,13 +39,45 @@ Route::get('/logout', [AuthController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
+| GANTI PASSWORD (Wajib untuk akun baru yang disetujui)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin/ganti-password', [ChangePasswordController::class, 'show'])
+    ->middleware(['admin'])
+    ->name('admin.change-password');
+
+Route::post('/admin/ganti-password', [ChangePasswordController::class, 'update'])
+    ->middleware(['admin'])
+    ->name('admin.change-password.process');
+
+/*
+|--------------------------------------------------------------------------
 | DASHBOARD
 |--------------------------------------------------------------------------
 */
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('admin')
+    ->middleware(['admin', 'must.change.password'])
     ->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN MASTER — MANAJEMEN PENGAJUAN
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin/master/pengajuan', [AdminApplicationController::class, 'index'])
+    ->middleware(['admin', 'admin.master'])
+    ->name('admin.master.applications.index');
+
+Route::post('/admin/master/pengajuan/{app}/approve', [AdminApplicationController::class, 'approve'])
+    ->middleware(['admin', 'admin.master'])
+    ->name('admin.master.applications.approve');
+
+Route::post('/admin/master/pengajuan/{app}/reject', [AdminApplicationController::class, 'reject'])
+    ->middleware(['admin', 'admin.master'])
+    ->name('admin.master.applications.reject');
 
 /*
 |--------------------------------------------------------------------------
@@ -50,11 +86,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 */
 
 Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])
-    ->middleware('admin')
+    ->middleware(['admin', 'must.change.password'])
     ->name('admin.laporan.penjualan');
 
 Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'export'])
-    ->middleware('admin')
+    ->middleware(['admin', 'must.change.password'])
     ->name('admin.laporan.penjualan.export');
 
 /*
@@ -64,7 +100,7 @@ Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'exp
 */
 
 Route::resource('harga-tiket', HargaTiketController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +109,7 @@ Route::resource('harga-tiket', HargaTiketController::class)
 */
 
 Route::resource('fasilitas', FasilitasController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +118,7 @@ Route::resource('fasilitas', FasilitasController::class)
 */
 
 Route::resource('kolam-renang', KolamRenangController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);
 
 /*
 |--------------------------------------------------------------------------
@@ -92,12 +128,12 @@ Route::resource('kolam-renang', KolamRenangController::class)
 
 // Halaman Reservasi Dikonfirmasi
 Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi'])
-    ->middleware('admin')
+    ->middleware(['admin', 'must.change.password'])
     ->name('reservasi.dikonfirmasi');
 
 // Resource Reservasi
 Route::resource('reservasi', ReservasiController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);
 
 /*
 |--------------------------------------------------------------------------
@@ -106,7 +142,7 @@ Route::resource('reservasi', ReservasiController::class)
 */
 
 Route::resource('promo', PromoController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);
 
 /*
 |--------------------------------------------------------------------------
@@ -115,4 +151,4 @@ Route::resource('promo', PromoController::class)
 */
 
 Route::resource('review', ReviewController::class)
-    ->middleware('admin');
+    ->middleware(['admin', 'must.change.password']);

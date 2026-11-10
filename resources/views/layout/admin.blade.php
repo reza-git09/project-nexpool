@@ -99,6 +99,25 @@
             <a href="{{ route('admin.laporan.penjualan') }}" class="{{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                 <i class="fa-solid fa-chart-column" style="color:#60a5fa;"></i><span>Laporan Penjualan Tiket</span>
             </a>
+
+            @php
+                $isAdminMaster = session('admin_role') === 'admin_master' || in_array(session('admin_username'), ['admin_master', 'admin', 'admin_tiara']);
+                $pendingAppsCount = \Illuminate\Support\Facades\Schema::hasTable('admin_applications')
+                    ? \App\Models\AdminApplication::where('status', 'pending')->count()
+                    : 0;
+            @endphp
+
+            @if($isAdminMaster)
+                <a href="{{ route('admin.master.applications.index') }}" class="{{ request()->routeIs('admin.master.applications*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-shield" style="color:#f472b6;"></i>
+                    <span style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                        Pengajuan Admin
+                        @if($pendingAppsCount > 0)
+                            <span style="background:#ef4444; color:#fff; border-radius:10px; padding:2px 7px; font-size:10px; font-weight:bold; margin-left:8px;">{{ $pendingAppsCount }}</span>
+                        @endif
+                    </span>
+                </a>
+            @endif
         </div>
 
         <div class="logout">

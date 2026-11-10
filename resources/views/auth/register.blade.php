@@ -4,79 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <title>Register Admin - NEXPOOL</title>
+    <title>Pengajuan Admin - NEXPOOL</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
 
         body {
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 20px;
+            padding: 30px 20px;
         }
 
         .register-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             background: white;
             padding: 35px 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 22px;
-        }
+        .logo { text-align: center; margin-bottom: 24px; }
+        .logo h1 { color: #1e3c72; font-size: 30px; margin-bottom: 4px; }
+        .logo p { color: #666; font-size: 13px; }
 
-        .logo h1 {
-            color: #1e3c72;
-            font-size: 30px;
-            margin-bottom: 4px;
-        }
-
-        .logo p {
-            color: #666;
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 18px;
             font-size: 13px;
+            line-height: 1.5;
         }
+        .alert-success { background: #d1fae5; border: 1px solid #34d399; color: #065f46; }
+        .alert-error   { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #333;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-size: 13px; font-weight: bold; }
 
         .form-group input,
         .form-group select {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            background: #fff;
+            width: 100%; padding: 11px 12px;
+            border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; outline: none; background: #fff;
             transition: border-color 0.2s;
         }
 
         .form-group input:focus,
-        .form-group select:focus {
-            border-color: #1e3c72;
-        }
+        .form-group select:focus { border-color: #1e3c72; }
+
+        .form-group input.is-invalid,
+        .form-group select.is-invalid { border-color: #dc2626; }
 
         .form-group input[readonly] {
             background-color: #f1f5f9;
@@ -85,237 +65,244 @@
             border-color: #cbd5e1;
         }
 
-        .password-wrapper {
-            position: relative;
-        }
+        .error-message { color: #dc2626; font-size: 12px; margin-top: 4px; display: block; }
 
-        .password-wrapper input {
-            padding-right: 42px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #888;
-            font-size: 15px;
-            padding: 0;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
-        .toggle-password:hover {
-            color: #1e3c72;
-        }
-
-        .error-message {
-            color: #dc2626;
+        .note {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 7px;
+            padding: 10px 13px;
             font-size: 12px;
-            margin-top: 4px;
-            display: block;
+            color: #92400e;
+            margin-bottom: 18px;
         }
+        .note i { margin-right: 5px; }
 
         .btn-register {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 8px;
-            background: #1e3c72;
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
+            width: 100%; padding: 13px;
+            border: none; border-radius: 8px;
+            background: #1e3c72; color: white;
+            font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: background 0.2s;
             margin-top: 10px;
         }
+        .btn-register:hover { background: #16315f; }
+        .btn-register:disabled { background: #94a3b8; cursor: not-allowed; }
 
-        .btn-register:hover {
-            background: #16315f;
-        }
+        .login-link { text-align: center; margin-top: 18px; font-size: 13px; color: #555; }
+        .login-link a { color: #1e3c72; font-weight: bold; text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
 
-        .btn-register:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
+        .footer { text-align: center; margin-top: 20px; color: #999; font-size: 11px; }
 
-        .login-link {
-            text-align: center;
-            margin-top: 18px;
-            font-size: 13px;
-            color: #555;
-        }
+        .form-row { display: flex; gap: 12px; }
+        .form-row .form-group { flex: 1; }
 
-        .login-link a {
-            color: #1e3c72;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #999;
-            font-size: 11px;
-        }
+        .helper-text { font-size: 11px; color: #888; margin-top: 3px; }
     </style>
 </head>
-
 <body>
 
-    <div class="register-container">
+<div class="register-container">
 
-        <div class="logo">
-            <h1>NEXPOOL</h1>
-            <p>Registrasi Akun Admin Wisata</p>
-        </div>
-
-        <form id="registerForm" action="{{ route('register.process') }}" method="POST">
-            @csrf
-
-            <!-- Username -->
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value="{{ old('username') }}"
-                    placeholder="Masukkan username (4-30 karakter)"
-                    required
-                >
-                @error('username')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Nama Wisata Kolam Renang -->
-            <div class="form-group">
-                <label for="pool_select">Nama Wisata Kolam Renang</label>
-                <select id="pool_select" name="pool_id" required>
-                    <option value="">Pilih wisata kolam renang</option>
-                    @foreach($pools as $pool)
-                        <option value="{{ $pool->pool_id }}" {{ old('pool_id') == $pool->pool_id ? 'selected' : '' }}>
-                            {{ $pool->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('pool_id')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Pool ID (Readonly) -->
-            <div class="form-group">
-                <label for="pool_id_display">Pool ID</label>
-                <input
-                    type="text"
-                    id="pool_id_display"
-                    readonly
-                    placeholder="Pilih wisata di atas dulu"
-                    value="{{ old('pool_id') }}"
-                >
-            </div>
-
-            <!-- Password -->
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-wrapper">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Minimal 8 karakter"
-                        required
-                    >
-                    <button type="button" class="toggle-password" data-target="password" aria-label="Toggle password">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                </div>
-                @error('password')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Konfirmasi Password -->
-            <div class="form-group">
-                <label for="password_confirmation">Konfirmasi Password</label>
-                <div class="password-wrapper">
-                    <input
-                        type="password"
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        placeholder="Ulangi password"
-                        required
-                    >
-                    <button type="button" class="toggle-password" data-target="password_confirmation" aria-label="Toggle password">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" id="submitBtn" class="btn-register">
-                Daftar
-            </button>
-
-        </form>
-
-        <div class="login-link">
-            Sudah punya akun? <a href="{{ route('login') }}">Login</a>
-        </div>
-
-        <div class="footer">
-            NEXPOOL &copy; 2026
-        </div>
-
+    <div class="logo">
+        <h1>NEXPOOL</h1>
+        <p>Pengajuan Akun Admin Wisata</p>
     </div>
 
-<script>
-    // 1. Auto Fill Pool ID Display on Select Change
-    const poolSelect = document.getElementById('pool_select');
-    const poolIdDisplay = document.getElementById('pool_id_display');
+    {{-- Alert sukses --}}
+    @if (session('success'))
+        <div class="alert alert-success">
+            <i class="fa fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
 
-    function updatePoolIdDisplay() {
-        poolIdDisplay.value = poolSelect.value || '';
+    {{-- Alert error global --}}
+    @if ($errors->any())
+        <div class="alert alert-error">
+            <i class="fa fa-exclamation-circle"></i> Mohon periksa kembali isian form.
+        </div>
+    @endif
+
+    <form id="applyForm" action="{{ route('register.process') }}" method="POST" novalidate>
+        @csrf
+
+        {{-- Nama Lengkap --}}
+        <div class="form-group">
+            <label for="full_name">Nama Lengkap Calon Admin <span style="color:#dc2626">*</span></label>
+            <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                value="{{ old('full_name') }}"
+                placeholder="Contoh: Budi Santoso"
+                class="{{ $errors->has('full_name') ? 'is-invalid' : '' }}"
+            >
+            @error('full_name')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Username --}}
+        <div class="form-group">
+            <label for="username">Username Calon Admin <span style="color:#dc2626">*</span></label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                value="{{ old('username') }}"
+                placeholder="4–20 karakter, huruf/angka/underscore"
+                class="{{ $errors->has('username') ? 'is-invalid' : '' }}"
+                maxlength="20"
+            >
+            <span class="helper-text">Digunakan untuk login. Hanya huruf, angka, dan _ (underscore).</span>
+            @error('username')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Email --}}
+        <div class="form-group">
+            <label for="email">Email Aktif <span style="color:#dc2626">*</span></label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ old('email') }}"
+                placeholder="email@contoh.com"
+                class="{{ $errors->has('email') ? 'is-invalid' : '' }}"
+            >
+            <span class="helper-text">Digunakan untuk menerima informasi akun setelah disetujui.</span>
+            @error('email')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Nomor HP --}}
+        <div class="form-group">
+            <label for="phone">Nomor HP / WhatsApp <span style="color:#dc2626">*</span></label>
+            <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value="{{ old('phone') }}"
+                placeholder="08xx atau 62xx (10–14 digit)"
+                class="{{ $errors->has('phone') ? 'is-invalid' : '' }}"
+                maxlength="14"
+            >
+            @error('phone')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Jabatan --}}
+        <div class="form-group">
+            <label for="position">Jabatan / Posisi di Kolam <span style="color:#dc2626">*</span></label>
+            <select id="position" name="position" class="{{ $errors->has('position') ? 'is-invalid' : '' }}">
+                <option value="">Pilih Jabatan</option>
+                <option value="kasir_tiket"         {{ old('position') == 'kasir_tiket'         ? 'selected' : '' }}>Kasir Tiket</option>
+                <option value="pengelola_fasilitas" {{ old('position') == 'pengelola_fasilitas' ? 'selected' : '' }}>Pengelola Fasilitas</option>
+                <option value="staf_admin"          {{ old('position') == 'staf_admin'          ? 'selected' : '' }}>Staf Admin</option>
+            </select>
+            @error('position')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Wisata Kolam Renang --}}
+        <div class="form-group">
+            <label for="pool_id">Wisata Kolam Renang <span style="color:#dc2626">*</span></label>
+            <select id="pool_id" name="pool_id" class="{{ $errors->has('pool_id') ? 'is-invalid' : '' }}">
+                <option value="">Pilih Wisata Kolam Renang</option>
+                @foreach($pools as $pool)
+                    <option value="{{ $pool->pool_id }}" {{ old('pool_id') == $pool->pool_id ? 'selected' : '' }}>
+                        {{ $pool->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('pool_id')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Kode Akses (read-only, terisi otomatis) --}}
+        <div class="form-group">
+            <label for="access_code">Kode Akses</label>
+            <input
+                type="text"
+                id="access_code"
+                name="access_code"
+                readonly
+                placeholder="Otomatis terisi setelah pilih wisata"
+                value=""
+            >
+            <span class="helper-text">Terisi otomatis, tidak perlu diubah.</span>
+            @error('access_code')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+
+        {{-- Catatan password --}}
+        <div class="note">
+            <i class="fa fa-info-circle"></i>
+            <strong>Tanpa password:</strong> Password sementara akan dikirim ke email Anda setelah pengajuan disetujui oleh Admin Master.
+        </div>
+
+        {{-- Submit --}}
+        <button type="submit" id="submitBtn" class="btn-register">
+            <i class="fa fa-paper-plane"></i> Kirim Pengajuan ke Admin Master
+        </button>
+
+    </form>
+
+    <div class="login-link">
+        Sudah punya akun? <a href="{{ route('login') }}">Login</a>
+    </div>
+
+    <div class="footer">NEXPOOL &copy; {{ date('Y') }}</div>
+
+</div>
+
+<script>
+    // Mapping pool_id → kode akses (hanya untuk tampilan, verifikasi tetap di backend)
+    const poolCodes = {
+        'tiara_park':        'NXP-T01P',
+        'kebon_agung':       'NXP-K02A',
+        'annasya_waterpark': 'NXP-A03W',
+        'dira_park':         'NXP-D04P',
+        'jati_park':         'NXP-J05P',
+    };
+
+    const poolSelect   = document.getElementById('pool_id');
+    const accessCode   = document.getElementById('access_code');
+
+    function updateAccessCode() {
+        const selected = poolSelect.value;
+        accessCode.value = poolCodes[selected] || '';
     }
 
-    poolSelect.addEventListener('change', updatePoolIdDisplay);
-    updatePoolIdDisplay(); // Run initial setup for old input
+    poolSelect.addEventListener('change', updateAccessCode);
 
-    // 2. Toggle Password Visibility for both password fields
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function () {
-            const targetId = this.getAttribute('data-target');
-            const targetInput = document.getElementById(targetId);
-            const icon = this.querySelector('i');
+    // Set nilai awal jika old() ada
+    updateAccessCode();
 
-            if (targetInput.type === 'password') {
-                targetInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                targetInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
+    // Hanya angka untuk input telepon
+    document.getElementById('phone').addEventListener('input', function () {
+        this.value = this.value.replace(/[^0-9]/g, '');
     });
 
-    // 3. Disable submit button on form submission to prevent double-submit
-    const registerForm = document.getElementById('registerForm');
+    // Hanya karakter valid untuk username
+    document.getElementById('username').addEventListener('input', function () {
+        this.value = this.value.replace(/[^a-zA-Z0-9_]/g, '');
+    });
+
+    // Disable tombol submit saat proses
+    const applyForm = document.getElementById('applyForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    registerForm.addEventListener('submit', function () {
+    applyForm.addEventListener('submit', function () {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Memproses...';
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Mengirim...';
     });
 </script>
 

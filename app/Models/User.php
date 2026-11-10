@@ -17,6 +17,11 @@ class User extends Authenticatable
         'pool_id',
         'email',
         'password',
+        'role',
+        'must_change_password',
+        'position',
+        'phone',
+        'full_name',
     ];
 
     protected $hidden = [
@@ -27,9 +32,15 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'    => 'datetime',
+            'password'             => 'hashed',
+            'must_change_password' => 'boolean',
         ];
+    }
+
+    public function isAdminMaster(): bool
+    {
+        return $this->role === 'admin_master';
     }
 
     public function pool()
