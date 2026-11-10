@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservasi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -71,32 +72,84 @@ class PaymentApiController extends Controller
             $validated['reservation_code'],
         )->firstOrFail();
 
+        $this->configureMidtrans();
+
         if ($reservation->status_pembayaran === 'paid') {
             return response()->json([
                 'status' => 'success',
                 'order_id' => $reservation->midtrans_order_id,
                 'status_pembayaran' => 'paid',
                 'qr_url' => $reservation->midtrans_qr_url,
+                'paid_at' => $reservation->paid_at,
             ]);
         }
 
+        // Jika sudah ada transaksi QRIS pending sebelumnya, verifikasi apakah masih aktif di Midtrans
         if (
             $reservation->status_pembayaran === 'pending'
             && $reservation->midtrans_order_id
             && $reservation->midtrans_qr_url
         ) {
-            return response()->json([
-                'status' => 'success',
-                'order_id' => $reservation->midtrans_order_id,
-                'status_pembayaran' => $reservation->status_pembayaran,
-                'qr_url' => $reservation->midtrans_qr_url,
-            ]);
-        }
+            try {
+                $statusResp = Transaction::status($reservation->midtrans_order_id);
+                $statusData = json_decode(
+                    json_encode($statusResp, JSON_THROW_ON_ERROR),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR,
+                );
+                $txStatus = strtolower((string) ($statusData['transaction_status'] ?? ''));
 
-        $this->configureMidtrans();
+                if ($txStatus === 'settlement' || $txStatus === 'capture') {
+                    $this->syncPaymentStatus($reservation, $statusData);
+                    $reservation->refresh();
+
+                    return response()->json([
+                        'status' => 'success',
+                        'order_id' => $reservation->midtrans_order_id,
+                        'status_pembayaran' => 'paid',
+                        'qr_url' => $reservation->midtrans_qr_url,
+                        'paid_at' => $reservation->paid_at,
+                    ]);
+                }
+
+                if ($txStatus === 'pending') {
+                    $txTime = isset($statusData['transaction_time'])
+                        ? Carbon::parse($statusData['transaction_time'], 'Asia/Jakarta')
+                        : Carbon::parse($reservation->updated_at, 'Asia/Jakarta');
+                    $txExpiry = isset($statusData['expiry_time'])
+                        ? Carbon::parse($statusData['expiry_time'], 'Asia/Jakarta')
+                        : $txTime->copy()->addMinutes(5);
+
+                    $secondsLeft = Carbon::now('Asia/Jakarta')->diffInSeconds($txExpiry, false);
+
+                    if ($secondsLeft > 10) {
+                        return response()->json([
+                            'status' => 'success',
+                            'order_id' => $reservation->midtrans_order_id,
+                            'status_pembayaran' => 'pending',
+                            'qr_url' => $reservation->midtrans_qr_url,
+                            'server_time' => Carbon::now('Asia/Jakarta')->toIso8601String(),
+                            'created_at' => $txTime->toIso8601String(),
+                            'expired_at' => $txExpiry->toIso8601String(),
+                            'remaining_seconds' => (int) $secondsLeft,
+                        ]);
+                    }
+
+                    Log::info("Transaksi Midtrans {$reservation->midtrans_order_id} sisa waktunya habis ({$secondsLeft}s). Membuat transaksi baru.");
+                } else {
+                    Log::info("Transaksi Midtrans lama {$reservation->midtrans_order_id} berstatus {$txStatus}. Membuat QRIS baru.");
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Gagal periksa status transaksi lama {$reservation->midtrans_order_id}: {$e->getMessage()}. Membuat QRIS baru.");
+            }
+        }
 
         try {
             $orderId = $reservation->kode_reservasi.'-'.strtoupper(Str::random(6));
+            $nowWib = Carbon::now('Asia/Jakarta');
+            $expiredAtWib = $nowWib->copy()->addMinutes(5);
+
             $transaction = CoreApi::charge([
                 'payment_type' => 'qris',
                 'transaction_details' => [
@@ -113,7 +166,7 @@ class PaymentApiController extends Controller
                     'acquirer' => 'gopay',
                 ],
                 'custom_expiry' => [
-                    'order_time' => now()->format('Y-m-d H:i:s O'),
+                    'order_time' => Carbon::now('Asia/Jakarta')->format('Y-m-d H:i:s O'),
                     'expiry_duration' => 5,
                     'unit' => 'minute',
                 ],
@@ -150,6 +203,10 @@ class PaymentApiController extends Controller
                 'order_id' => $orderId,
                 'status_pembayaran' => 'pending',
                 'qr_url' => $qrUrl,
+                'server_time' => $nowWib->toIso8601String(),
+                'created_at' => $nowWib->toIso8601String(),
+                'expired_at' => $expiredAtWib->toIso8601String(),
+                'remaining_seconds' => 300,
             ]);
         } catch (\Throwable $exception) {
             Log::error('Midtrans QRIS creation failed.', [
@@ -159,7 +216,7 @@ class PaymentApiController extends Controller
 
             $message = str_contains($exception->getMessage(), 'HTTP status code: 401')
                 ? 'Midtrans menolak Server Key (HTTP 401). Periksa bahwa MIDTRANS_SERVER_KEY adalah Server Key Sandbox saat MIDTRANS_IS_PRODUCTION=false, lalu bersihkan config dan restart server Laravel.'
-                : 'Gagal membuat QRIS. Silakan coba lagi.';
+                : (config('app.debug') ? 'Gagal membuat QRIS: ' . $exception->getMessage() : 'Gagal membuat QRIS. Silakan coba lagi.');
 
             return response()->json([
                 'status' => 'error',
@@ -206,6 +263,8 @@ class PaymentApiController extends Controller
                 'reservation_code' => $reservation->kode_reservasi,
                 'status_pembayaran' => $reservation->status_pembayaran,
                 'paid_at' => $reservation->paid_at,
+                'qr_url' => $reservation->midtrans_qr_url,
+                'server_time' => Carbon::now('Asia/Jakarta')->toIso8601String(),
             ],
         ]);
     }
@@ -227,13 +286,23 @@ class PaymentApiController extends Controller
             .'/qr-code';
 
         try {
-            $response = Http::withBasicAuth(
+            $caPath = storage_path('cacert.pem');
+            $httpClient = Http::withBasicAuth(
                 (string) config('services.midtrans.server_key'),
                 '',
             )
                 ->accept('image/png')
-                ->timeout(15)
-                ->get($url);
+                ->timeout(15);
+
+            if (file_exists($caPath)) {
+                $httpClient = $httpClient->withOptions(['verify' => $caPath]);
+            }
+
+            if (! config('services.midtrans.is_production') || app()->isLocal()) {
+                $httpClient = $httpClient->withoutVerifying();
+            }
+
+            $response = $httpClient->get($url);
 
             if (! $response->successful()) {
                 Log::warning('Midtrans QR image request failed.', [
@@ -348,6 +417,16 @@ class PaymentApiController extends Controller
         Config::$isProduction = (bool) config('services.midtrans.is_production');
         Config::$isSanitized = true;
         Config::$is3ds = true;
+
+        $caPath = storage_path('cacert.pem');
+        if (file_exists($caPath)) {
+            Config::$curlOptions[CURLOPT_CAINFO] = $caPath;
+        }
+
+        if (! Config::$isProduction || app()->isLocal()) {
+            Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
+            Config::$curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
+        }
     }
 
     private function assertMidtransConfigured(): void
