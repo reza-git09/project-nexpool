@@ -1,484 +1,242 @@
 @extends('layout.admin_master')
 
-@section('title', 'Daftar Pengajuan Akun Admin - NEXPOOL')
-@section('header-title', 'Pengajuan Akun Admin Wisata')
-@section('header-subtitle', 'Kelola persetujuan calon admin kolam renang NEXPOOL')
+@section('title', 'Persetujuan Admin - NEXPOOL')
+@section('header-title', 'Persetujuan Admin')
+@section('header-subtitle', 'Tinjau dan proses pengajuan admin kolam renang')
 
 @push('styles')
 <style>
-    .card-filter {
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 10px rgba(0,0,0,.04);
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
+    [hidden] { display:none !important; }
+    .filter-card, .table-container { background:#fff; border:1px solid #e8ecf3; border-radius:14px; box-shadow:0 3px 12px rgba(15,23,42,.03); }
+    .filter-card { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:15px; padding:18px 20px; margin-bottom:20px; }
+    .filter-form { display:flex; flex-wrap:wrap; gap:9px; }
+    .filter-form input, .filter-form select { min-height:38px; border:1px solid #cbd5e1; border-radius:8px; padding:8px 11px; font-size:13px; }
+    .btn-filter, .btn-reset, .btn-detail, .btn-approve, .btn-reject, .btn-cancel, .btn-submit-reject {
+        display:inline-flex; justify-content:center; align-items:center; gap:7px; border:0; border-radius:8px; padding:9px 13px; font-size:12px; font-weight:700; cursor:pointer;
     }
-    .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
+    .btn-filter { background:#1e3c72; color:#fff; }
+    .btn-reset, .btn-cancel { background:#f1f5f9; color:#475569; }
+    .btn-detail { background:#eff6ff; color:#1d4ed8; }
+    .btn-approve { background:#059669; color:#fff; }
+    .btn-reject, .btn-submit-reject { background:#dc2626; color:#fff; }
+    .pending-count { color:#64748b; font-size:13px; }
+    .app-table { width:100%; min-width:820px; border-collapse:collapse; font-size:13px; }
+    .app-table th { padding:14px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#475569; font-size:11px; text-align:left; text-transform:uppercase; letter-spacing:.5px; }
+    .app-table td { padding:14px 16px; border-bottom:1px solid #f1f5f9; color:#1e293b; vertical-align:middle; }
+    .app-table tr:last-child td { border-bottom:0; }
+    .badge { display:inline-flex; padding:5px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .badge-pending { background:#fef3c7; color:#92400e; }
+    .badge-approved { background:#d1fae5; color:#065f46; }
+    .badge-rejected { background:#fee2e2; color:#991b1b; }
+    .table-scroll { overflow-x:auto; }
+    .pagination-wrapper { display:flex; justify-content:flex-end; padding:17px 20px; }
+    .alert { padding:13px 16px; border-radius:9px; margin-bottom:17px; font-size:13px; }
+    .alert-success { background:#d1fae5; color:#065f46; }
+    .alert-danger { background:#fee2e2; color:#991b1b; }
+    .alert-warning { background:#fef3c7; color:#92400e; }
+    .modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.62); align-items:center; justify-content:center; padding:18px; }
+    .modal-overlay.active { display:flex; }
+    .modal-card { width:100%; max-width:590px; max-height:90vh; overflow-y:auto; padding:25px; border-radius:14px; background:#fff; box-shadow:0 20px 50px rgba(15,23,42,.25); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:20px; }
+    .modal-header h3 { color:#172033; font-size:18px; }
+    .modal-close { border:0; background:transparent; color:#64748b; font-size:22px; cursor:pointer; }
+    .detail-list { display:grid; grid-template-columns:150px 1fr; gap:13px 16px; font-size:13px; }
+    .detail-list dt { color:#64748b; }
+    .detail-list dd { color:#172033; font-weight:600; overflow-wrap:anywhere; }
+    .modal-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:9px; margin-top:22px; }
+    .reject-panel { margin-top:20px; padding-top:18px; border-top:1px solid #e8ecf3; }
+    .reject-panel label { display:block; margin-bottom:8px; color:#334155; font-size:12px; font-weight:700; }
+    .reject-panel textarea { width:100%; min-height:100px; resize:vertical; border:1px solid #cbd5e1; border-radius:8px; padding:11px; font:inherit; font-size:13px; }
+    .reject-error { color:#dc2626; font-size:12px; margin-top:6px; }
+    @media(max-width:600px) {
+        .detail-list { grid-template-columns:1fr; gap:5px; }
+        .detail-list dd { margin-bottom:9px; }
+        .modal-actions { justify-content:stretch; }
+        .modal-actions button { flex:1; }
     }
-    .filter-input {
-        padding: 9px 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        min-width: 240px;
-    }
-    .filter-input:focus {
-        border-color: #2563eb;
-    }
-    .filter-select {
-        padding: 9px 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        background: #fff;
-    }
-    .btn-filter {
-        padding: 9px 18px;
-        background: #1e3c72;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .btn-filter:hover { background: #16315f; }
-    .btn-reset {
-        padding: 9px 14px;
-        background: #f3f4f6;
-        color: #4b5563;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 13px;
-        text-decoration: none;
-    }
-    .table-container {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,.04);
-        overflow-x: auto;
-    }
-    .app-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-        min-width: 950px;
-    }
-    .app-table th {
-        background: #f8fafc;
-        color: #475569;
-        font-weight: 700;
-        text-align: left;
-        padding: 14px 16px;
-        border-bottom: 2px solid #e2e8f0;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-    .app-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-        vertical-align: middle;
-    }
-    .app-table tr:hover {
-        background: #f8fafc;
-    }
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-    .badge-pending  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-    .badge-approved { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .badge-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-    .wa-link {
-        color: #059669;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .wa-link:hover { text-decoration: underline; color: #047857; }
-
-    .action-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .btn-approve {
-        padding: 7px 13px;
-        background: #10b981;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: background .15s;
-    }
-    .btn-approve:hover { background: #059669; }
-
-    .btn-reject {
-        padding: 7px 13px;
-        background: #ef4444;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: background .15s;
-    }
-    .btn-reject:hover { background: #dc2626; }
-
-    .pagination-wrapper {
-        padding: 18px 24px;
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    /* Modal Styling */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(15, 23, 42, .6);
-        backdrop-filter: blur(4px);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-    .modal-overlay.active { display: flex; }
-    .modal-card {
-        background: #fff;
-        border-radius: 14px;
-        width: 100%;
-        max-width: 480px;
-        padding: 26px;
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,.2);
-    }
-    .modal-card h3 {
-        color: #dc2626;
-        font-size: 18px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .modal-card p {
-        color: #4b5563;
-        font-size: 13px;
-        margin-bottom: 16px;
-    }
-    .modal-card textarea {
-        width: 100%;
-        min-height: 110px;
-        padding: 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        resize: vertical;
-        box-sizing: border-box;
-    }
-    .modal-card textarea:focus { border-color: #dc2626; }
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 18px;
-    }
-    .btn-modal-cancel {
-        padding: 9px 18px;
-        background: #f3f4f6;
-        color: #4b5563;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-    }
-    .btn-modal-reject {
-        padding: 9px 20px;
-        background: #dc2626;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-    }
-    .btn-modal-reject:hover { background: #b91c1c; }
-
-    .alert {
-        padding: 14px 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .alert-success { background: #d1fae5; border: 1px solid #86efac; color: #065f46; }
-    .alert-danger  { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; }
 </style>
 @endpush
 
 @section('content')
-
-    {{-- Pesan Sukses / Error --}}
     @if(session('success'))
-        <div class="alert alert-success">
-            <i class="fa-solid fa-circle-check"></i>
-            <div>{{ session('success') }}</div>
-        </div>
+        <div class="alert alert-success" role="status">{{ session('success') }}</div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <div>{{ session('error') }}</div>
-        </div>
+        <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
+    @endif
+    @if(session('warning'))
+        <div class="alert alert-warning" role="alert">{{ session('warning') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>
     @endif
 
-    {{-- Filter & Search Form --}}
-    <div class="card-filter">
-        <form method="GET" action="{{ route('admin.master.applications.index') }}" class="filter-group">
-            <input
-                type="text"
-                name="search"
-                class="filter-input"
-                placeholder="Cari nama, username, email..."
-                value="{{ request('search', $search) }}"
-            >
-
-            <select name="status" class="filter-select">
-                <option value="pending"  {{ request('status', $status) == 'pending'  ? 'selected' : '' }}>Status: Menunggu (Pending)</option>
-                <option value="approved" {{ request('status', $status) == 'approved' ? 'selected' : '' }}>Status: Disetujui (Approved)</option>
-                <option value="rejected" {{ request('status', $status) == 'rejected' ? 'selected' : '' }}>Status: Ditolak (Rejected)</option>
-                <option value="all"      {{ request('status', $status) == 'all'      ? 'selected' : '' }}>Semua Status</option>
+    <div class="filter-card">
+        <form method="GET" action="{{ route('admin.master.applications.index') }}" class="filter-form">
+            <input type="search" name="search" placeholder="Cari nama atau email" value="{{ $search }}">
+            <select name="status" aria-label="Filter status">
+                <option value="pending" @selected($status === 'pending')>Menunggu Persetujuan</option>
+                <option value="approved" @selected($status === 'approved')>Diterima</option>
+                <option value="rejected" @selected($status === 'rejected')>Ditolak</option>
+                <option value="all" @selected($status === 'all')>Semua Status</option>
             </select>
-
-            <button type="submit" class="btn-filter">
-                <i class="fa-solid fa-magnifying-glass"></i> Filter
-            </button>
-
-            @if(request('search') || (request('status') && request('status') !== 'pending'))
-                <a href="{{ route('admin.master.applications.index') }}" class="btn-reset">
-                    <i class="fa-solid fa-rotate-left"></i> Reset
-                </a>
+            <button type="submit" class="btn-filter"><i class="fa-solid fa-magnifying-glass"></i> Filter</button>
+            @if($search !== '' || $status !== 'pending')
+                <a href="{{ route('admin.master.applications.index') }}" class="btn-reset">Reset</a>
             @endif
         </form>
-
-        <div style="font-size: 13px; color: #64748b;">
-            <i class="fa-solid fa-clock" style="color: #f59e0b;"></i>
-            <strong>{{ $pendingCount }}</strong> pengajuan menunggu persetujuan
-        </div>
+        <div class="pending-count"><strong>{{ $pendingCount }}</strong> pengajuan menunggu persetujuan</div>
     </div>
 
-    {{-- Tabel Pengajuan --}}
     <div class="table-container">
-        <table class="app-table">
-            <thead>
-                <tr>
-                    <th style="width:50px;">No</th>
-                    <th>Nama & Username</th>
-                    <th>Email</th>
-                    <th>No HP / WhatsApp</th>
-                    <th>Jabatan</th>
-                    <th>Wisata Kolam</th>
-                    <th>Tanggal Diajukan</th>
-                    <th>Status</th>
-                    <th style="text-align:center; width:180px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($applications as $index => $app)
-                    @php
-                        // Format no HP untuk WhatsApp (08xx -> 628xx)
-                        $cleanPhone = preg_replace('/[^0-9]/', '', $app->phone);
-                        if (str_starts_with($cleanPhone, '0')) {
-                            $waNumber = '62' . substr($cleanPhone, 1);
-                        } else {
-                            $waNumber = $cleanPhone;
-                        }
-                    @endphp
+        <div class="table-scroll">
+            <table class="app-table">
+                <thead>
                     <tr>
-                        <td>{{ $applications->firstItem() + $index }}</td>
-                        <td>
-                            <strong>{{ $app->full_name }}</strong>
-                            <div style="font-size:12px; color:#64748b; font-family:monospace;">@ {{ $app->username }}</div>
-                        </td>
-                        <td>{{ $app->email }}</td>
-                        <td>
-                            <a href="https://wa.me/{{ $waNumber }}?text=Halo%20{{ urlencode($app->full_name) }},%20kami%20dari%20Admin%20Master%20NEXPOOL"
-                               target="_blank"
-                               class="wa-link"
-                               title="Hubungi lewat WhatsApp">
-                                <i class="fa-brands fa-whatsapp"></i> {{ $app->phone }}
-                            </a>
-                        </td>
-                        <td>{{ $app->position_label }}</td>
-                        <td>
-                            <strong>{{ $app->pool->name ?? $app->pool_id }}</strong>
-                            <div style="font-size:11px; color:#94a3b8;">Kode: {{ $app->access_code }}</div>
-                        </td>
-                        <td>
-                            <div>{{ $app->created_at?->translatedFormat('d M Y') ?? '-' }}</div>
-                            <div style="font-size:11px; color:#94a3b8;">{{ $app->created_at?->format('H:i') }} WIB</div>
-                        </td>
-                        <td>
-                            @if($app->status === 'pending')
-                                <span class="badge badge-pending">
-                                    <i class="fa-solid fa-clock"></i> Menunggu
-                                </span>
-                            @elseif($app->status === 'approved')
-                                <span class="badge badge-approved">
-                                    <i class="fa-solid fa-circle-check"></i> Disetujui
-                                </span>
-                            @else
-                                <span class="badge badge-rejected" title="{{ $app->rejection_reason }}">
-                                    <i class="fa-solid fa-circle-xmark"></i> Ditolak
-                                </span>
-                                @if($app->rejection_reason)
-                                    <div style="font-size:11px; color:#dc2626; margin-top:3px; max-width:180px;" title="{{ $app->rejection_reason }}">
-                                        <em>"{{ Str::limit($app->rejection_reason, 35) }}"</em>
-                                    </div>
-                                @endif
-                            @endif
-                        </td>
-                        <td style="text-align:center;">
-                            @if($app->status === 'pending')
-                                <div class="action-group" style="justify-content:center;">
-                                    {{-- Form Approve --}}
-                                    <form method="POST"
-                                          action="{{ route('admin.master.applications.approve', $app->id) }}"
-                                          onsubmit="return confirm('Apakah Anda yakin ingin menyetujui pengajuan atas nama {{ addslashes($app->full_name) }}?\n\nSistem akan membuat akun dan mengirimkan password sementara ke email {{ $app->email }}.');">
-                                        @csrf
-                                        <button type="submit" class="btn-approve" title="Setujui dan buat akun">
-                                            <i class="fa-solid fa-check"></i> Setujui
-                                        </button>
-                                    </form>
-
-                                    {{-- Tombol Buka Modal Reject --}}
-                                    <button type="button"
-                                            class="btn-reject"
-                                            onclick="openRejectModal('{{ $app->id }}', '{{ addslashes($app->full_name) }}')"
-                                            title="Tolak pengajuan">
-                                        <i class="fa-solid fa-xmark"></i> Tolak
-                                    </button>
-                                </div>
-                            @elseif($app->status === 'approved')
-                                <span style="font-size:12px; color:#059669; font-weight:600;">
-                                    <i class="fa-solid fa-check-double"></i> Akun Aktif
-                                </span>
-                            @else
-                                <span style="font-size:12px; color:#94a3b8;">
-                                    <i class="fa-solid fa-ban"></i> Selesai
-                                </span>
-                            @endif
-                        </td>
+                        <th>Nama Lengkap</th>
+                        <th>Email</th>
+                        <th>Nomor HP</th>
+                        <th>Tanggal Diajukan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="9" style="text-align:center; padding: 40px 20px; color:#94a3b8;">
-                            <i class="fa-solid fa-inbox" style="font-size:32px; margin-bottom:10px; display:block;"></i>
-                            Tidak ada data pengajuan yang ditemukan.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
+                </thead>
+                <tbody>
+                    @forelse($applications as $application)
+                        <tr>
+                            <td>{{ $application->full_name }}</td>
+                            <td>{{ $application->email }}</td>
+                            <td>{{ $application->phone }}</td>
+                            <td>{{ $application->created_at?->translatedFormat('d M Y, H:i') ?? '-' }}</td>
+                            <td><span class="badge badge-{{ $application->status }}">{{ $application->status_label }}</span></td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn-detail"
+                                    data-id="{{ $application->id }}"
+                                    data-name="{{ $application->full_name }}"
+                                    data-email="{{ $application->email }}"
+                                    data-phone="{{ $application->phone }}"
+                                    data-position="{{ $application->position_label }}"
+                                    data-pool="{{ $application->pool?->name ?? $application->pool_id }}"
+                                    data-submitted="{{ $application->created_at?->translatedFormat('d M Y, H:i') ?? '-' }}"
+                                    data-status="{{ $application->status_label }}"
+                                    data-reason="{{ $application->rejection_reason }}"
+                                    data-approve-url="{{ route('admin.master.applications.approve', $application) }}"
+                                    data-reject-url="{{ route('admin.master.applications.reject', $application) }}"
+                                    data-pending="{{ $application->status === 'pending' ? '1' : '0' }}"
+                                    onclick="openApplicationDetail(this)"
+                                >Detail</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" style="padding:36px;text-align:center;color:#94a3b8;">Tidak ada pengajuan admin.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         @if($applications->hasPages())
-            <div class="pagination-wrapper">
-                {{ $applications->links() }}
-            </div>
+            <div class="pagination-wrapper">{{ $applications->links() }}</div>
         @endif
     </div>
 
-    {{-- MODAL PENOLAKAN --}}
-    <div id="rejectModal" class="modal-overlay">
-        <div class="modal-card">
-            <h3><i class="fa-solid fa-triangle-exclamation"></i> Tolak Pengajuan</h3>
-            <p>Tuliskan alasan penolakan untuk <strong id="modalApplicantName">-</strong>. Alasan ini akan dikirimkan ke email calon admin.</p>
+    <div id="applicationDetailModal" class="modal-overlay" aria-hidden="true">
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+            <div class="modal-header">
+                <h3 id="detailTitle">Detail Pengajuan Admin</h3>
+                <button type="button" class="modal-close" aria-label="Tutup" onclick="closeApplicationDetail()">&times;</button>
+            </div>
+            <dl class="detail-list">
+                <dt>Nama lengkap</dt><dd id="detailName"></dd>
+                <dt>Email</dt><dd id="detailEmail"></dd>
+                <dt>Nomor HP</dt><dd id="detailPhone"></dd>
+                <dt>Jabatan</dt><dd id="detailPosition"></dd>
+                <dt>Wisata/kolam renang asal</dt><dd id="detailPool"></dd>
+                <dt>Tanggal diajukan</dt><dd id="detailSubmitted"></dd>
+                <dt>Status</dt><dd id="detailStatus"></dd>
+                <dt id="detailReasonLabel" hidden>Alasan penolakan</dt><dd id="detailReason" hidden></dd>
+            </dl>
 
-            <form id="rejectForm" method="POST" action="">
-                @csrf
-                <textarea
-                    name="rejection_reason"
-                    id="rejection_reason"
-                    required
-                    minlength="10"
-                    placeholder="Contoh: Nomor telepon tidak dapat dihubungi atau data verifikasi tidak valid..."></textarea>
+            <div id="pendingActions" class="modal-actions" hidden>
+                <form id="approveForm" method="POST" onsubmit="return confirmApproval()">
+                    @csrf
+                    <button type="submit" class="btn-approve"><i class="fa-solid fa-check"></i> Terima</button>
+                </form>
+                <button type="button" class="btn-reject" onclick="showRejectForm()">Tolak</button>
+            </div>
 
-                <div class="modal-actions">
-                    <button type="button" class="btn-modal-cancel" onclick="closeRejectModal()">Batal</button>
-                    <button type="submit" class="btn-modal-reject">
-                        <i class="fa-solid fa-paper-plane"></i> Kirim Penolakan
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div id="rejectPanel" class="reject-panel" hidden>
+                <form id="rejectForm" method="POST">
+                    @csrf
+                    <label for="rejection_reason">Alasan penolakan</label>
+                    <textarea id="rejection_reason" name="rejection_reason" required minlength="10" maxlength="500" placeholder="Tuliskan alasan penolakan (minimal 10 karakter)."></textarea>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="hideRejectForm()">Batal</button>
+                        <button type="submit" class="btn-submit-reject" onclick="return confirm('Tolak pengajuan admin ini?')">Konfirmasi Tolak</button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </div>
-
 @endsection
 
 @push('scripts')
 <script>
-    function openRejectModal(appId, name) {
-        const modal = document.getElementById('rejectModal');
-        const form  = document.getElementById('rejectForm');
-        const nameEl = document.getElementById('modalApplicantName');
-        const textarea = document.getElementById('rejection_reason');
+    let selectedApplicantName = '';
 
-        form.action = `/admin/master/pengajuan/${appId}/reject`;
-        nameEl.innerText = name;
-        textarea.value = '';
+    function openApplicationDetail(button) {
+        const detail = button.dataset;
+        selectedApplicantName = detail.name;
+        document.getElementById('detailName').textContent = detail.name;
+        document.getElementById('detailEmail').textContent = detail.email;
+        document.getElementById('detailPhone').textContent = detail.phone;
+        document.getElementById('detailPosition').textContent = detail.position;
+        document.getElementById('detailPool').textContent = detail.pool;
+        document.getElementById('detailSubmitted').textContent = detail.submitted;
+        document.getElementById('detailStatus').textContent = detail.status;
 
+        const hasReason = detail.reason !== '';
+        document.getElementById('detailReasonLabel').hidden = !hasReason;
+        document.getElementById('detailReason').hidden = !hasReason;
+        document.getElementById('detailReason').textContent = detail.reason;
+
+        const pending = detail.pending === '1';
+        document.getElementById('pendingActions').hidden = !pending;
+        document.getElementById('rejectPanel').hidden = true;
+        document.getElementById('approveForm').action = detail.approveUrl;
+        document.getElementById('rejectForm').action = detail.rejectUrl;
+        document.getElementById('rejection_reason').value = '';
+
+        const modal = document.getElementById('applicationDetailModal');
         modal.classList.add('active');
-        textarea.focus();
+        modal.setAttribute('aria-hidden', 'false');
     }
 
-    function closeRejectModal() {
-        document.getElementById('rejectModal').classList.remove('active');
+    function showRejectForm() {
+        document.getElementById('pendingActions').hidden = true;
+        document.getElementById('rejectPanel').hidden = false;
+        document.getElementById('rejection_reason').focus();
     }
 
-    // Tutup modal jika klik di luar area modal card
-    document.getElementById('rejectModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeRejectModal();
+    function hideRejectForm() {
+        document.getElementById('rejectPanel').hidden = true;
+        document.getElementById('pendingActions').hidden = false;
+    }
+
+    function confirmApproval() {
+        return confirm(`Terima pengajuan admin atas nama ${selectedApplicantName}?`);
+    }
+
+    function closeApplicationDetail() {
+        const modal = document.getElementById('applicationDetailModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.getElementById('applicationDetailModal').addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+            closeApplicationDetail();
         }
     });
 </script>
 @endpush
-

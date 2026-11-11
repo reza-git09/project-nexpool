@@ -15,7 +15,7 @@ class AdminApplicationApproved extends Mailable
 
     public function __construct(
         public AdminApplication $application,
-        public string $plainPassword
+        public ?string $plainPassword = null
     ) {}
 
     public function envelope(): Envelope
@@ -32,4 +32,3 @@ class AdminApplicationApproved extends Mailable
         );
     }
 }
-

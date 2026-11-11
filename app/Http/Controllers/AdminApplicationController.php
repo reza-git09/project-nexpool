@@ -6,38 +6,62 @@ use App\Mail\AdminApplicationApproved;
 use App\Mail\AdminApplicationRejected;
 use App\Models\AdminApplication;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
 
 class AdminApplicationController extends Controller
 {
     // ----------------------------------------------------------------
     // GET /admin/master/pengajuan → daftar pengajuan (Admin Master only)
     // ----------------------------------------------------------------
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $status = $request->get('status', 'pending');
-        $search = $request->get('search', '');
+        $statusInput = $request->query('status', 'pending');
+        $searchInput = $request->query('search', '');
+        $status = is_string($statusInput) ? $statusInput : 'pending';
+        $search = is_string($searchInput) ? trim($searchInput) : '';
 
-        $query = AdminApplication::with('pool')->latest();
+        $query = AdminApplication::query()
+            ->select([
+                'id',
+                'full_name',
+                'username',
+                'email',
+                'phone',
+                'position',
+                'pool_id',
+                'status',
+                'rejection_reason',
+                'reviewed_at',
+                'created_at',
+            ])
+            ->with('pool')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
 
         if (in_array($status, ['pending', 'approved', 'rejected'])) {
             $query->where('status', $status);
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('full_name', 'like', "%$search%")
-                    ->orWhere('username', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
+        if ($search !== '') {
+            $query->where(function ($query) use ($search): void {
+                $query->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
         $applications = $query->paginate(15)->withQueryString();
-        $pendingCount = AdminApplication::where('status', 'pending')->count();
+        $pendingCount = AdminApplication::query()
+            ->where('status', AdminApplication::STATUS_PENDING)
+            ->count();
 
         return view('admin.master.applications.index', compact('applications', 'pendingCount', 'status', 'search'));
     }
@@ -45,77 +69,139 @@ class AdminApplicationController extends Controller
     // ----------------------------------------------------------------
     // POST /admin/master/pengajuan/{app}/approve
     // ----------------------------------------------------------------
-    public function approve(Request $request, AdminApplication $app)
+    public function approve(Request $request, AdminApplication $app): RedirectResponse
     {
-        if ($app->status !== AdminApplication::STATUS_PENDING) {
+        $result = DB::transaction(function () use ($app, $request): array {
+            $application = AdminApplication::query()
+                ->whereKey($app->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($application->status !== AdminApplication::STATUS_PENDING) {
+                return ['processed' => true];
+            }
+
+            if (User::query()->where('email', $application->email)->exists()) {
+                return ['duplicate' => true];
+            }
+
+            $plainPassword = null;
+            $passwordHash = $application->password_hash;
+
+            if (! $passwordHash) {
+                $plainPassword = Str::random(16);
+                $passwordHash = Hash::make($plainPassword);
+            }
+
+            User::create([
+                'full_name' => $application->full_name,
+                'name' => $application->full_name,
+                'username' => $application->username,
+                'email' => $application->email,
+                'phone' => $application->phone,
+                'position' => $application->position,
+                'pool_id' => $application->pool_id,
+                'password' => $passwordHash,
+                'role' => 'admin_pool',
+                'must_change_password' => $plainPassword !== null,
+            ]);
+
+            $application->update([
+                'status' => AdminApplication::STATUS_APPROVED,
+                'password_hash' => null,
+                'reviewed_at' => now(),
+                'reviewed_by' => $request->session()->get('admin_id'),
+            ]);
+
+            return [
+                'application' => $application->load('pool'),
+                'plain_password' => $plainPassword,
+            ];
+        });
+
+        if ($result['processed'] ?? false) {
             return back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
         }
 
-        // Generate password sementara yang kuat
-        $plainPassword = Str::random(8).rand(10, 99).Str::upper(Str::random(2));
-
-        // Buat akun admin_pool
-        $user = User::create([
-            'full_name' => $app->full_name,
-            'name' => $app->full_name,
-            'username' => $app->username,
-            'email' => $app->email,
-            'phone' => $app->phone,
-            'position' => $app->position,
-            'pool_id' => $app->pool_id,
-            'password' => Hash::make($plainPassword),
-            'role' => 'admin_pool',
-            'must_change_password' => true,
-        ]);
-
-        // Update status pengajuan
-        $app->update([
-            'status' => AdminApplication::STATUS_APPROVED,
-            'reviewed_at' => Carbon::now(),
-            'reviewed_by' => session('admin_id'),
-        ]);
-
-        // Kirim email persetujuan
-        try {
-            Mail::to($app->email)->send(new AdminApplicationApproved($app, $plainPassword));
-        } catch (\Throwable $e) {
-            // Gagal kirim email tidak membatalkan proses approve
-            logger()->error('Gagal kirim email approve: '.$e->getMessage());
+        if ($result['duplicate'] ?? false) {
+            return back()->with('error', 'Email pengajuan sudah digunakan oleh akun lain. Akun tidak dibuat.');
         }
 
-        return back()->with('success', "Pengajuan {$app->full_name} disetujui. Akun telah dibuat dan email dikirim.");
+        /** @var AdminApplication $application */
+        $application = $result['application'];
+
+        try {
+            Mail::to($application->email)->send(
+                new AdminApplicationApproved($application, $result['plain_password'])
+            );
+        } catch (Throwable $exception) {
+            Log::error('Gagal mengirim email persetujuan Admin NEXPOOL.', [
+                'application_id' => $application->id,
+                'exception' => $exception,
+            ]);
+
+            return back()->with(
+                'warning',
+                $result['plain_password'] === null
+                    ? 'Akun berhasil dibuat, tetapi email pemberitahuan gagal dikirim. Admin baru dapat login menggunakan password yang didaftarkan.'
+                    : 'Akun lama berhasil dibuat, tetapi email password sementara gagal dikirim. Password perlu diatur ulang secara aman sebelum admin dapat login.'
+            );
+        }
+
+        return back()->with('success', "Pengajuan {$application->full_name} disetujui dan akun admin berhasil dibuat.");
     }
 
     // ----------------------------------------------------------------
     // POST /admin/master/pengajuan/{app}/reject
     // ----------------------------------------------------------------
-    public function reject(Request $request, AdminApplication $app)
+    public function reject(Request $request, AdminApplication $app): RedirectResponse
     {
-        if ($app->status !== AdminApplication::STATUS_PENDING) {
-            return back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
-        }
-
-        $request->validate([
+        $validated = $request->validate([
             'rejection_reason' => ['required', 'string', 'min:10', 'max:500'],
         ], [
             'rejection_reason.required' => 'Alasan penolakan wajib diisi.',
             'rejection_reason.min' => 'Alasan penolakan minimal 10 karakter.',
         ]);
 
-        $app->update([
-            'status' => AdminApplication::STATUS_REJECTED,
-            'rejection_reason' => $request->rejection_reason,
-            'reviewed_at' => Carbon::now(),
-            'reviewed_by' => session('admin_id'),
-        ]);
+        $rejectedApplication = DB::transaction(function () use ($app, $request, $validated): ?AdminApplication {
+            $application = AdminApplication::query()
+                ->whereKey($app->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        // Kirim email penolakan
-        try {
-            Mail::to($app->email)->send(new AdminApplicationRejected($app));
-        } catch (\Throwable $e) {
-            logger()->error('Gagal kirim email reject: '.$e->getMessage());
+            if ($application->status !== AdminApplication::STATUS_PENDING) {
+                return null;
+            }
+
+            $application->update([
+                'status' => AdminApplication::STATUS_REJECTED,
+                'rejection_reason' => $validated['rejection_reason'],
+                'password_hash' => null,
+                'reviewed_at' => now(),
+                'reviewed_by' => $request->session()->get('admin_id'),
+            ]);
+
+            return $application->load('pool');
+        });
+
+        if (! $rejectedApplication) {
+            return back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
         }
 
-        return back()->with('success', "Pengajuan {$app->full_name} telah ditolak dan email pemberitahuan dikirim.");
+        try {
+            Mail::to($rejectedApplication->email)->send(new AdminApplicationRejected($rejectedApplication));
+        } catch (Throwable $exception) {
+            Log::error('Gagal mengirim email penolakan Admin NEXPOOL.', [
+                'application_id' => $rejectedApplication->id,
+                'exception' => $exception,
+            ]);
+
+            return back()->with(
+                'warning',
+                'Pengajuan berhasil ditolak, tetapi email pemberitahuan gagal dikirim.'
+            );
+        }
+
+        return back()->with('success', "Pengajuan {$rejectedApplication->full_name} telah ditolak.");
     }
 }

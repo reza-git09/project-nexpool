@@ -43,15 +43,21 @@
         <div class="cred-box">
             <p class="label">Username</p>
             <p class="value">{{ $application->username }}</p>
-            <p class="label" style="margin-top:14px;">Password Sementara</p>
-            <p class="value">{{ $plainPassword }}</p>
+            @if($plainPassword)
+                <p class="label" style="margin-top:14px;">Password Sementara</p>
+                <p class="value">{{ $plainPassword }}</p>
+            @else
+                <p>Password: gunakan password yang Anda daftarkan.</p>
+            @endif
         </div>
 
-        <div class="warning">
-            ⚠️ <strong>Penting:</strong> Anda akan diminta mengganti password ini saat pertama kali login. Jaga kerahasiaan password Anda.
-        </div>
+        @if($plainPassword)
+            <div class="warning">
+                ⚠️ <strong>Penting:</strong> Anda akan diminta mengganti password ini saat pertama kali login. Jaga kerahasiaan password Anda.
+            </div>
+        @endif
 
-        <a href="{{ config('app.url') }}/login" class="btn">Login ke Dashboard Admin</a>
+        <a href="{{ route('login') }}" class="btn">Login ke Dashboard Admin</a>
     </div>
     <div class="footer">
         Email ini dikirim otomatis oleh sistem NEXPOOL. Harap tidak membalas email ini.<br>
@@ -60,4 +66,3 @@
 </div>
 </body>
 </html>
-

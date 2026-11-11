@@ -17,22 +17,25 @@
             background:linear-gradient(180deg,#101c36 0%,#14213d 55%,#101b32 100%);
             color:white; padding:24px 16px; z-index:1000;
             box-shadow:8px 0 30px rgba(15,23,42,.08);
+            display:flex; flex-direction:column; overflow:hidden;
         }
-        .logo { padding:6px 10px 28px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:25px; text-align:center; }
+        .logo { flex:0 0 auto; padding:6px 10px 28px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:25px; text-align:center; }
         .logo h2 { font-size:22px; letter-spacing:1px; }
         .logo p { margin-top:4px; font-size:10px; color:#91a0b9; letter-spacing:1.3px; }
-        .menu-title { padding:0 12px; margin-bottom:10px; font-size:10px; font-weight:bold; color:#73819b; letter-spacing:1.2px; text-transform:uppercase; }
-        .menu { display:flex; flex-direction:column; gap:5px; }
+        .menu-title { flex:0 0 auto; padding:0 12px; margin-bottom:10px; font-size:10px; font-weight:bold; color:#73819b; letter-spacing:1.2px; text-transform:uppercase; }
+        .menu { display:flex; flex:1 1 auto; flex-direction:column; gap:5px; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(148,163,184,.35) transparent; }
+        .menu::-webkit-scrollbar { width:5px; }
+        .menu::-webkit-scrollbar-thumb { background:rgba(148,163,184,.35); border-radius:8px; }
         .menu a {
             position:relative; display:flex; align-items:center; gap:13px;
             padding:12px 13px; border-radius:10px; color:#cbd5e1;
-            font-size:13px; font-weight:500; transition:.2s;
+            flex:0 0 auto; font-size:13px; font-weight:500; transition:.2s;
         }
         .menu a i { width:20px; text-align:center; font-size:15px; }
         .menu a:hover { background:rgba(255,255,255,.07); color:white; transform:translateX(2px); }
         .menu a.active { background:linear-gradient(90deg,#2563eb,#1d4ed8); color:white; box-shadow:0 8px 20px rgba(37,99,235,.25); }
         .menu a.active::before { content:""; position:absolute; left:-16px; top:8px; width:3px; height:calc(100% - 16px); border-radius:0 5px 5px 0; background:#60a5fa; }
-        .logout { position:absolute; bottom:20px; left:16px; right:16px; padding-top:15px; border-top:1px solid rgba(255,255,255,.08); }
+        .logout { flex:0 0 auto; margin-top:10px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); }
         .logout a { display:flex; align-items:center; gap:13px; padding:12px 13px; border-radius:10px; color:#fca5a5; font-size:13px; }
         .logout a:hover { background:rgba(239,68,68,.12); color:#fecaca; }
         .logout i { width:20px; text-align:center; }
@@ -129,7 +132,7 @@
             .cards .stat-card:last-child { grid-column:1 / -1; }
         }
         @media(max-width:800px) {
-            .sidebar { width:70px; padding:20px 10px; }
+            .sidebar { width:70px; padding:20px 10px 14px; }
             .logo { padding:6px 0 20px; }
             .logo h2,.logo p,.menu-title,.menu a span,.logout span { display:none; }
             .menu a,.logout a { justify-content:center; }
@@ -172,25 +175,28 @@
 
         <div class="menu-title">Menu Utama</div>
         <nav class="menu">
-            <a href="{{ route('dashboard') }}" class="active">
+            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="fa-solid fa-gauge-high" style="color:#bfdbfe;"></i><span>Dashboard</span>
             </a>
-            <a href="{{ route('harga-tiket.index') }}">
+            <a href="{{ route('harga-tiket.index') }}" class="{{ request()->routeIs('harga-tiket*') ? 'active' : '' }}">
                 <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i><span>Manajemen Tiket</span>
             </a>
-            <a href="{{ route('fasilitas.index') }}">
+            <a href="{{ route('fasilitas.index') }}" class="{{ request()->routeIs('fasilitas*') ? 'active' : '' }}">
                 <i class="fa-solid fa-person-swimming" style="color:#67e8f9;"></i><span>Fasilitas</span>
             </a>
-            <a href="{{ route('reservasi.index') }}">
+            <a href="{{ route('reservasi.index') }}" class="{{ request()->routeIs('reservasi*') ? 'active' : '' }}">
                 <i class="fa-solid fa-calendar-check" style="color:#6ee7b7;"></i><span>Reservasi</span>
             </a>
-            <a href="{{ route('promo.index') }}">
+            <a href="{{ route('promo.index') }}" class="{{ request()->routeIs('promo*') ? 'active' : '' }}">
                 <i class="fa-solid fa-tags" style="color:#c4b5fd;"></i><span>Promo</span>
             </a>
-            <a href="{{ route('review.index') }}">
+            <a href="{{ route('review.index') }}" class="{{ request()->routeIs('review*') ? 'active' : '' }}">
                 <i class="fa-solid fa-star" style="color:#fde047;"></i><span>Review</span>
             </a>
-            <a href="{{ route('admin.laporan.penjualan') }}">
+            <a href="{{ route('admin.pool.applications.index') }}" class="{{ request()->routeIs('admin.pool.applications*') ? 'active' : '' }}">
+                <i class="fa-solid fa-user-plus" style="color:#86efac;"></i><span>Tambah Admin</span>
+            </a>
+            <a href="{{ route('admin.laporan.penjualan') }}" class="{{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                 <i class="fa-solid fa-chart-column" style="color:#60a5fa;"></i><span>Laporan Penjualan Tiket</span>
             </a>
             @include('layout.partials.penarikan-saldo-link')

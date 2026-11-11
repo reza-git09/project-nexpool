@@ -13,6 +13,7 @@ use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\HargaTiketController;
 use App\Http\Controllers\KolamRenangController;
 use App\Http\Controllers\PenarikanSaldoController;
+use App\Http\Controllers\PoolAdminApplicationController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\ReviewController;
@@ -88,16 +89,31 @@ Route::get('/admin-master/transaksi', [
 */
 
 Route::get('/admin/master/pengajuan', [AdminApplicationController::class, 'index'])
-    ->middleware(['admin', 'admin.master'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.applications.index');
 
 Route::post('/admin/master/pengajuan/{app}/approve', [AdminApplicationController::class, 'approve'])
-    ->middleware(['admin', 'admin.master'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.applications.approve');
 
 Route::post('/admin/master/pengajuan/{app}/reject', [AdminApplicationController::class, 'reject'])
-    ->middleware(['admin', 'admin.master'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.applications.reject');
+
+/*
+|--------------------------------------------------------------------------
+| PENGAJUAN ADMIN KOLAM RENANG
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['admin', 'admin.pool', 'must.change.password'])
+    ->prefix('admin/pengajuan-admin')
+    ->name('admin.pool.applications.')
+    ->controller(PoolAdminApplicationController::class)
+    ->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->middleware('throttle:10,1')->name('store');
+    });
 
 /*
 |--------------------------------------------------------------------------
