@@ -99,6 +99,7 @@
             <a href="{{ route('admin.laporan.penjualan') }}" class="{{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                 <i class="fa-solid fa-chart-column" style="color:#60a5fa;"></i><span>Laporan Penjualan Tiket</span>
             </a>
+            @include('layout.partials.penarikan-saldo-link')
 
             @php
                 $isAdminMaster = session('admin_role') === 'admin_master' || in_array(session('admin_username'), ['admin_master', 'admin', 'admin_tiara']);

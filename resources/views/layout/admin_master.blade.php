@@ -261,6 +261,12 @@
                 </a>
             @endif
 
+            <a href="{{ route('admin.master.penarikan-saldo.index') }}"
+               class="{{ request()->routeIs('admin.master.penarikan-saldo.*') ? 'active' : '' }}">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                <span>Cairkan Saldo</span>
+            </a>
+
             @if(\Illuminate\Support\Facades\Route::has($applicationRoute))
                 <a href="{{ route($applicationRoute) }}"
                    class="{{ request()->routeIs('admin.master.applications*') ? 'active' : '' }}">

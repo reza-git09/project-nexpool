@@ -616,6 +616,7 @@
                 <i class="fa-solid fa-chart-column" style="color:#60a5fa;"></i>
                 <span>Laporan Penjualan Tiket</span>
             </a>
+            @include('layout.partials.penarikan-saldo-link')
 
         </div>
 

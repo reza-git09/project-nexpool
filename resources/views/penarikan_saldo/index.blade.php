@@ -1,0 +1,220 @@
+@extends('layout.admin')
+
+@section('title', 'Penarikan Saldo')
+@section('header-title', 'Penarikan Saldo')
+@section('header-subtitle', 'Ajukan pencairan saldo wisata kolam renang')
+
+@push('styles')
+<style>
+    .withdrawal-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .withdrawal-heading p { color: #64748b; font-size: 13px; }
+    .button-primary, .button-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 8px;
+        padding: 11px 16px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .button-primary { background: #2563eb; }
+    .button-primary:hover { background: #1d4ed8; }
+    .notice, .alert {
+        padding: 13px 16px;
+        border-radius: 9px;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+    .notice { color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; }
+    .alert-success { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .alert-error { color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; }
+    .table-card {
+        overflow-x: auto;
+        background: #fff;
+        border: 1px solid #e8ecf3;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, .04);
+    }
+    .withdrawal-table { width: 100%; min-width: 620px; border-collapse: collapse; }
+    .withdrawal-table th, .withdrawal-table td {
+        padding: 15px 18px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        font-size: 13px;
+    }
+    .withdrawal-table th {
+        color: #64748b;
+        background: #f8fafc;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+    .withdrawal-table td { color: #1e293b; }
+    .status-badge {
+        display: inline-flex;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .status-proses { color: #92400e; background: #fef3c7; }
+    .status-berhasil { color: #166534; background: #dcfce7; }
+    .status-ditolak { color: #991b1b; background: #fee2e2; }
+    .empty-state { padding: 36px 20px; color: #64748b; text-align: center; }
+    .pagination-wrapper { padding: 16px 20px; }
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, .6);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+        width: min(100%, 480px);
+        padding: 25px;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, .2);
+    }
+    .modal-card h2 { margin-bottom: 7px; color: #172033; font-size: 19px; }
+    .modal-card > p { margin-bottom: 20px; color: #64748b; font-size: 13px; line-height: 1.5; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; color: #334155; font-size: 12px; font-weight: 700; }
+    .form-group input {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    .form-group input:focus { outline: 2px solid #bfdbfe; border-color: #2563eb; }
+    .field-error { display: block; margin-top: 5px; color: #b91c1c; font-size: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+    .button-cancel {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #334155;
+        background: #fff;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    @media (max-width: 600px) {
+        .withdrawal-heading { align-items: flex-start; flex-direction: column; }
+        .withdrawal-heading .button-primary { width: 100%; }
+        .modal-card { padding: 20px; }
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="withdrawal-heading">
+    <p>Riwayat pengajuan penarikan saldo untuk wisata ini.</p>
+    <button class="button-primary" id="openWithdrawalModal" type="button">
+        <i class="fa-solid fa-plus"></i> Ajukan Pencairan
+    </button>
+</div>
+
+<div class="notice">
+    Transfer ke rekening dilakukan oleh Admin Master di luar aplikasi. Status akan berubah setelah pengajuan diproses.
+</div>
+
+@if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if (session('error'))
+    <div class="alert alert-error">{{ session('error') }}</div>
+@endif
+
+<div class="table-card">
+    <table class="withdrawal-table">
+        <thead>
+            <tr>
+                <th>Tanggal Pengajuan</th>
+                <th>Jumlah Saldo</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($withdrawals as $withdrawal)
+                <tr>
+                    <td>{{ $withdrawal->created_at->format('d/m/Y H:i') }}</td>
+                    <td>Rp {{ number_format((float) $withdrawal->amount, 2, ',', '.') }}</td>
+                    <td>
+                        <span class="status-badge status-{{ $withdrawal->status }}">
+                            {{ ucfirst($withdrawal->status) }}
+                        </span>
+                        @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_DITOLAK && $withdrawal->rejection_reason)
+                            <div class="field-error">{{ $withdrawal->rejection_reason }}</div>
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr><td class="empty-state" colspan="3">Belum ada pengajuan penarikan saldo.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+    @if ($withdrawals->hasPages())
+        <div class="pagination-wrapper">{{ $withdrawals->links() }}</div>
+    @endif
+</div>
+
+<div class="modal-overlay {{ $errors->any() ? 'active' : '' }}" id="withdrawalModal" role="dialog" aria-modal="true" aria-labelledby="withdrawalModalTitle">
+    <div class="modal-card">
+        <h2 id="withdrawalModalTitle">Ajukan Pencairan Saldo</h2>
+        <p>Isi rekening tujuan dan jumlah yang ingin dicairkan. Pastikan data rekening sudah benar.</p>
+        <form action="{{ route('penarikan-saldo.store') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="bank_name">Bank</label>
+                <input id="bank_name" name="bank_name" value="{{ old('bank_name') }}" maxlength="100" placeholder="Contoh: BCA" required>
+                @error('bank_name') <span class="field-error">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
+                <label for="account_number">Nomor Rekening</label>
+                <input id="account_number" name="account_number" value="{{ old('account_number') }}" inputmode="numeric" pattern="[0-9]{5,30}" maxlength="30" placeholder="Masukkan nomor rekening" required>
+                @error('account_number') <span class="field-error">{{ $message }}</span> @enderror
+            </div>
+            <div class="form-group">
+                <label for="amount">Jumlah Saldo (Rp)</label>
+                <input id="amount" name="amount" type="number" min="0.01" max="9999999999999.99" step="0.01" value="{{ old('amount') }}" placeholder="Contoh: 500000" required>
+                @error('amount') <span class="field-error">{{ $message }}</span> @enderror
+            </div>
+            <div class="modal-actions">
+                <button class="button-cancel" id="closeWithdrawalModal" type="button">Batal</button>
+                <button class="button-primary" type="submit">Kirim Pengajuan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    const withdrawalModal = document.getElementById('withdrawalModal');
+    const openWithdrawalModal = document.getElementById('openWithdrawalModal');
+    const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
+
+    openWithdrawalModal.addEventListener('click', () => withdrawalModal.classList.add('active'));
+    closeWithdrawalModal.addEventListener('click', () => withdrawalModal.classList.remove('active'));
+    withdrawalModal.addEventListener('click', (event) => {
+        if (event.target === withdrawalModal) {
+            withdrawalModal.classList.remove('active');
+        }
+    });
+</script>
+@endpush

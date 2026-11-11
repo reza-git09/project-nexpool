@@ -39,6 +39,8 @@ class HargaTiketControllerTest extends TestCase
             ->assertSee('Jenis Hari')
             ->assertSee('Harga Tiket')
             ->assertSee('Aksi')
+            ->assertSee('Penarikan Saldo')
+            ->assertSee(route('penarikan-saldo.index'))
             ->assertDontSee('Kategori');
 
         $this->withSession($session)
@@ -46,6 +48,7 @@ class HargaTiketControllerTest extends TestCase
             ->assertOk()
             ->assertSee('name="jenis_hari"', false)
             ->assertSee('name="harga"', false)
+            ->assertSee('Penarikan Saldo')
             ->assertDontSee('name="kategori"', false);
 
         $this->withSession($session)
@@ -53,6 +56,7 @@ class HargaTiketControllerTest extends TestCase
             ->assertOk()
             ->assertSee('name="jenis_hari"', false)
             ->assertSee('name="harga"', false)
+            ->assertSee('Penarikan Saldo')
             ->assertDontSee('name="kategori"', false);
     }
 
