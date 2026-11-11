@@ -22,7 +22,7 @@
         .logo h2 { font-size: 22px; letter-spacing: 1px; }
         .logo p { margin-top: 5px; font-size: 10px; color: #91a0b9; letter-spacing: 1.3px; }
         .menu-title { flex: 0 0 auto; padding: 0 12px; margin-bottom: 10px; font-size: 10px; font-weight: bold; color: #73819b; letter-spacing: 1.2px; text-transform: uppercase; }
-        .menu { display: flex; flex: 1 1 auto; flex-direction: column; gap: 5px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(148,163,184,.35) transparent; }
+        .menu { display: flex; flex: 1 1 auto; flex-direction: column; gap: 5px; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(148,163,184,.35) transparent; }
         .menu::-webkit-scrollbar { width: 5px; }
         .menu::-webkit-scrollbar-thumb { background: rgba(148,163,184,.35); border-radius: 8px; }
         .menu a, .logout a { display: flex; align-items: center; gap: 13px; padding: 12px 13px; border-radius: 10px; font-size: 13px; }

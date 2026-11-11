@@ -23,7 +23,7 @@
         .logo h2 { font-size:22px; letter-spacing:1px; }
         .logo p { margin-top:4px; font-size:10px; color:#91a0b9; letter-spacing:1.3px; }
         .menu-title { flex:0 0 auto; padding:0 12px; margin-bottom:10px; font-size:10px; font-weight:bold; color:#73819b; letter-spacing:1.2px; text-transform:uppercase; }
-        .menu { display:flex; flex:1 1 auto; flex-direction:column; gap:5px; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(148,163,184,.35) transparent; }
+        .menu { display:flex; flex:1 1 auto; flex-direction:column; gap:5px; min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(148,163,184,.35) transparent; }
         .menu::-webkit-scrollbar { width:5px; }
         .menu::-webkit-scrollbar-thumb { background:rgba(148,163,184,.35); border-radius:8px; }
         .menu a {
@@ -98,10 +98,16 @@
         .chart-summary { display:flex; align-items:baseline; gap:8px; margin:-5px 0 8px; }
         .chart-summary strong { font-size:24px; color:#172033; }
         .chart-summary span { font-size:11px; color:#16804f; }
+        .chart-filters { display:flex; flex-wrap:wrap; gap:4px; padding:3px; border:1px solid #e8ecf3; border-radius:9px; background:#f8fafc; }
+        .chart-filters button { padding:6px 9px; border:0; border-radius:6px; background:transparent; color:#64748b; font-size:10px; font-weight:600; cursor:pointer; }
+        .chart-filters button[aria-pressed="true"] { background:#2563eb; color:#fff; box-shadow:0 2px 6px rgba(37,99,235,.2); }
+        .chart-filters button:focus-visible { outline:2px solid #60a5fa; outline-offset:2px; }
         .chart { height:210px; display:flex; align-items:stretch; justify-content:space-around; gap:10px; padding:18px 5px 0; border-bottom:1px solid #e5eaf1; }
         .bar-wrapper { height:100%; flex:1; min-width:0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:9px; }
+        .bar-wrapper[hidden] { display:none; }
         .bar-track { width:min(100%,38px); flex:1; display:flex; align-items:flex-end; background:#f1f5fb; border-radius:7px 7px 0 0; overflow:hidden; }
         .bar { width:100%; background:linear-gradient(180deg,#60a5fa,#2563eb); border-radius:6px 6px 0 0; min-height:8px; }
+        .bar[data-zero="true"] { display:none; }
         .bar-wrapper span { font-size:10px; color:#8a94a6; padding-bottom:8px; }
 
         .reservation { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #eef1f5; }
@@ -155,9 +161,10 @@
             .cards .stat-card:last-child { grid-column:auto; }
             .stat-card { padding:18px; }
             .panel { padding:17px; }
-            .panel-header { align-items:flex-start; }
+            .panel-header { align-items:flex-start; flex-wrap:wrap; }
             .chart { height:185px; gap:5px; }
             .bar-wrapper span { font-size:9px; }
+            .chart-filters { margin-left:auto; }
         }
     </style>
 </head>
@@ -274,22 +281,42 @@
                                 <div class="panel-icon"><i class="fa-solid fa-chart-column"></i></div>
                                 <h3>Penjualan Tiket</h3>
                             </div>
-                            <span>Ilustrasi 7 Hari</span>
+                            <div class="chart-filters" role="group" aria-label="Filter grafik penjualan tiket">
+                                <button type="button" data-chart-filter="all" aria-pressed="true">Semua</button>
+                                <button type="button" data-chart-filter="weekday" aria-pressed="false">Weekday</button>
+                                <button type="button" data-chart-filter="weekend" aria-pressed="false">Weekend</button>
+                            </div>
                         </div>
 
                         <div class="chart-summary">
-                            <strong>{{ number_format($totalTiket ?? 0, 0, ',', '.') }}</strong>
-                            <span><i class="fa-solid fa-ticket"></i> Total reservasi</span>
+                            <strong data-chart-total>{{ number_format($chartTotalTickets, 0, ',', '.') }}</strong>
+                            <span><i class="fa-solid fa-ticket"></i> Total tiket (<span data-chart-period>Semua hari</span>)</span>
                         </div>
 
-                        <div class="chart" aria-label="Ilustrasi grafik tujuh hari terakhir">
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:45%"></div></div><span>Sen</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:60%"></div></div><span>Sel</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:50%"></div></div><span>Rab</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:75%"></div></div><span>Kam</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:65%"></div></div><span>Jum</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:90%"></div></div><span>Sab</span></div>
-                            <div class="bar-wrapper"><div class="bar-track"><div class="bar" style="height:80%"></div></div><span>Min</span></div>
+                        <div class="chart" aria-label="Grafik jumlah tiket selama tujuh hari terakhir">
+                            @foreach ($chartDays as $day)
+                                @php
+                                    $barHeight = $day['total_tiket'] > 0
+                                        ? max(8, ($day['total_tiket'] / $chartMaxTickets) * 100)
+                                        : 0;
+                                @endphp
+                                <div
+                                    class="bar-wrapper"
+                                    data-chart-day
+                                    data-day-type="{{ $day['day_type'] }}"
+                                    data-ticket-count="{{ $day['total_tiket'] }}"
+                                    title="{{ $day['label'] }} {{ $day['date'] }}: {{ $day['total_tiket'] }} tiket"
+                                >
+                                    <div class="bar-track">
+                                        <div
+                                            class="bar"
+                                            @if ($day['total_tiket'] === 0) data-zero="true" @endif
+                                            style="height: {{ $barHeight }}%"
+                                        ></div>
+                                    </div>
+                                    <span>{{ $day['label'] }} {{ $day['date'] }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     </section>
 
@@ -404,9 +431,46 @@
             </div>
 
             <p style="margin:2px 0 8px;color:#94a3b8;font-size:10px;">
-                Statistik dan daftar reservasi ditampilkan berdasarkan variabel yang dikirim controller. Grafik batang masih berupa ilustrasi.
+                Grafik menghitung tiket dari reservasi yang dikonfirmasi atau selesai selama tujuh hari terakhir.
             </p>
         </section>
     </main>
+    <script>
+        const chartFilterButtons = document.querySelectorAll('[data-chart-filter]');
+        const chartDays = document.querySelectorAll('[data-chart-day]');
+        const chartTotal = document.querySelector('[data-chart-total]');
+        const chartPeriod = document.querySelector('[data-chart-period]');
+        const chartPeriodLabels = {
+            all: 'Semua hari',
+            weekday: 'Weekday',
+            weekend: 'Weekend',
+        };
+
+        chartFilterButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const filter = button.dataset.chartFilter;
+                let ticketTotal = 0;
+
+                chartFilterButtons.forEach((filterButton) => {
+                    filterButton.setAttribute(
+                        'aria-pressed',
+                        String(filterButton === button),
+                    );
+                });
+
+                chartDays.forEach((day) => {
+                    const isVisible = filter === 'all' || day.dataset.dayType === filter;
+                    day.hidden = !isVisible;
+
+                    if (isVisible) {
+                        ticketTotal += Number(day.dataset.ticketCount);
+                    }
+                });
+
+                chartTotal.textContent = new Intl.NumberFormat('id-ID').format(ticketTotal);
+                chartPeriod.textContent = chartPeriodLabels[filter];
+            });
+        });
+    </script>
 </body>
 </html>

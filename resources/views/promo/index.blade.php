@@ -982,6 +982,7 @@
 
     </style>
 
+    @include('layout.partials.sidebar-scroll')
 </head>
 
 

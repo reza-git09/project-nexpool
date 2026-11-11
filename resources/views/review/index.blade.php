@@ -154,6 +154,7 @@ tbody tr:hover{background:#fafcff}
     .modal-body{padding:17px}
 }
 </style>
+    @include('layout.partials.sidebar-scroll')
 </head>
 
 <body>

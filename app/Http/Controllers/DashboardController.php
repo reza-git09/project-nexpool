@@ -48,6 +48,65 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | GRAFIK TIKET TUJUH HARI TERAKHIR
+        |--------------------------------------------------------------------------
+        */
+
+        $chartEndDate = now('Asia/Jakarta')->startOfDay();
+        $chartStartDate = $chartEndDate->copy()->subDays(6);
+        $chartReservationsQuery = DB::table('reservasis')
+            ->whereBetween('tanggal_kunjungan', [
+                $chartStartDate->toDateString(),
+                $chartEndDate->toDateString(),
+            ]);
+
+        if ($poolId && Schema::hasColumn('reservasis', 'pool_id')) {
+            $chartReservationsQuery->where('pool_id', $poolId);
+        }
+
+        if (Schema::hasColumn('reservasis', 'status_reservasi')) {
+            $chartReservationsQuery->whereIn('status_reservasi', [
+                'Dikonfirmasi',
+                'Selesai',
+            ]);
+        }
+
+        $chartTicketTotalsByDate = $chartReservationsQuery
+            ->select('tanggal_kunjungan')
+            ->selectRaw('SUM(jumlah_dewasa + jumlah_anak) as total_tiket')
+            ->groupBy('tanggal_kunjungan')
+            ->pluck('total_tiket', 'tanggal_kunjungan');
+
+        $weekdayLabels = [
+            1 => 'Sen',
+            2 => 'Sel',
+            3 => 'Rab',
+            4 => 'Kam',
+            5 => 'Jum',
+            6 => 'Sab',
+            7 => 'Min',
+        ];
+
+        $chartDays = [];
+
+        for ($daysAgo = 0; $daysAgo < 7; $daysAgo++) {
+            $date = $chartStartDate->copy()->addDays($daysAgo);
+            $dateKey = $date->toDateString();
+            $ticketCount = (int) ($chartTicketTotalsByDate[$dateKey] ?? 0);
+
+            $chartDays[] = [
+                'label' => $weekdayLabels[$date->dayOfWeekIso],
+                'date' => $date->format('d/m'),
+                'day_type' => $date->isWeekend() ? 'weekend' : 'weekday',
+                'total_tiket' => $ticketCount,
+            ];
+        }
+
+        $chartTotalTickets = array_sum(array_column($chartDays, 'total_tiket'));
+        $chartMaxTickets = max(1, max(array_column($chartDays, 'total_tiket')));
+
+        /*
+        |--------------------------------------------------------------------------
         | TOTAL PROMO AKTIF
         |--------------------------------------------------------------------------
         */
@@ -115,6 +174,9 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'totalPengunjung',
             'totalTiket',
+            'chartDays',
+            'chartMaxTickets',
+            'chartTotalTickets',
             'promoAktif',
             'reservasiTerbaru'
         ));

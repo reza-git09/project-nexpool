@@ -251,6 +251,7 @@
             color: #1e40af;
         }
     </style>
+    @include('layout.partials.sidebar-scroll')
 </head>
 
 <body>
