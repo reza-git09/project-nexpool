@@ -12,7 +12,6 @@ use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\HargaTiketController;
 use App\Http\Controllers\KolamRenangController;
 use App\Http\Controllers\PromoController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\AdminMasterTransaksiApiController;
@@ -20,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION (LOGIN & REGISTER)
+| ADMIN AUTHENTICATION
 |--------------------------------------------------------------------------
 */
 
@@ -30,13 +29,6 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])
 Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login.process');
-
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])
-    ->name('register');
-
-Route::post('/register', [AdminApplicationController::class, 'store'])
-    ->middleware('throttle:5,1')
-    ->name('register.process');
 
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');

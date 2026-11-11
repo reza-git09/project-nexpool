@@ -3,50 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdminApplication;
-use App\Models\User;
-use App\Models\Pool;
 use App\Models\KolamRenang;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
-        $pools = Pool::orderBy('pool_id')->get();
-
-        return view('auth.login', compact('pools'));
+        return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
+        $email = strtolower(trim($request->input('email', '')));
+        $request->merge(['email' => $email]);
+
         $request->validate([
-            'username' => 'required|string',
-            'pool_id'  => 'nullable|string',
-            'password' => 'required|string',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        $username = trim($request->username);
-        $poolId = trim($request->pool_id ?? '');
-
-        // Cari akun berdasarkan username.
-        $user = User::where('username', $request->username)
-            ->orWhere('email', $request->username)
-            ->first();
-
-        // Admin Kolam wajib memilih pool yang sesuai.
-        // Admin Master tidak membutuhkan pool_id.
-        if ($user && $user->role !== 'admin_master') {
-            if ($poolId === '' || $user->pool_id != $poolId) {
-                $user = null;
-            }
-        }
+        $user = User::where('email', $email)->first();
 
         // Periksa pengajuan admin jika akun belum ditemukan.
-        if (!$user && $poolId !== '') {
-            $pendingApp = AdminApplication::where('username', $username)
-                ->where('pool_id', $poolId)
+        if (! $user) {
+            $pendingApp = AdminApplication::where('email', $email)
                 ->where('status', AdminApplication::STATUS_PENDING)
                 ->first();
 
@@ -56,18 +42,17 @@ class AuthController extends Controller
                     ->withInput($request->except('password'));
             }
 
-            $rejectedApp = AdminApplication::where('username', $username)
-                ->where('pool_id', $poolId)
+            $rejectedApp = AdminApplication::where('email', $email)
                 ->where('status', AdminApplication::STATUS_REJECTED)
                 ->first();
 
             if ($rejectedApp) {
                 $reason = $rejectedApp->rejection_reason
-                    ? ' Alasan: ' . $rejectedApp->rejection_reason
+                    ? ' Alasan: '.$rejectedApp->rejection_reason
                     : '';
 
                 return back()
-                    ->with('error', 'Pengajuan Anda telah ditolak.' . $reason)
+                    ->with('error', 'Pengajuan Anda telah ditolak.'.$reason)
                     ->withInput($request->except('password'));
             }
         }
@@ -109,11 +94,11 @@ class AuthController extends Controller
         }
 
         return back()
-            ->with('error', 'Username, Pool ID, atau password salah.')
+            ->with('error', 'Email atau password salah.')
             ->withInput($request->except('password'));
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 

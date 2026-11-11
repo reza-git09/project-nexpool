@@ -150,23 +150,6 @@
             cursor: not-allowed;
         }
 
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .register-link a {
-            color: #1e3c72;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -182,7 +165,7 @@
 
         <div class="logo">
             <h1>NEXPOOL</h1>
-            <p>Website Management System</p>
+            <p>Admin Panel Wisata</p>
         </div>
 
         @if(session('success'))
@@ -197,41 +180,28 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <form id="loginForm" action="{{ route('login.process') }}" method="POST">
              @csrf
 
-            <!-- Username -->
             <div class="form-group">
-                <label for="username">Email / Username</label>
+                <label for="email">Email</label>
                 <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value="{{ session('registered_username', old('username')) }}"
-                    placeholder="Masukkan email atau username"
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    placeholder="Masukkan email admin"
+                    autocomplete="username"
                     required
                 >
             </div>
 
-            
-        <!-- Pool ID -->
-        <div class="form-group">
-            <label for="pool_id">Wisata / Pool ID (Khusus Admin Kolam)</label>
-
-            <select id="pool_id" name="pool_id">
-                <option value="">Tidak perlu memilih kolam untuk Admin Master</option>
-
-                @foreach($pools as $pool)
-                    <option value="{{ $pool->pool_id }}"
-                        {{ (session('registered_pool_id', old('pool_id')) == $pool->pool_id) ? 'selected' : '' }}>
-                        {{ $pool->name }} ({{ $pool->pool_id }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-
-            <!-- Password -->
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-wrapper">
@@ -253,10 +223,6 @@
             </button>
 
         </form>
-
-        <div class="register-link">
-            Belum punya akun? <a href="{{ route('register') }}">Daftar</a>
-        </div>
 
         <div class="footer">
             NEXPOOL &copy; 2026
