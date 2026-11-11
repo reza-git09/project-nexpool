@@ -1,4 +1,4 @@
-@extends('layout.admin')
+@extends('layout.admin_master')
 
 @section('title', 'Daftar Pengajuan Akun Admin - NEXPOOL')
 @section('header-title', 'Pengajuan Akun Admin Wisata')

@@ -202,30 +202,34 @@
 
             <!-- Username -->
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">Email / Username</label>
                 <input
                     type="text"
                     id="username"
                     name="username"
                     value="{{ session('registered_username', old('username')) }}"
-                    placeholder="Masukkan username"
+                    placeholder="Masukkan email atau username"
                     required
                 >
             </div>
 
-            <!-- Pool ID -->
-            <div class="form-group">
-                <label for="pool_id">Wisata / Pool ID</label>
-                <select id="pool_id" name="pool_id" required>
-                    <option value="">Pilih Wisata Kolam Renang</option>
-                    @foreach($pools as $pool)
-                        <option value="{{ $pool->pool_id }}"
-                            {{ (session('registered_pool_id', old('pool_id')) == $pool->pool_id) ? 'selected' : '' }}>
-                            {{ $pool->name }} ({{ $pool->pool_id }})
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            
+        <!-- Pool ID -->
+        <div class="form-group">
+            <label for="pool_id">Wisata / Pool ID (Khusus Admin Kolam)</label>
+
+            <select id="pool_id" name="pool_id">
+                <option value="">Tidak perlu memilih kolam untuk Admin Master</option>
+
+                @foreach($pools as $pool)
+                    <option value="{{ $pool->pool_id }}"
+                        {{ (session('registered_pool_id', old('pool_id')) == $pool->pool_id) ? 'selected' : '' }}>
+                        {{ $pool->name }} ({{ $pool->pool_id }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
 
             <!-- Password -->
             <div class="form-group">

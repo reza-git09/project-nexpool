@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\KolamRenang;
 
 class Reservasi extends Model
 {
@@ -33,4 +34,16 @@ class Reservasi extends Model
         'total_harga' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
+
+    /**
+     * Relasi reservasi dengan kolam renang.
+     */
+    public function kolamRenang()
+    {
+        return $this->belongsTo(
+            KolamRenang::class,
+            'pool_id',
+            'pool_id'
+        );
+    }
 }

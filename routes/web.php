@@ -1,7 +1,10 @@
+
 <?php
 
 use App\Http\Controllers\Admin\LaporanPenjualanController;
 use App\Http\Controllers\AdminApplicationController;
+use App\Http\Controllers\AdminMasterController;
+use App\Http\Controllers\AdminMasterTransaksiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\DashboardController;
@@ -12,6 +15,7 @@ use App\Http\Controllers\PromoController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Api\AdminMasterTransaksiApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,16 +24,16 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])
+    ->name('login');
 
 Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login.process');
 
-// Halaman Form Pengajuan Admin
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])
+    ->name('register');
 
-// Proses submit pengajuan (rate limit: 5 request per menit per IP)
 Route::post('/register', [AdminApplicationController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('register.process');
@@ -37,9 +41,10 @@ Route::post('/register', [AdminApplicationController::class, 'store'])
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+
 /*
 |--------------------------------------------------------------------------
-| GANTI PASSWORD (Wajib untuk akun baru yang disetujui)
+| GANTI PASSWORD
 |--------------------------------------------------------------------------
 */
 
@@ -51,9 +56,10 @@ Route::post('/admin/ganti-password', [ChangePasswordController::class, 'update']
     ->middleware(['admin'])
     ->name('admin.change-password.process');
 
+
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD
+| DASHBOARD ADMIN KOLAM
 |--------------------------------------------------------------------------
 */
 
@@ -61,9 +67,35 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['admin', 'must.change.password'])
     ->name('dashboard');
 
+
 /*
 |--------------------------------------------------------------------------
-| ADMIN MASTER — MANAJEMEN PENGAJUAN
+| ADMIN MASTER - DASHBOARD
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin-master/dashboard', [AdminMasterController::class, 'index'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.dashboard');
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN MASTER - TRANSAKSI PEMBAYARAN (WEB)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin-master/transaksi', [
+    AdminMasterTransaksiController::class,
+    'index'
+])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.transaksi.index');
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN MASTER - MANAJEMEN PENGAJUAN
 |--------------------------------------------------------------------------
 */
 
@@ -79,6 +111,7 @@ Route::post('/admin/master/pengajuan/{app}/reject', [AdminApplicationController:
     ->middleware(['admin', 'admin.master'])
     ->name('admin.master.applications.reject');
 
+
 /*
 |--------------------------------------------------------------------------
 | LAPORAN PENJUALAN
@@ -93,6 +126,7 @@ Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'exp
     ->middleware(['admin', 'must.change.password'])
     ->name('admin.laporan.penjualan.export');
 
+
 /*
 |--------------------------------------------------------------------------
 | HARGA TIKET
@@ -101,6 +135,7 @@ Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'exp
 
 Route::resource('harga-tiket', HargaTiketController::class)
     ->middleware(['admin', 'must.change.password']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +146,7 @@ Route::resource('harga-tiket', HargaTiketController::class)
 Route::resource('fasilitas', FasilitasController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | KOLAM RENANG
@@ -120,20 +156,20 @@ Route::resource('fasilitas', FasilitasController::class)
 Route::resource('kolam-renang', KolamRenangController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | RESERVASI
 |--------------------------------------------------------------------------
 */
 
-// Halaman Reservasi Dikonfirmasi
 Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi'])
     ->middleware(['admin', 'must.change.password'])
     ->name('reservasi.dikonfirmasi');
 
-// Resource Reservasi
 Route::resource('reservasi', ReservasiController::class)
     ->middleware(['admin', 'must.change.password']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +180,7 @@ Route::resource('reservasi', ReservasiController::class)
 Route::resource('promo', PromoController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | REVIEW
@@ -152,3 +189,36 @@ Route::resource('promo', PromoController::class)
 
 Route::resource('review', ReviewController::class)
     ->middleware(['admin', 'must.change.password']);
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN MASTER - TRANSAKSI API
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin/master/api')
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.api.')
+    ->group(function () {
+
+        Route::get('/dashboard', [
+            AdminMasterTransaksiApiController::class,
+            'dashboard'
+        ])->name('dashboard');
+
+        Route::get('/transaksi', [
+            AdminMasterTransaksiApiController::class,
+            'index'
+        ])->name('transaksi.index');
+
+        Route::get('/transaksi/{id}', [
+            AdminMasterTransaksiApiController::class,
+            'show'
+        ])->name('transaksi.show');
+
+        Route::get('/kolam', [
+            AdminMasterTransaksiApiController::class,
+            'kolam'
+        ])->name('kolam');
+    });
