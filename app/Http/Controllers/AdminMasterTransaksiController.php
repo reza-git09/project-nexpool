@@ -39,7 +39,8 @@ class AdminMasterTransaksiController extends Controller
         if ($request->filled('tanggal')) {
             $query->whereDate(
                 \Illuminate\Support\Facades\DB::raw(
-                    'COALESCE(paid_at, created_at)'
+                    "CASE WHEN status_pembayaran = 'paid' AND paid_at IS NOT NULL
+                    THEN paid_at ELSE created_at END"
                 ),
                 $request->tanggal
             );
@@ -47,7 +48,10 @@ class AdminMasterTransaksiController extends Controller
 
         // Data transaksi dengan pagination
         $transaksi = $query
-            ->orderByRaw('COALESCE(paid_at, created_at) DESC')
+            ->orderByRaw("
+                CASE WHEN status_pembayaran = 'paid' AND paid_at IS NOT NULL
+                THEN paid_at ELSE created_at END DESC
+            ")
             ->paginate(15)
             ->withQueryString();
 

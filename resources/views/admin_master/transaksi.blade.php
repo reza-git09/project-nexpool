@@ -177,7 +177,7 @@
             </div>
             <div>
                 <label>Kolam renang</label>
-                <select name="pool_id">
+                <select name="pool_id" onchange="this.form.submit()">
                     <option value="">Semua kolam</option>
                     @foreach($kolam as $item)
                         <option value="{{ $item->pool_id }}" @selected(request('pool_id') == $item->pool_id)>{{ $item->nama_kolam }}</option>
@@ -186,7 +186,7 @@
             </div>
             <div>
                 <label>Status</label>
-                <select name="status_pembayaran">
+                <select name="status_pembayaran" onchange="this.form.submit()">
                     <option value="">Semua status</option>
                     <option value="paid" @selected(request('status_pembayaran') == 'paid')>Berhasil</option>
                     <option value="pending" @selected(request('status_pembayaran') == 'pending')>Pending</option>
@@ -195,7 +195,7 @@
             </div>
             <div>
                 <label>Tanggal</label>
-                <input type="date" name="tanggal" value="{{ request('tanggal') }}">
+                <input type="date" name="tanggal" value="{{ request('tanggal') }}" onchange="this.form.submit()">
             </div>
             <div class="trx-actions">
                 <button type="submit" class="trx-btn primary">Cari</button>
