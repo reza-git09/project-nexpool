@@ -130,6 +130,7 @@
 </div>
 
 <div class="notice">
+    Saldo tersedia saat ini: <strong>Rp {{ number_format((float) $availableBalance, 2, ',', '.') }}</strong>.<br>
     Transfer ke rekening dilakukan oleh Admin Master di luar aplikasi. Status akan berubah setelah pengajuan diproses.
 </div>
 
@@ -186,12 +187,13 @@
             </div>
             <div class="form-group">
                 <label for="account_number">Nomor Rekening</label>
-                <input id="account_number" name="account_number" value="{{ old('account_number') }}" inputmode="numeric" pattern="[0-9]{5,30}" maxlength="30" placeholder="Masukkan nomor rekening" required>
+                <input id="account_number" name="account_number" type="text" value="{{ old('account_number') }}" inputmode="numeric" pattern="[0-9]{5,30}" maxlength="30" autocomplete="off" placeholder="Masukkan nomor rekening" required>
                 @error('account_number') <span class="field-error">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">
-                <label for="amount">Jumlah Saldo (Rp)</label>
-                <input id="amount" name="amount" type="number" min="0.01" max="9999999999999.99" step="0.01" value="{{ old('amount') }}" placeholder="Contoh: 500000" required>
+                <label for="amount_display">Jumlah Saldo (Rp)</label>
+                <input id="amount_display" type="text" inputmode="decimal" autocomplete="off" value="{{ old('amount') }}" placeholder="Contoh: 20.000" required>
+                <input id="amount" name="amount" type="hidden" value="{{ old('amount') }}">
                 @error('amount') <span class="field-error">{{ $message }}</span> @enderror
             </div>
             <div class="modal-actions">
@@ -208,6 +210,73 @@
     const withdrawalModal = document.getElementById('withdrawalModal');
     const openWithdrawalModal = document.getElementById('openWithdrawalModal');
     const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
+    const accountNumberInput = document.getElementById('account_number');
+    const amountDisplayInput = document.getElementById('amount_display');
+    const amountInput = document.getElementById('amount');
+
+    const sanitizeAccountNumber = () => {
+        accountNumberInput.value = accountNumberInput.value.replace(/\D/g, '').slice(0, 30);
+    };
+
+    accountNumberInput.addEventListener('input', sanitizeAccountNumber);
+    sanitizeAccountNumber();
+
+    const parseAmount = (value) => {
+        const cleaned = value.replace(/[^\d,.]/g, '');
+        const decimalSeparator = cleaned.lastIndexOf(',');
+        const integerPart = (decimalSeparator >= 0
+            ? cleaned.slice(0, decimalSeparator)
+            : cleaned
+        ).replace(/\D/g, '');
+        const decimalPart = decimalSeparator >= 0
+            ? cleaned.slice(decimalSeparator + 1).replace(/\D/g, '').slice(0, 2)
+            : '';
+
+        return { integerPart, decimalPart };
+    };
+
+    const formatAmount = (integerPart) => integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    const updateAmount = () => {
+        const { integerPart, decimalPart } = parseAmount(amountDisplayInput.value);
+        const caretPosition = amountDisplayInput.selectionStart ?? amountDisplayInput.value.length;
+        const digitsBeforeCaret = amountDisplayInput.value.slice(0, caretPosition).replace(/\D/g, '').length;
+        const formattedInteger = formatAmount(integerPart);
+        const formattedValue = decimalPart.length > 0
+            ? `${formattedInteger},${decimalPart}`
+            : formattedInteger;
+        amountDisplayInput.value = formattedValue;
+        amountInput.value = integerPart + (decimalPart.length > 0 ? `.${decimalPart}` : '');
+
+        let nextCaretPosition = 0;
+        let digitCount = 0;
+        while (nextCaretPosition < formattedValue.length && digitCount < digitsBeforeCaret) {
+            if (/\d/.test(formattedValue[nextCaretPosition])) {
+                digitCount += 1;
+            }
+            nextCaretPosition += 1;
+        }
+        amountDisplayInput.setSelectionRange(nextCaretPosition, nextCaretPosition);
+    };
+
+    amountDisplayInput.addEventListener('input', updateAmount);
+    amountDisplayInput.form.addEventListener('submit', (event) => {
+        updateAmount();
+        if (!amountInput.value || Number(amountInput.value) <= 0) {
+            event.preventDefault();
+            amountDisplayInput.setCustomValidity('Masukkan nominal pencairan yang valid.');
+            amountDisplayInput.reportValidity();
+        } else {
+            amountDisplayInput.setCustomValidity('');
+        }
+    });
+
+    if (amountDisplayInput.value) {
+        const oldAmount = amountDisplayInput.value;
+        const normalizedOldAmount = oldAmount.replace(/^(\d+)\.(\d{1,2})$/, '$1,$2');
+        amountDisplayInput.value = normalizedOldAmount;
+        updateAmount();
+    }
 
     openWithdrawalModal.addEventListener('click', () => withdrawalModal.classList.add('active'));
     closeWithdrawalModal.addEventListener('click', () => withdrawalModal.classList.remove('active'));

@@ -49,6 +49,13 @@ class AdminMasterController extends Controller
             'paid'
         )->sum('total_harga');
 
+        $totalPenarikan = \App\Models\PenarikanSaldo::whereIn(
+            'status',
+            [\App\Models\PenarikanSaldo::STATUS_PROSES, \App\Models\PenarikanSaldo::STATUS_BERHASIL]
+        )->sum('amount');
+
+        $totalPendapatan = max((float) $totalPendapatan - (float) $totalPenarikan, 0.0);
+
         return view('admin_master.dashboard', compact(
             'totalPengunjung',
             'totalAdmin',

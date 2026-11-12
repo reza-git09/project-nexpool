@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PenarikanSaldo;
+use App\Models\Reservasi;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,19 +14,39 @@ class PenarikanSaldoController extends Controller
     public function index(): View
     {
         $poolId = $this->poolId();
+        $availableBalance = $this->availableBalanceForPool($poolId);
         $withdrawals = PenarikanSaldo::where('pool_id', $poolId)
             ->latest()
             ->paginate(15);
 
-        return view('penarikan_saldo.index', compact('withdrawals'));
+        return view('penarikan_saldo.index', compact('withdrawals', 'availableBalance'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $poolId = $this->poolId();
+        $availableBalance = $this->availableBalanceForPool($poolId);
+
         $validated = $request->validate([
             'bank_name' => ['required', 'string', 'max:100'],
             'account_number' => ['required', 'string', 'regex:/^[0-9]{5,30}$/'],
-            'amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999999.99'],
+            'amount' => [
+                'required',
+                'numeric',
+                'gt:0',
+                'decimal:0,2',
+                'max:9999999999999.99',
+                function (string $attribute, mixed $value, \Closure $fail) use ($availableBalance): void {
+                    $amount = (float) $value;
+
+                    if ($amount > $availableBalance) {
+                        $fail(sprintf(
+                            'Jumlah pencairan melebihi pendapatan valid kolam saat ini. Maksimal yang bisa dicairkan adalah Rp %s.',
+                            number_format($availableBalance, 2, ',', '.'),
+                        ));
+                    }
+                },
+            ],
         ], [
             'bank_name.required' => 'Nama bank wajib diisi.',
             'account_number.required' => 'Nomor rekening wajib diisi.',
@@ -37,7 +58,7 @@ class PenarikanSaldoController extends Controller
         ]);
 
         PenarikanSaldo::create([
-            'pool_id' => $this->poolId(),
+            'pool_id' => $poolId,
             'bank_name' => trim($validated['bank_name']),
             'account_number' => $validated['account_number'],
             'amount' => $validated['amount'],
@@ -99,6 +120,29 @@ class PenarikanSaldoController extends Controller
         abort_if($poolId === '', 403, 'Akun ini tidak terhubung ke wisata kolam renang.');
 
         return $poolId;
+    }
+
+    private function availableBalanceForPool(string $poolId): float
+    {
+        $totalPendapatan = (float) Reservasi::query()
+            ->where('pool_id', $poolId)
+            ->where('status_pembayaran', 'paid')
+            ->sum('total_harga');
+
+        $totalPenarikan = $this->withdrawalAmountForPool($poolId);
+
+        return max($totalPendapatan - $totalPenarikan, 0.0);
+    }
+
+    private function withdrawalAmountForPool(string $poolId): float
+    {
+        return (float) PenarikanSaldo::query()
+            ->where('pool_id', $poolId)
+            ->whereIn('status', [
+                PenarikanSaldo::STATUS_PROSES,
+                PenarikanSaldo::STATUS_BERHASIL,
+            ])
+            ->sum('amount');
     }
 
     private function updatePendingWithdrawal(

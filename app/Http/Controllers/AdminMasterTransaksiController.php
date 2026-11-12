@@ -78,12 +78,35 @@ class AdminMasterTransaksiController extends Controller
             ")
             ->first();
 
-        // Pendapatan masing-masing kolam
+        $withdrawalSum = (float) \App\Models\PenarikanSaldo::query()
+            ->when($request->filled('pool_id'), fn ($query) => $query->where('pool_id', $request->pool_id))
+            ->whereIn('status', [
+                \App\Models\PenarikanSaldo::STATUS_PROSES,
+                \App\Models\PenarikanSaldo::STATUS_BERHASIL,
+            ])
+            ->sum('amount');
+
+        $statistik->total_pendapatan = max((float) $statistik->total_pendapatan - $withdrawalSum, 0.0);
+
+        // Pendapatan masing-masing kolam (neto setelah penarikan yang sudah diproses/berhasil)
         $pendapatanKolam = Reservasi::with('kolamRenang')
             ->where('status_pembayaran', 'paid')
             ->selectRaw('pool_id, COUNT(*) as jumlah_transaksi, SUM(total_harga) as total_pendapatan')
             ->groupBy('pool_id')
-            ->get();
+            ->get()
+            ->map(function ($row) {
+                $totalPenarikan = (float) \App\Models\PenarikanSaldo::query()
+                    ->where('pool_id', $row->pool_id)
+                    ->whereIn('status', [
+                        \App\Models\PenarikanSaldo::STATUS_PROSES,
+                        \App\Models\PenarikanSaldo::STATUS_BERHASIL,
+                    ])
+                    ->sum('amount');
+
+                $row->total_pendapatan = max((float) $row->total_pendapatan - $totalPenarikan, 0.0);
+
+                return $row;
+            });
 
         return view('admin_master.transaksi', compact(
             'transaksi',

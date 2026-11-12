@@ -30,6 +30,14 @@ class PenarikanSaldoTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('reservasis', function (Blueprint $table): void {
+            $table->id();
+            $table->string('pool_id');
+            $table->decimal('total_harga', 15, 2)->default(0);
+            $table->string('status_pembayaran')->default('pending');
+            $table->timestamps();
+        });
+
         DB::table('pools')->insert([
             [
                 'pool_id' => 'pool_01',
@@ -73,17 +81,34 @@ class PenarikanSaldoTest extends TestCase
             ->assertDontSee('700.000,00');
     }
 
-    public function test_pool_admin_can_submit_a_withdrawal_without_balance_limit(): void
+    public function test_pool_admin_can_submit_a_withdrawal_up_to_current_pool_income(): void
     {
+        DB::table('reservasis')->insert([
+            [
+                'pool_id' => 'pool_01',
+                'total_harga' => '495000.00',
+                'status_pembayaran' => 'paid',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'pool_id' => 'pool_01',
+                'total_harga' => '250000.00',
+                'status_pembayaran' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
         $this->withSession([
             'admin_id' => 1,
             'admin_pool_id' => 'pool_01',
         ])
+            ->from(route('penarikan-saldo.index'))
             ->post(route('penarikan-saldo.store'), [
                 'bank_name' => 'BCA',
                 'account_number' => '123456789012',
-                'amount' => '999999999999.99',
-                'pool_id' => 'pool_02',
+                'amount' => '450000.00',
             ])
             ->assertRedirect(route('penarikan-saldo.index'))
             ->assertSessionHas('success');
@@ -92,9 +117,22 @@ class PenarikanSaldoTest extends TestCase
             'pool_id' => 'pool_01',
             'bank_name' => 'BCA',
             'account_number' => '123456789012',
-            'amount' => '999999999999.99',
+            'amount' => '450000.00',
             'status' => PenarikanSaldo::STATUS_PROSES,
         ]);
+
+        $this->withSession([
+            'admin_id' => 1,
+            'admin_pool_id' => 'pool_01',
+        ])
+            ->from(route('penarikan-saldo.index'))
+            ->post(route('penarikan-saldo.store'), [
+                'bank_name' => 'BCA',
+                'account_number' => '123456789013',
+                'amount' => '495001.00',
+            ])
+            ->assertRedirect(route('penarikan-saldo.index'))
+            ->assertSessionHasErrors('amount');
     }
 
     public function test_withdrawal_factory_creates_a_withdrawal_for_a_pool(): void

@@ -10,6 +10,7 @@ class Review extends Model
 
     protected $fillable = [
         'pool_id',
+        'reservation_order_id',
         'nama_pengunjung',
         'rating',
         'komentar',

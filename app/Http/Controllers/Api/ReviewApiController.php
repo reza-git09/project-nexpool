@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Models\Reservasi;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -81,6 +82,8 @@ class ReviewApiController extends Controller
 
             $validated = $request->validate([
                 'pool_id' => 'required|string|max:255',
+                'reservation_order_id' => 'required|string|max:255',
+                'customer_phone' => 'required|string|max:20',
                 'nama_pengunjung' => 'required|string|max:255',
                 'rating' => 'required|integer|min:1|max:5',
                 'komentar' => 'nullable|string',
@@ -89,6 +92,32 @@ class ReviewApiController extends Controller
                 'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             ]);
 
+            $paidReservation = Reservasi::query()
+                ->where('midtrans_order_id', $validated['reservation_order_id'])
+                ->where('pool_id', $validated['pool_id'])
+                ->where('no_hp', trim($validated['customer_phone']))
+                ->where('status_pembayaran', 'paid')
+                ->whereNotNull('paid_at')
+                ->first();
+
+            if ($paidReservation === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ulasan hanya dapat dikirim setelah tiket kolam ini lunas dan struk pembayaran tersedia.',
+                ], 403);
+            }
+
+            if (
+                Review::where(
+                    'reservation_order_id',
+                    $paidReservation->midtrans_order_id,
+                )->exists()
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Struk tiket ini sudah pernah digunakan untuk mengirim ulasan.',
+                ], 409);
+            }
 
             // ==========================================
             // UPLOAD FOTO
@@ -111,6 +140,7 @@ class ReviewApiController extends Controller
 
             $review = Review::create([
                 'pool_id' => $validated['pool_id'],
+                'reservation_order_id' => $paidReservation->midtrans_order_id,
                 'nama_pengunjung' => $validated['nama_pengunjung'],
                 'rating' => $validated['rating'],
                 'komentar' => $validated['komentar'] ?? null,
