@@ -110,6 +110,7 @@
             <tr>
                 <th>Tanggal Pengajuan</th>
                 <th>Wisata Kolam Renang</th>
+                <th>Admin Pengaju</th>
                 <th>Bank</th>
                 <th>Nomor Rekening</th>
                 <th>Jumlah</th>
@@ -121,6 +122,7 @@
                 <tr>
                     <td>{{ $withdrawal->created_at->format('d/m/Y H:i') }}</td>
                     <td>{{ $withdrawal->pool?->name ?? $withdrawal->pool_id }}</td>
+                    <td>{{ $withdrawal->requester?->full_name ?: $withdrawal->requester?->name ?: $withdrawal->requester?->username ?: 'Admin kolam' }}</td>
                     <td>{{ $withdrawal->bank_name }}</td>
                     <td>
                         <div class="account-cell">
@@ -132,11 +134,11 @@
                     </td>
                     <td>Rp {{ number_format((float) $withdrawal->amount, 2, ',', '.') }}</td>
                     <td class="action-cell">
-                        <span class="status-badge status-{{ $withdrawal->status }}">{{ ucfirst($withdrawal->status) }}</span>
+                        <span class="status-badge status-{{ $withdrawal->status }}">{{ $withdrawal->status_label }}</span>
                         @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_PROSES)
                             <form class="action-form" action="{{ route('admin.master.penarikan-saldo.complete', $withdrawal) }}" method="POST" onsubmit="return confirm('Pastikan transfer ke rekening tujuan sudah berhasil sebelum melanjutkan. Tandai pengajuan ini berhasil?')">
                                 @csrf
-                                <button class="button-complete" type="submit"><i class="fa-solid fa-check"></i> Cairkan</button>
+                                <button class="button-complete" type="submit"><i class="fa-solid fa-check"></i> Cairkan Saldo</button>
                             </form>
                             <form class="action-form" action="{{ route('admin.master.penarikan-saldo.reject', $withdrawal) }}" method="POST" onsubmit="return confirm('Tolak pengajuan pencairan saldo ini?')">
                                 @csrf
@@ -149,7 +151,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td class="empty-state" colspan="6">Belum ada pengajuan pencairan saldo.</td></tr>
+                <tr><td class="empty-state" colspan="7">Belum ada pengajuan pencairan saldo.</td></tr>
             @endforelse
         </tbody>
     </table>

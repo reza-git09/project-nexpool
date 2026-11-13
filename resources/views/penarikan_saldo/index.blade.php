@@ -157,7 +157,7 @@
                     <td>Rp {{ number_format((float) $withdrawal->amount, 2, ',', '.') }}</td>
                     <td>
                         <span class="status-badge status-{{ $withdrawal->status }}">
-                            {{ ucfirst($withdrawal->status) }}
+                            {{ $withdrawal->status_label }}
                         </span>
                         @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_DITOLAK && $withdrawal->rejection_reason)
                             <div class="field-error">{{ $withdrawal->rejection_reason }}</div>

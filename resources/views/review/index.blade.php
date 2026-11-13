@@ -168,6 +168,7 @@ tbody tr:hover{background:#fafcff}
         ['reservasi.index',     'fa-calendar-check',   '#6ee7b7', 'Reservasi'],
         ['promo.index',         'fa-tags',             '#c4b5fd', 'Promo'],
         ['review.index',        'fa-star',             '#fde047', 'Review'],
+        ['admin.pool.applications.index', 'fa-user-plus', '#86efac', 'Tambah Admin'],
         ['admin.laporan.penjualan', 'fa-chart-column', '#60a5fa', 'Laporan Penjualan Tiket'],
         ['penarikan-saldo.index', 'fa-money-bill-transfer', '#86efac', 'Penarikan Saldo'],
     ];
@@ -184,7 +185,7 @@ tbody tr:hover{background:#fafcff}
 
     <div class="menu">
         @foreach($menus as [$rute, $ikon, $warna, $label])
-            <a href="{{ route($rute) }}" @if($rute === 'review.index') class="active" @elseif($rute === 'penarikan-saldo.index' && request()->routeIs('penarikan-saldo.*')) class="active" @endif>
+            <a href="{{ route($rute) }}" @if($rute === 'review.index' || ($rute === 'admin.pool.applications.index' && request()->routeIs('admin.pool.applications*'))) class="active" @elseif($rute === 'penarikan-saldo.index' && request()->routeIs('penarikan-saldo.*')) class="active" @endif>
                 <i class="fa-solid {{ $ikon }}" style="color:{{ $warna }};"></i>
                 <span>{{ $label }}</span>
             </a>

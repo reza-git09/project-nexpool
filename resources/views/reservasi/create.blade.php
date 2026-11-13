@@ -275,6 +275,11 @@
             <a href="#">
                 <i class="fa-solid fa-star" style="color:#eab308;width:18px;text-align:center;font-size:15px;"></i> <span>Review</span>
             </a>
+            <a href="{{ route('admin.pool.applications.index') }}" class="{{ request()->routeIs('admin.pool.applications*') ? 'active' : '' }}">
+                <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
+                <span>Tambah Admin</span>
+            </a>
+
             <a href="{{ route('admin.laporan.penjualan') }}">
                 <i class="fa-solid fa-chart-column" style="color:#60a5fa;width:18px;text-align:center;font-size:15px;"></i> <span>Laporan Penjualan Tiket</span>
             </a>

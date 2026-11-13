@@ -20,6 +20,7 @@ class PenarikanSaldo extends Model
 
     protected $fillable = [
         'pool_id',
+        'requested_by',
         'bank_name',
         'account_number',
         'amount',
@@ -42,8 +43,23 @@ class PenarikanSaldo extends Model
         return $this->belongsTo(Pool::class, 'pool_id', 'pool_id');
     }
 
+    public function requester(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'requested_by');
+    }
+
     public function processor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            self::STATUS_PROSES => 'Diproses',
+            self::STATUS_BERHASIL => 'Berhasil/Dicairkan',
+            self::STATUS_DITOLAK => 'Ditolak',
+            default => ucfirst($this->status),
+        };
     }
 }

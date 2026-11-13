@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\PenarikanSaldo;
+use App\Models\Pool;
 use App\Models\Reservasi;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PenarikanSaldoController extends Controller
 {
@@ -25,7 +27,8 @@ class PenarikanSaldoController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $poolId = $this->poolId();
-        $availableBalance = $this->availableBalanceForPool($poolId);
+        $availableBalanceInCents = $this->availableBalanceInCentsForPool($poolId);
+        $availableBalance = $availableBalanceInCents / 100;
 
         $validated = $request->validate([
             'bank_name' => ['required', 'string', 'max:100'],
@@ -36,13 +39,11 @@ class PenarikanSaldoController extends Controller
                 'gt:0',
                 'decimal:0,2',
                 'max:9999999999999.99',
-                function (string $attribute, mixed $value, \Closure $fail) use ($availableBalance): void {
-                    $amount = (float) $value;
-
-                    if ($amount > $availableBalance) {
+                function (string $attribute, mixed $value, \Closure $fail) use ($availableBalanceInCents): void {
+                    if ($this->amountInCents((string) $value) > $availableBalanceInCents) {
                         $fail(sprintf(
                             'Jumlah pencairan melebihi pendapatan valid kolam saat ini. Maksimal yang bisa dicairkan adalah Rp %s.',
-                            number_format($availableBalance, 2, ',', '.'),
+                            number_format($availableBalanceInCents / 100, 2, ',', '.'),
                         ));
                     }
                 },
@@ -59,6 +60,7 @@ class PenarikanSaldoController extends Controller
 
         PenarikanSaldo::create([
             'pool_id' => $poolId,
+            'requested_by' => (int) session('admin_id'),
             'bank_name' => trim($validated['bank_name']),
             'account_number' => $validated['account_number'],
             'amount' => $validated['amount'],
@@ -72,7 +74,7 @@ class PenarikanSaldoController extends Controller
 
     public function indexForAdminMaster(): View
     {
-        $withdrawals = PenarikanSaldo::with('pool')
+        $withdrawals = PenarikanSaldo::with(['pool', 'requester'])
             ->latest()
             ->paginate(20);
 
@@ -124,25 +126,39 @@ class PenarikanSaldoController extends Controller
 
     private function availableBalanceForPool(string $poolId): float
     {
-        $totalPendapatan = (float) Reservasi::query()
+        return $this->availableBalanceInCentsForPool($poolId) / 100;
+    }
+
+    private function availableBalanceInCentsForPool(string $poolId): int
+    {
+        $totalPendapatan = Reservasi::query()
             ->where('pool_id', $poolId)
             ->where('status_pembayaran', 'paid')
             ->sum('total_harga');
 
         $totalPenarikan = $this->withdrawalAmountForPool($poolId);
 
-        return max($totalPendapatan - $totalPenarikan, 0.0);
+        return max(
+            $this->amountInCents($totalPendapatan) - $this->amountInCents($totalPenarikan),
+            0,
+        );
     }
 
-    private function withdrawalAmountForPool(string $poolId): float
+    private function withdrawalAmountForPool(string $poolId): string
     {
-        return (float) PenarikanSaldo::query()
+        return (string) PenarikanSaldo::query()
             ->where('pool_id', $poolId)
-            ->whereIn('status', [
-                PenarikanSaldo::STATUS_PROSES,
-                PenarikanSaldo::STATUS_BERHASIL,
-            ])
+            ->where('status', PenarikanSaldo::STATUS_BERHASIL)
             ->sum('amount');
+    }
+
+    private function amountInCents(string|int|float $amount): int
+    {
+        $amount = (string) $amount;
+        [$wholeAmount, $fractionalAmount] = array_pad(explode('.', $amount, 2), 2, '0');
+        $fractionalAmount = str_pad(substr($fractionalAmount, 0, 2), 2, '0');
+
+        return ((int) $wholeAmount * 100) + (int) $fractionalAmount;
     }
 
     private function updatePendingWithdrawal(
@@ -157,6 +173,20 @@ class PenarikanSaldoController extends Controller
 
             if ($lockedWithdrawal->status !== PenarikanSaldo::STATUS_PROSES) {
                 return false;
+            }
+
+            if ($status === PenarikanSaldo::STATUS_BERHASIL) {
+                Pool::query()
+                    ->where('pool_id', $lockedWithdrawal->pool_id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($this->amountInCents($lockedWithdrawal->amount)
+                    > $this->availableBalanceInCentsForPool($lockedWithdrawal->pool_id)) {
+                    throw ValidationException::withMessages([
+                        'withdrawal' => 'Saldo tersedia tidak mencukupi untuk mencairkan pengajuan ini.',
+                    ]);
+                }
             }
 
             $lockedWithdrawal->forceFill([

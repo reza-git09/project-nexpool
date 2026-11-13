@@ -136,7 +136,7 @@
             <a class="btn" href="{{ route('admin.laporan.penjualan') }}">← Kembali</a>
             @if (empty($error))
                 <a class="btn" href="{{ route('admin.laporan.penjualan', $printQuery) }}" target="_blank" rel="noopener">Cetak / Simpan PDF</a>
-                <a class="btn primary" href="{{ route('admin.laporan.penjualan.export', $exportQuery) }}">Unduh Excel (CSV)</a>
+                <a class="btn primary" href="{{ route('admin.laporan.penjualan.export', $exportQuery) }}">Unduh Excel</a>
             @endif
         </div>
     </div>

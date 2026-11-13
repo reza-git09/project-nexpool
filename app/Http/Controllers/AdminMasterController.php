@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Reservasi;
-use App\Models\KolamRenang;
-use App\Models\HargaTiket;
 use App\Models\AdminApplication;
+use App\Models\HargaTiket;
+use App\Models\KolamRenang;
+use App\Models\PenarikanSaldo;
+use App\Models\Reservasi;
+use App\Models\User;
 
 class AdminMasterController extends Controller
 {
@@ -49,9 +50,9 @@ class AdminMasterController extends Controller
             'paid'
         )->sum('total_harga');
 
-        $totalPenarikan = \App\Models\PenarikanSaldo::whereIn(
+        $totalPenarikan = PenarikanSaldo::where(
             'status',
-            [\App\Models\PenarikanSaldo::STATUS_PROSES, \App\Models\PenarikanSaldo::STATUS_BERHASIL]
+            PenarikanSaldo::STATUS_BERHASIL
         )->sum('amount');
 
         $totalPendapatan = max((float) $totalPendapatan - (float) $totalPenarikan, 0.0);

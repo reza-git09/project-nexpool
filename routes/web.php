@@ -19,6 +19,16 @@ use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
+
+/*
+|--------------------------------------------------------------------------
+| HALAMAN UTAMA
+|--------------------------------------------------------------------------
+*/
+
+Route::redirect('/', '/login');
+
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN AUTHENTICATION
@@ -35,6 +45,7 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+
 /*
 |--------------------------------------------------------------------------
 | GANTI PASSWORD
@@ -49,6 +60,7 @@ Route::post('/admin/ganti-password', [ChangePasswordController::class, 'update']
     ->middleware(['admin'])
     ->name('admin.change-password.process');
 
+
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD ADMIN KOLAM
@@ -59,6 +71,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['admin', 'must.change.password'])
     ->name('dashboard');
 
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN MASTER - DASHBOARD
@@ -68,6 +81,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/admin-master/dashboard', [AdminMasterController::class, 'index'])
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +95,7 @@ Route::get('/admin-master/transaksi', [
 ])
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.transaksi.index');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +115,7 @@ Route::post('/admin/master/pengajuan/{app}/reject', [AdminApplicationController:
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.applications.reject');
 
+
 /*
 |--------------------------------------------------------------------------
 | PENGAJUAN ADMIN KOLAM RENANG
@@ -115,6 +131,7 @@ Route::middleware(['admin', 'admin.pool', 'must.change.password'])
         Route::post('/', 'store')->middleware('throttle:10,1')->name('store');
     });
 
+
 /*
 |--------------------------------------------------------------------------
 | LAPORAN PENJUALAN
@@ -129,6 +146,7 @@ Route::get('/laporan-penjualan/export', [LaporanPenjualanController::class, 'exp
     ->middleware(['admin', 'must.change.password'])
     ->name('admin.laporan.penjualan.export');
 
+
 /*
 |--------------------------------------------------------------------------
 | PENARIKAN SALDO ADMIN KOLAM
@@ -142,6 +160,7 @@ Route::get('/penarikan-saldo', [PenarikanSaldoController::class, 'index'])
 Route::post('/penarikan-saldo', [PenarikanSaldoController::class, 'store'])
     ->middleware(['admin', 'must.change.password'])
     ->name('penarikan-saldo.store');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -161,6 +180,7 @@ Route::post('/admin-master/penarikan-saldo/{withdrawal}/tolak', [PenarikanSaldoC
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.penarikan-saldo.reject');
 
+
 /*
 |--------------------------------------------------------------------------
 | HARGA TIKET
@@ -169,6 +189,7 @@ Route::post('/admin-master/penarikan-saldo/{withdrawal}/tolak', [PenarikanSaldoC
 
 Route::resource('harga-tiket', HargaTiketController::class)
     ->middleware(['admin', 'must.change.password']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -179,6 +200,7 @@ Route::resource('harga-tiket', HargaTiketController::class)
 Route::resource('fasilitas', FasilitasController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | KOLAM RENANG
@@ -187,6 +209,7 @@ Route::resource('fasilitas', FasilitasController::class)
 
 Route::resource('kolam-renang', KolamRenangController::class)
     ->middleware(['admin', 'must.change.password']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -201,6 +224,7 @@ Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi
 Route::resource('reservasi', ReservasiController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | PROMO
@@ -210,6 +234,7 @@ Route::resource('reservasi', ReservasiController::class)
 Route::resource('promo', PromoController::class)
     ->middleware(['admin', 'must.change.password']);
 
+
 /*
 |--------------------------------------------------------------------------
 | REVIEW
@@ -218,6 +243,7 @@ Route::resource('promo', PromoController::class)
 
 Route::resource('review', ReviewController::class)
     ->middleware(['admin', 'must.change.password']);
+
 
 /*
 |--------------------------------------------------------------------------
