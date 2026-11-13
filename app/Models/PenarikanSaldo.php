@@ -28,6 +28,9 @@ class PenarikanSaldo extends Model
         'processed_by',
         'processed_at',
         'rejection_reason',
+        'transfer_proof_path',
+        'transfer_proof_uploaded_by',
+        'transfer_proof_uploaded_at',
     ];
 
     protected function casts(): array
@@ -35,6 +38,7 @@ class PenarikanSaldo extends Model
         return [
             'amount' => 'decimal:2',
             'processed_at' => 'datetime',
+            'transfer_proof_uploaded_at' => 'datetime',
         ];
     }
 
@@ -51,6 +55,11 @@ class PenarikanSaldo extends Model
     public function processor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function transferProofUploader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'transfer_proof_uploaded_by');
     }
 
     public function getStatusLabelAttribute(): string

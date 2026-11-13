@@ -6,114 +6,134 @@
 
 @push('styles')
     <style>
-        .lp {
-            --bg: #f6f8fc; --card: #ffffff; --ink: #172033; --muted: #7b8494; --line: #e8ecf3;
-            --brand: #1d4ed8; --brand-2: #2563eb; --ok: #047857; --ok-bg: #ecfdf5;
-            --wait: #a86a00; --wait-bg: #fff3d6; --bad: #b3261e; --bad-bg: #fde8e6; --neutral-bg: #eceff4;
-            color: var(--ink); font-size: 14px; line-height: 1.5;
-        }
+        .lp { min-height: calc(100vh - 100px); padding: 1px 18px; color: #111; background: #eef0f3; font: 10pt/1.35 Arial, sans-serif; }
         .lp *, .lp *::before, .lp *::after { box-sizing: border-box; }
-        .lp .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
-        .lp .page-title { display: flex; align-items: center; gap: 14px; }
-        .lp .page-icon { width: 48px; height: 48px; flex-shrink: 0; border-radius: 13px; background: linear-gradient(135deg,#dbeafe,#eff6ff); color: #2563eb; font-size: 19px; display: flex; align-items: center; justify-content: center; }
-        .lp h1 { margin: 0 0 6px; font-size: 25px; color: #111827; }
-        .lp .page-title p { color: var(--muted); font-size: 13px; }
-        .lp .sub { color: var(--muted); margin-top: 2px; }
-        .lp .head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-        .lp .btns { display: flex; gap: 8px; flex-wrap: wrap; }
-        .lp .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 9px 14px; border-radius: 9px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: .2s; }
-        .lp .btn:hover { border-color: var(--brand-2); }
-        .lp .btn.primary { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
-        .lp .btn.primary:hover { background: #1e40af; }
-        .lp .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 12px rgba(15,23,42,.025); }
-        .lp .card h2 { margin: 0 0 12px; font-size: 15px; color: #1f2937; }
-        .lp form.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
-        .lp label { display: block; font-size: 12px; color: #718096; margin-bottom: 4px; }
-        .lp input { width: min(100%, 260px); min-height: 41px; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 9px; font: inherit; background: #fff; color: #172033; }
-        .lp input:focus { outline: 2px solid #bfdbfe; border-color: #60a5fa; }
-        .lp .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 16px; }
-        .lp .stat { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: 15px 17px; border-left: 5px solid #3b82f6; }
-        .lp .stat .k { color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-        .lp .stat .v { font-size: 25px; font-weight: 700; color: #17457f; margin-top: 3px; }
-        .lp .stat .n { color: var(--muted); font-size: 12px; }
-        .lp .note { padding: 12px 15px; border-radius: 10px; background: #fff4d6; color: #a86a00; margin-bottom: 12px; }
-        .lp .error { padding: 16px; border-radius: 10px; background: var(--bad-bg); color: var(--bad); }
+        .lp .page-header { display: flex; justify-content: space-between; margin-bottom: 18px; }
+        .lp .page-title { display: flex; align-items: center; gap: 12px; }
+        .lp .page-icon { width: 42px; height: 42px; display: grid; place-items: center; color: #333; background: #e5e7eb; border-radius: 8px; }
+        .lp h1 { margin: 0 0 4px; font-size: 22px; }
+        .lp .page-title p, .lp .sub { margin: 0; color: #667085; font-size: 13px; }
+        .lp .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+        .lp .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+        .lp .btn { display: inline-flex; align-items: center; justify-content: center; padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 6px; color: #1f2937; background: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+        .lp .btn.primary { border-color: #1d4ed8; color: #fff; background: #1d4ed8; }
+        .lp .btn.primary:hover { border-color: #1e40af; background: #1e40af; }
+        .lp .card, .lp .cards { margin-bottom: 14px; }
+        .lp .card { padding: 16px; border: 1px solid #d5d9df; border-radius: 10px; background: #fff; }
+        .lp .card h2 { margin: 0 0 10px; color: #1f2937; font-size: 15px; }
+        .lp form.filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+        .lp label { display: block; margin-bottom: 4px; color: #475569; font-size: 12px; }
+        .lp input { width: min(100%, 260px); min-height: 40px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; color: #172033; background: #fff; font: inherit; }
+        .lp .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+        .lp .stat { padding: 14px 16px; border: 1px solid #d5d9df; border-left: 4px solid #6b7280; border-radius: 8px; background: #fff; }
+        .lp .stat .k { color: #667085; font-size: 11px; text-transform: uppercase; }
+        .lp .stat .v { margin-top: 3px; color: #111; font-size: 22px; font-weight: 700; }
+        .lp .stat .n { color: #667085; font-size: 11px; }
+        .lp .note, .lp .error { margin-bottom: 12px; padding: 12px 15px; border-radius: 6px; }
+        .lp .note { color: #854d0e; background: #fefce8; }
+        .lp .error { color: #991b1b; background: #fef2f2; }
         .lp table { width: 100%; border-collapse: collapse; }
-        .lp th, .lp td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #eef1f5; vertical-align: middle; }
-        .lp th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; background: #f8fafc; white-space: nowrap; }
-        .lp td { font-size: 12px; color: #475569; }
-        .lp tbody tr { transition: background .2s; }
-        .lp tbody tr:hover { background: #fafcff; }
+        .lp th, .lp td { padding: 8px 10px; border-bottom: 1px solid #d5d9df; text-align: left; vertical-align: top; }
+        .lp th { color: #475569; background: #f3f4f6; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        .lp td { color: #334155; font-size: 11px; }
         .lp td.num, .lp th.num { text-align: right; white-space: nowrap; }
         .lp .scroll { overflow-x: auto; }
-        .lp .badge { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-        .lp .badge.ok { background: var(--ok-bg); color: var(--ok); }
-        .lp .badge.wait { background: var(--wait-bg); color: var(--wait); }
-        .lp .badge.bad { background: var(--bad-bg); color: var(--bad); }
-        .lp .badge.neutral { background: var(--neutral-bg); color: var(--muted); }
-        .lp .bar { height: 8px; background: var(--neutral-bg); border-radius: 99px; overflow: hidden; min-width: 80px; }
-        .lp .bar > span { display: block; height: 100%; background: var(--brand-2); }
-        .lp .empty { text-align: center; color: var(--muted); padding: 35px 24px; }
-        .lp .pagination { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 14px 0 0; justify-content: center; }
-        .lp .pagination li a, .lp .pagination li span { display: block; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); text-decoration: none; background: #fff; }
-        .lp .pagination li.active span { background: var(--brand); border-color: var(--brand); color: #fff; }
-        .lp .pagination li.disabled span { color: #b8c2d1; }
-        .lp .print-header, .lp .signature { display: none; }
-        @media (max-width: 600px) {
+        .lp .badge { display: inline-block; padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .lp .badge.ok { color: #166534; background: #dcfce7; }
+        .lp .badge.wait { color: #854d0e; background: #fef3c7; }
+        .lp .badge.bad { color: #991b1b; background: #fee2e2; }
+        .lp .badge.neutral { color: #475569; background: #e5e7eb; }
+        .lp .bar { height: 7px; min-width: 70px; overflow: hidden; border-radius: 99px; background: #e5e7eb; }
+        .lp .bar > span { display: block; height: 100%; background: #6b7280; }
+        .lp .empty { padding: 20px; color: #667085; text-align: center; }
+        .lp .pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 14px 0 0; padding: 0; list-style: none; }
+        .lp .pagination li a, .lp .pagination li span { display: block; padding: 6px 12px; border: 1px solid #d5d9df; border-radius: 5px; color: #111; background: #fff; text-decoration: none; }
+        .lp .pagination li.active span { color: #fff; background: #333; }
+        .lp .pagination li.disabled span { color: #9ca3af; }
+        .lp .paper { width: min(100%, 210mm); min-height: 297mm; margin: 18px auto; padding: 18mm 16mm 20mm; color: #111; background: #fff; box-shadow: 0 2px 16px rgba(15, 23, 42, .16); }
+        .lp .print-header { padding-bottom: 7px; border-bottom: 3px double #111; }
+        .lp .print-brand { font-size: 18pt; font-weight: 700; letter-spacing: 1px; }
+        .lp .print-subtitle { font-size: 9pt; }
+        .lp .print-document-meta { float: right; text-align: right; font-size: 8pt; }
+        .lp .report-title { margin: 10px 0 2px; text-align: center; font-size: 13pt; font-weight: 700; text-decoration: underline; }
+        .lp .report-number { margin: 0 0 10px; text-align: center; font-size: 9pt; }
+        .lp .print-meta { margin-bottom: 10px; }
+        .lp .print-meta th, .lp .print-meta td { padding: 2px 4px; border: 0; background: transparent; font-size: 9pt; text-transform: none; }
+        .lp .print-meta th { width: 105px; font-weight: 400; white-space: nowrap; }
+        .lp .print-meta td { width: 40%; }
+        .lp .report-section { margin-top: 11px; }
+        .lp .report-section h2 { margin: 0 0 5px; padding-bottom: 3px; border-bottom: 1px solid #111; color: #111; font-size: 10pt; }
+        .lp .report-table { border: 1px solid #111; font-size: 9pt; }
+        .lp .report-table th, .lp .report-table td { padding: 4px 5px; border: 1px solid #111; color: #111; font-size: 9pt; }
+        .lp .report-table th { background: #eee; text-align: center; white-space: normal; }
+        .lp .report-table tfoot td { font-weight: 700; background: #f3f3f3; }
+        .lp .report-total-label { text-align: right !important; }
+        .lp .detail-table { table-layout: fixed; }
+        .lp .detail-table th:nth-child(1) { width: 5%; }
+        .lp .detail-table th:nth-child(2) { width: 18%; }
+        .lp .detail-table th:nth-child(3) { width: 20%; }
+        .lp .detail-table th:nth-child(4) { width: 12%; }
+        .lp .detail-table th:nth-child(5), .lp .detail-table th:nth-child(6) { width: 7%; }
+        .lp .detail-table th:nth-child(7) { width: 17%; }
+        .lp .detail-table th:nth-child(8) { width: 14%; }
+        .lp .detail-table .customer-phone { display: block; margin-top: 2px; color: #333; font-size: 8pt; }
+        .lp .report-note { margin: 8px 0 0; font-size: 8pt; }
+        .lp .signature { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 22px; break-inside: avoid; }
+        .lp .signature-block { min-height: 105px; text-align: center; font-size: 9pt; }
+        .lp .signature-role { min-height: 14px; }
+        .lp .signature-space { height: 62px; }
+        .lp .signature-name { display: inline-block; min-width: 150px; padding-top: 3px; border-top: 1px solid #111; font-weight: 700; }
+        @media (max-width: 700px) {
             .lp .page-header { align-items: flex-start; }
-            .lp h1 { font-size: 22px; }
+            .lp h1 { font-size: 20px; }
             .lp .head { align-items: flex-start; }
             .lp .btns { width: 100%; }
             .lp .btns .btn { flex: 1; }
-            .lp .card { padding: 14px; }
+            .lp .card { padding: 12px; }
+            .lp .paper { min-height: 0; padding: 22px 16px; }
         }
         @media print {
-            @page { size: A4 landscape; margin: 14mm; }
-            .sidebar, .header { display: none !important; }
-            .main { margin-left: 0 !important; }
-            .content { padding: 0 !important; }
-            body { background: #fff !important; color: #111827 !important; }
-            .lp { color: #111827; font-size: 10pt; }
-            .lp .no-print, .lp .page-header, .lp .head { display: none !important; }
-            .lp .print-header { display: block; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #1f2937; }
-            .lp .print-brand { font-size: 19pt; font-weight: 700; letter-spacing: 1px; }
-            .lp .print-title { margin-top: 8px; font-size: 14pt; font-weight: 700; text-transform: uppercase; }
-            .lp .print-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; margin-top: 8px; font-size: 9pt; }
-            .lp .card, .lp .stat { break-inside: avoid; box-shadow: none; border: 1px solid #9ca3af; }
-            .lp .cards { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .lp .stat { border-left: 3px solid #374151; padding: 10px 12px; }
-            .lp .stat .v { font-size: 16pt; color: #111827; }
-            .lp .scroll { overflow: visible; }
-            .lp table { width: 100%; }
-            .lp th, .lp td { padding: 6px 7px; border-color: #d1d5db; font-size: 8pt; }
-            .lp th { background: #e5e7eb !important; color: #111827; print-color-adjust: exact; }
+            @page {
+                size: A4;
+                margin: 18mm 16mm 20mm;
+                @bottom-right {
+                    content: "Halaman " counter(page) " dari " counter(pages);
+                    font: 8pt Arial, sans-serif;
+                }
+            }
+            html, body { width: auto !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; color: #111 !important; }
+            .sidebar, .header, nav, .no-print { display: none !important; }
+            .main, .content { width: auto !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+            .lp { min-height: 0 !important; padding: 0 !important; color: #111 !important; background: #fff !important; font: 10pt/1.25 Arial, sans-serif !important; }
+            .lp .page-header, .lp .head, .lp .pagination { display: none !important; }
+            .lp .paper { width: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+            .lp .print-header { display: block !important; }
+            .lp .card, .lp .stat, .lp .cards { margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important; }
+            .lp .cards { display: block !important; }
+            .lp .scroll { overflow: visible !important; }
+            .lp .report-section { margin-top: 9px; }
+            .lp .report-section h2 { break-after: avoid; }
+            .lp .print-meta { break-inside: avoid; }
+            .lp table { width: 100% !important; }
             .lp thead { display: table-header-group; }
-            .lp tr { break-inside: avoid; }
-            .lp .pagination { display: none; }
-            .lp .signature { display: flex; justify-content: flex-end; margin-top: 28px; break-inside: avoid; }
-            .lp .signature-block { width: 250px; text-align: center; }
-            .lp .signature-space { height: 65px; }
+            .lp tfoot { display: table-row-group; }
+            .lp tr { break-inside: avoid; page-break-inside: avoid; }
+            .lp .report-table { border-collapse: collapse !important; }
+            .lp .report-table th, .lp .report-table td { border: 1px solid #111 !important; font-size: 9pt !important; }
+            .lp .report-table th { background: #eee !important; color: #111 !important; print-color-adjust: exact; }
+            .lp .summary-table th { width: 58%; text-align: left; text-transform: none; }
+            .lp .summary-table td { text-align: right; }
+            .lp .no-print, .lp .badge, .lp .bar { display: none !important; }
+            .lp .screen-status { display: none !important; }
+            .lp .print-status { display: inline !important; }
+            .lp .signature { margin-top: 16px; break-inside: avoid; page-break-inside: avoid; }
+            .lp .signature-space { height: 55px; }
         }
     </style>
 @endpush
 
 @section('content')
 <div class="lp">
-
-    @if (!empty($isPrintView))
-        <div class="print-header">
-            <div class="print-brand">NEXPOOL</div>
-            <div>Laporan Administrasi Penjualan Tiket</div>
-            <div class="print-title">Laporan Penjualan Tiket Bulanan</div>
-            <div class="print-meta">
-                <div><strong>Kolam:</strong> {{ $poolLabel }}</div>
-                <div><strong>Periode:</strong> {{ $periodeLabel }}</div>
-                <div><strong>Nomor laporan:</strong> LPT/{{ session('admin_pool_id') }}/{{ $f['bulan'] }}</div>
-                <div><strong>Tanggal cetak:</strong> {{ now()->format('d/m/Y H:i') }}</div>
-            </div>
-        </div>
-    @endif
-
     <div class="page-header">
         <div class="page-title">
             <div class="page-icon"><i class="fa-solid fa-chart-column"></i></div>
@@ -147,7 +167,6 @@
 
 @else
 
-    {{-- ====== FILTER ====== --}}
     <div class="card no-print">
         <form class="filters" method="GET" action="{{ route('admin.laporan.penjualan') }}">
             <div>
@@ -161,126 +180,189 @@
     </div>
 
     @unless ($s['total'])
-        <div class="note">Kolom total harga tidak ditemukan di tabel <strong>{{ $s['table'] }}</strong>, jadi nilai pendapatan tampil Rp 0. Tambahkan nama kolom total-mu di <code>detectSchema()</code>.</div>
+        <div class="note no-print">Kolom total harga tidak ditemukan di tabel <strong>{{ $s['table'] }}</strong>, jadi nilai pendapatan tampil Rp 0. Tambahkan nama kolom total-mu di <code>detectSchema()</code>.</div>
     @endunless
     @if ($s['status'] && !$hasPaid)
-        <div class="note">Belum ada reservasi berstatus selesai atau terkonfirmasi pada periode ini. Reservasi menunggu atau dibatalkan tidak dihitung sebagai penjualan tiket.</div>
+        <div class="note no-print">Belum ada reservasi berstatus selesai atau terkonfirmasi pada periode ini. Reservasi menunggu atau dibatalkan tidak dihitung sebagai penjualan tiket.</div>
     @endif
 
-    {{-- ====== RINGKASAN ====== --}}
-    <div class="cards">
-        <div class="stat">
-            <div class="k">Pendapatan Penjualan Tiket</div>
-            <div class="v">Rp {{ number_format($summary['omzet'], 0, ',', '.') }}</div>
-            <div class="n">{{ $periodeLabel }}</div>
-        </div>
-        <div class="stat">
-            <div class="k">Transaksi Tiket</div>
-            <div class="v">{{ number_format($summary['trx'], 0, ',', '.') }}</div>
-            <div class="n">Rata-rata Rp {{ number_format($summary['rata'], 0, ',', '.') }} / transaksi</div>
-        </div>
-        <div class="stat">
-            <div class="k">Jumlah Tiket Terjual</div>
-            <div class="v">{{ number_format($summary['dewasa'] + $summary['anak'], 0, ',', '.') }}</div>
-            <div class="n">{{ number_format($summary['dewasa'], 0, ',', '.') }} tiket dewasa · {{ number_format($summary['anak'], 0, ',', '.') }} tiket anak</div>
-        </div>
-    </div>
-
-    {{-- ====== PER KOLAM ====== --}}
-    @if ($s['pool'])
-        <div class="card">
-            <h2>Rekap Penjualan Tiket per Kolam</h2>
-            <div class="scroll">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Kolam</th>
-                        <th class="num">Transaksi</th>
-                        <th class="num">Tiket Terjual</th>
-                        <th class="num">Pendapatan Tiket</th>
-                        <th style="width:22%">Kontribusi</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @forelse ($perKolam as $k)
-                        <tr>
-                            <td><strong>{{ $k['nama'] }}</strong></td>
-                            <td class="num">{{ number_format($k['trx'], 0, ',', '.') }}</td>
-                            <td class="num">{{ number_format($k['tiket'], 0, ',', '.') }}</td>
-                            <td class="num">Rp {{ number_format($k['omzet'], 0, ',', '.') }}</td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px">
-                                    <div class="bar" style="flex:1"><span style="width: {{ $k['persen'] }}%"></span></div>
-                                    <span>{{ $k['persen'] }}%</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="empty">Belum ada data.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @endif
-
-    {{-- ====== DETAIL TRANSAKSI ====== --}}
     @php
         $displayRows = $isPrintView ? $printRows : $rows;
         $rowCount = $isPrintView ? $printRows->count() : $rows->total();
+        $detailTotalDewasa = $displayRows->sum('dewasa');
+        $detailTotalAnak = $displayRows->sum('anak');
+        $detailTotalPendapatan = $displayRows->sum('total');
+        $kolamTotalTransaksi = collect($perKolam)->sum('trx');
+        $kolamTotalTiket = collect($perKolam)->sum('tiket');
+        $kolamTotalPendapatan = collect($perKolam)->sum('omzet');
     @endphp
-    <div class="card">
-        <h2>Detail Penjualan Tiket <span style="color:var(--muted);font-weight:400">({{ number_format($rowCount, 0, ',', '.') }} transaksi)</span></h2>
-        <div class="scroll">
-            <table>
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Kode</th>
-                    <th>Nama</th>
-                    <th>Tanggal</th>
-                    @if ($s['pool']) <th>Kolam</th> @endif
-                    <th class="num">Tiket Dewasa</th>
-                    <th class="num">Tiket Anak</th>
-                    <th class="num">Pendapatan Tiket</th>
-                    @if ($s['status']) <th>Status</th> @endif
-                </tr>
-                </thead>
+
+    <div class="paper">
+        <header class="print-header">
+            <div class="print-document-meta">
+                Dokumen internal<br>
+                Dicetak: {{ now()->format('d/m/Y H:i') }} WIB
+            </div>
+            <div class="print-brand">NEXPOOL</div>
+            <div class="print-subtitle">Laporan Administrasi Penjualan Tiket</div>
+        </header>
+
+        <h1 class="report-title">LAPORAN PENJUALAN TIKET BULANAN</h1>
+        <p class="report-number">Nomor: LPT/{{ session('admin_pool_id') }}/{{ $f['bulan'] }}</p>
+
+        <table class="print-meta">
+            <tbody>
+                <tr><th>Nama Kolam</th><td>{{ $poolLabel }}</td></tr>
+                <tr><th>ID Kolam</th><td>{{ session('admin_pool_id') }}</td></tr>
+                <tr><th>Periode</th><td>{{ $periodeLabel }}</td></tr>
+                <tr><th>Tanggal Cetak</th><td>{{ now()->format('d/m/Y H:i') }} WIB</td></tr>
+            </tbody>
+        </table>
+
+        <section class="report-section">
+            <h2>A. Ringkasan Penjualan</h2>
+            <table class="report-table summary-table">
                 <tbody>
-                @forelse ($displayRows as $i => $r)
                     <tr>
-                        <td>{{ $isPrintView ? $loop->iteration : $rows->firstItem() + $i }}</td>
-                        <td>{{ $r['kode'] }}</td>
-                        <td>{{ $r['nama'] }}@if ($r['hp'] !== '-')<div style="color:var(--muted);font-size:12px">{{ $r['hp'] }}</div>@endif</td>
-                        <td>{{ $r['tanggal'] }}</td>
-                        @if ($s['pool']) <td>{{ $r['kolam'] }}</td> @endif
-                        <td class="num">{{ $r['dewasa'] }}</td>
-                        <td class="num">{{ $r['anak'] }}</td>
-                        <td class="num">Rp {{ number_format($r['total'], 0, ',', '.') }}</td>
-                        @if ($s['status']) <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td> @endif
+                        <th>Total pendapatan penjualan tiket</th>
+                        <td>Rp {{ number_format($summary['omzet'], 0, ',', '.') }}</td>
                     </tr>
-                @empty
-                    <tr><td colspan="9" class="empty">Tidak ada penjualan tiket pada bulan ini.</td></tr>
-                @endforelse
+                    <tr>
+                        <th>Jumlah transaksi</th>
+                        <td>{{ number_format($summary['trx'], 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Jumlah tiket terjual (dewasa / anak)</th>
+                        <td>{{ number_format($summary['dewasa'] + $summary['anak'], 0, ',', '.') }} ({{ number_format($summary['dewasa'], 0, ',', '.') }} tiket dewasa / {{ number_format($summary['anak'], 0, ',', '.') }} tiket anak)</td>
+                    </tr>
+                    <tr>
+                        <th>Rata-rata pendapatan per transaksi</th>
+                        <td>Rp {{ number_format($summary['rata'], 0, ',', '.') }}</td>
+                    </tr>
                 </tbody>
             </table>
-        </div>
+        </section>
 
-        @unless ($isPrintView)
-            {{ $rows->links() }}
-        @endunless
-    </div>
+        @if ($s['pool'])
+            <section class="report-section">
+                <h2>B. Rekap Penjualan per Kolam</h2>
+                <div class="scroll">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Kolam</th>
+                                <th>Transaksi</th>
+                                <th>Tiket Terjual</th>
+                                <th>Pendapatan Tiket</th>
+                                <th>Kontribusi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($perKolam as $k)
+                                <tr>
+                                    <td>{{ $k['nama'] }}</td>
+                                    <td class="num">{{ number_format($k['trx'], 0, ',', '.') }}</td>
+                                    <td class="num">{{ number_format($k['tiket'], 0, ',', '.') }}</td>
+                                    <td class="num">Rp {{ number_format($k['omzet'], 0, ',', '.') }}</td>
+                                    <td class="num">{{ number_format($k['persen'], 1, ',', '.') }}%</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="empty">Belum ada data.</td></tr>
+                            @endforelse
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Total</td>
+                                <td class="num">{{ number_format($kolamTotalTransaksi, 0, ',', '.') }}</td>
+                                <td class="num">{{ number_format($kolamTotalTiket, 0, ',', '.') }}</td>
+                                <td class="num">Rp {{ number_format($kolamTotalPendapatan, 0, ',', '.') }}</td>
+                                <td class="num">{{ $kolamTotalPendapatan > 0 ? '100%' : '0%' }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        @endif
 
-    @if (!empty($isPrintView))
+        <section class="report-section">
+            <h2>C. Rincian Transaksi ({{ number_format($rowCount, 0, ',', '.') }} transaksi)</h2>
+            <div class="scroll">
+                <table class="report-table detail-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Reservasi</th>
+                            <th>Nama Pemesan</th>
+                            <th>Tanggal</th>
+                            <th>Dewasa</th>
+                            <th>Anak</th>
+                            <th>Pendapatan</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($displayRows as $i => $r)
+                            <tr>
+                                <td class="num">{{ $isPrintView ? $loop->iteration : $rows->firstItem() + $i }}</td>
+                                <td>{{ $r['kode'] }}</td>
+                                <td>
+                                    {{ $r['nama'] }}
+                                    @if ($r['hp'] !== '-')
+                                        <span class="customer-phone">{{ $r['hp'] }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $r['tanggal'] }}</td>
+                                <td class="num">{{ number_format($r['dewasa'], 0, ',', '.') }}</td>
+                                <td class="num">{{ number_format($r['anak'], 0, ',', '.') }}</td>
+                                <td class="num">Rp {{ number_format($r['total'], 0, ',', '.') }}</td>
+                                <td>
+                                    @if ($isPrintView)
+                                        <span class="print-status">{{ $r['status'] === '-' ? '-' : 'Lunas' }}</span>
+                                    @else
+                                        <span class="screen-status badge {{ $r['status_class'] }}">{{ $r['status'] }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="8" class="empty">Tidak ada penjualan tiket pada bulan ini.</td></tr>
+                        @endforelse
+                    </tbody>
+                    @if ($isPrintView)
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="report-total-label">TOTAL</td>
+                                <td class="num">{{ number_format($detailTotalDewasa, 0, ',', '.') }}</td>
+                                <td class="num">{{ number_format($detailTotalAnak, 0, ',', '.') }}</td>
+                                <td class="num">Rp {{ number_format($detailTotalPendapatan, 0, ',', '.') }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    @endif
+                </table>
+            </div>
+
+            @unless ($isPrintView)
+                {{ $rows->links() }}
+            @endunless
+        </section>
+
+        <p class="report-note">Catatan: Laporan ini hanya memuat transaksi dengan status pembayaran lunas pada periode yang tertera.</p>
+
         <div class="signature">
             <div class="signature-block">
-                <div>{{ $poolLabel }}, {{ now()->format('d/m/Y') }}</div>
-                <div>Penanggung Jawab</div>
+                <div>Mengetahui,</div>
+                <div class="signature-role">Pemilik / Penanggung Jawab</div>
                 <div class="signature-space"></div>
-                <strong>{{ session('admin_nama', session('admin_username', 'Administrator')) }}</strong>
+                <span class="signature-name">{{ $poolLabel }}</span>
+            </div>
+            <div class="signature-block">
+                <div>{{ now()->format('d F Y') }}</div>
+                <div class="signature-role">Administrator</div>
+                <div class="signature-space"></div>
+                <span class="signature-name">{{ session('admin_nama', session('admin_username', 'Administrator')) }}</span>
             </div>
         </div>
-    @endif
+    </div>
 
 @endif
 
@@ -288,7 +370,7 @@
 </div>
 @endsection
 
-@if ($isPrintView)
+@if (!empty($isPrintView))
     @push('scripts')
         <script>
             window.addEventListener('load', () => window.print());

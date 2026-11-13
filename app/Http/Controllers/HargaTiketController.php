@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HargaTiket;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class HargaTiketController extends Controller
 {
@@ -31,21 +32,13 @@ class HargaTiketController extends Controller
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
-                'regex:/^[0-9]+$/',
-                'digits_between:4,5',
-                'integer',
-                'min:1000',
-                'max:99999',
+                Rule::in(range(5000, 100000, 5000)),
             ],
         ], [
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
-            'harga.regex' => 'Harga tiket hanya boleh diisi oleh angka saja (tanpa huruf, titik, atau koma).',
-            'harga.digits_between' => 'Harga tiket harus berjumlah 4 hingga 5 digit angka.',
-            'harga.integer' => 'Harga tiket harus berupa bilangan bulat.',
-            'harga.min' => 'Harga tiket minimal Rp1.000.',
-            'harga.max' => 'Harga tiket maksimal Rp99.999.',
+            'harga.in' => 'Harga tiket harus dipilih dari Rp5.000 hingga Rp100.000 dengan kenaikan Rp5.000.',
         ]);
 
         // 2. Cek kombinasi ganda (pool_id + jenis_hari)

@@ -59,17 +59,21 @@
     .status-proses { color: #92400e; background: #fef3c7; }
     .status-berhasil { color: #166534; background: #dcfce7; }
     .status-ditolak { color: #991b1b; background: #fee2e2; }
-    .action-cell { min-width: 240px; }
+    .action-cell { min-width: 280px; }
     .action-form { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
     .action-form:first-child { margin-top: 0; }
-    .action-form input {
+    .action-form input:not([type="file"]) {
         width: 140px;
         padding: 7px 8px;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
         font-size: 11px;
     }
-    .button-complete, .button-reject {
+    .proof-form { flex-wrap: wrap; }
+    .proof-form input[type="file"] { width: 100%; max-width: 250px; font-size: 11px; }
+    .proof-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; color: #1d4ed8; font-size: 11px; font-weight: 700; }
+    .proof-meta { margin-top: 5px; color: #64748b; font-size: 10px; }
+    .button-complete, .button-reject, .button-proof {
         border: 0;
         border-radius: 6px;
         padding: 8px 10px;
@@ -79,8 +83,11 @@
         white-space: nowrap;
         cursor: pointer;
     }
+    .button-proof { background: #2563eb; }
+    .button-proof:hover { background: #1d4ed8; }
     .button-complete { background: #16a34a; }
     .button-complete:hover { background: #15803d; }
+    .button-complete:disabled { background: #94a3b8; cursor: not-allowed; }
     .button-reject { background: #dc2626; }
     .button-reject:hover { background: #b91c1c; }
     .pagination-wrapper { padding: 16px 20px; }
@@ -91,7 +98,7 @@
 
 @section('content')
 <div class="notice">
-    Transfer dilakukan melalui rekening bank di luar aplikasi. Setelah memastikan transfer berhasil, klik <strong>Cairkan</strong> untuk memperbarui status pengajuan.
+    Unggah bukti transfer (JPG, PNG, atau PDF; maksimal 5 MB) setelah dana dikirim. Pengajuan hanya dapat dikonfirmasi setelah bukti tersimpan.
 </div>
 
 @if (session('success'))
@@ -136,10 +143,31 @@
                     <td class="action-cell">
                         <span class="status-badge status-{{ $withdrawal->status }}">{{ $withdrawal->status_label }}</span>
                         @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_PROSES)
-                            <form class="action-form" action="{{ route('admin.master.penarikan-saldo.complete', $withdrawal) }}" method="POST" onsubmit="return confirm('Pastikan transfer ke rekening tujuan sudah berhasil sebelum melanjutkan. Tandai pengajuan ini berhasil?')">
+                            @if ($withdrawal->transfer_proof_path)
+                                <a class="proof-link" href="{{ route('admin.master.penarikan-saldo.proof.show', $withdrawal) }}" target="_blank" rel="noopener">
+                                    <i class="fa-solid fa-paperclip"></i> Lihat bukti transfer
+                                </a>
+                                @if ($withdrawal->transfer_proof_uploaded_at)
+                                    <div class="proof-meta">Dikirim {{ $withdrawal->transfer_proof_uploaded_at->format('d/m/Y H:i') }}</div>
+                                @endif
+                            @endif
+                            <form class="action-form proof-form" action="{{ route('admin.master.penarikan-saldo.proof', $withdrawal) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <button class="button-complete" type="submit"><i class="fa-solid fa-check"></i> Cairkan Saldo</button>
+                                <input type="file" name="transfer_proof" accept=".jpg,.jpeg,.png,.pdf" aria-label="Pilih bukti transfer" required>
+                                <button class="button-proof" type="submit">
+                                    <i class="fa-solid fa-upload"></i>
+                                    {{ $withdrawal->transfer_proof_path ? 'Ganti Bukti' : 'Kirim Bukti Transfer' }}
+                                </button>
                             </form>
+                            <form class="action-form" action="{{ route('admin.master.penarikan-saldo.complete', $withdrawal) }}" method="POST" onsubmit="return confirm('Pastikan bukti transfer sudah sesuai dan dana berhasil dikirim. Konfirmasi pencairan ini?')">
+                                @csrf
+                                <button class="button-complete" type="submit" {{ $withdrawal->transfer_proof_path ? '' : 'disabled' }}>
+                                    <i class="fa-solid fa-check"></i> Konfirmasi Pencairan
+                                </button>
+                            </form>
+                            @unless ($withdrawal->transfer_proof_path)
+                                <div class="proof-meta">Kirim bukti transfer untuk mengaktifkan konfirmasi.</div>
+                            @endunless
                             <form class="action-form" action="{{ route('admin.master.penarikan-saldo.reject', $withdrawal) }}" method="POST" onsubmit="return confirm('Tolak pengajuan pencairan saldo ini?')">
                                 @csrf
                                 <input name="rejection_reason" maxlength="500" placeholder="Alasan (opsional)" aria-label="Alasan penolakan (opsional)">

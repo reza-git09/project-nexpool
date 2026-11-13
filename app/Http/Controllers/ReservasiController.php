@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ReservasiController extends Controller
 {
@@ -35,6 +37,43 @@ class ReservasiController extends Controller
             ->get();
 
         return view('reservasi.dikonfirmasi', compact('reservasi'));
+    }
+
+    public function confirm(Reservasi $reservasi)
+    {
+        if ($reservasi->pool_id !== session('admin_pool_id')) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
+        DB::transaction(function () use ($reservasi): void {
+            $lockedReservation = Reservasi::whereKey($reservasi->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedReservation->pool_id !== session('admin_pool_id')) {
+                abort(403, 'Anda tidak memiliki akses ke data ini.');
+            }
+
+            if ($lockedReservation->status_reservasi !== 'Menunggu') {
+                throw ValidationException::withMessages([
+                    'reservasi' => 'Reservasi ini tidak lagi berstatus menunggu.',
+                ]);
+            }
+
+            if ($lockedReservation->status_pembayaran !== 'paid') {
+                throw ValidationException::withMessages([
+                    'reservasi' => 'Pembayaran belum lunas. Periksa struk pengunjung terlebih dahulu.',
+                ]);
+            }
+
+            $lockedReservation->forceFill([
+                'status_reservasi' => 'Dikonfirmasi',
+            ])->save();
+        });
+
+        return redirect()
+            ->route('reservasi.dikonfirmasi')
+            ->with('success', 'Reservasi berhasil dikonfirmasi setelah struk diperiksa.');
     }
 
     /**
@@ -79,8 +118,17 @@ class ReservasiController extends Controller
             ],
         ], [
             'status_reservasi.required' => 'Status reservasi wajib dipilih.',
-            'status_reservasi.in' => 'Status reservasi tidak valid.',
+            'status_reservasi.in' => 'Status reservasi tidak valid. Gunakan tombol konfirmasi setelah memeriksa struk pembayaran.',
         ]);
+
+        if (
+            $validated['status_reservasi'] === 'Dikonfirmasi'
+            && $reservasi->status_reservasi !== 'Dikonfirmasi'
+        ) {
+            throw ValidationException::withMessages([
+                'status_reservasi' => 'Gunakan tombol Konfirmasi setelah memeriksa struk pembayaran di loket.',
+            ]);
+        }
 
         // Simpan status baru
         $reservasi->status_reservasi = $validated['status_reservasi'];

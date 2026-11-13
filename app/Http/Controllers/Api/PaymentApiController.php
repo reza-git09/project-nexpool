@@ -494,9 +494,6 @@ class PaymentApiController extends Controller
 
             if ($paymentStatus === 'paid') {
                 $attributes['paid_at'] = $lockedReservation->paid_at ?? now();
-                if ($lockedReservation->status_reservasi === 'Menunggu') {
-                    $attributes['status_reservasi'] = 'Dikonfirmasi';
-                }
             }
 
             $lockedReservation->forceFill($attributes)->save();

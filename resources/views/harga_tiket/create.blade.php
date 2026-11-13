@@ -833,7 +833,7 @@
 
                         <div class="form-group">
 
-                            <label>
+                            <label for="harga">
                                 Harga Tiket (Rp)
                             </label>
 
@@ -841,17 +841,14 @@
 
                                 <i class="fa-solid fa-money-bill-wave input-icon"></i>
 
-                                <input
-                                    type="text"
-                                    id="harga"
-                                    name="harga"
-                                    value="{{ old('harga') }}"
-                                    placeholder="Contoh: 25000"
-                                    maxlength="5"
-                                    inputmode="numeric"
-                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
-                                    required
-                                >
+                                <select id="harga" name="harga" required>
+                                    <option value="">-- Pilih Harga Tiket --</option>
+                                    @foreach (range(5000, 100000, 5000) as $harga)
+                                        <option value="{{ $harga }}" {{ (string) old('harga') === (string) $harga ? 'selected' : '' }}>
+                                            Rp{{ number_format($harga, 0, ',', '.') }}
+                                        </option>
+                                    @endforeach
+                                </select>
 
                             </div>
 
@@ -861,7 +858,7 @@
                                 <i class="fa-solid fa-circle-info"></i>
 
                                 <span>
-                                    Masukkan harga dalam angka. Maksimal Rp99.999, contoh Rp25.000.
+                                    Pilih harga tiket dari Rp5.000 hingga Rp100.000.
                                 </span>
 
                             </div>

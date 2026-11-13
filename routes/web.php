@@ -172,6 +172,14 @@ Route::get('/admin-master/penarikan-saldo', [PenarikanSaldoController::class, 'i
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.penarikan-saldo.index');
 
+Route::post('/admin-master/penarikan-saldo/{withdrawal}/bukti', [PenarikanSaldoController::class, 'uploadTransferProof'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.penarikan-saldo.proof');
+
+Route::get('/admin-master/penarikan-saldo/{withdrawal}/bukti', [PenarikanSaldoController::class, 'showTransferProof'])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.penarikan-saldo.proof.show');
+
 Route::post('/admin-master/penarikan-saldo/{withdrawal}/cairkan', [PenarikanSaldoController::class, 'complete'])
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.penarikan-saldo.complete');
@@ -220,6 +228,10 @@ Route::resource('kolam-renang', KolamRenangController::class)
 Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi'])
     ->middleware(['admin', 'must.change.password'])
     ->name('reservasi.dikonfirmasi');
+
+Route::post('/reservasi/{reservasi}/konfirmasi', [ReservasiController::class, 'confirm'])
+    ->middleware(['admin', 'must.change.password'])
+    ->name('reservasi.confirm');
 
 Route::resource('reservasi', ReservasiController::class)
     ->middleware(['admin', 'must.change.password']);

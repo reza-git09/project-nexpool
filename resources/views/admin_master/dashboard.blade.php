@@ -22,7 +22,7 @@
 
     <div class="stat-card">
         <div class="stat-icon blue">
-            <i class="fa-solid fa-users-gear"></i>
+            <i class="fa-solid fa-users"></i>
         </div>
         <div>
             <p>Total Admin Kolam</p>
@@ -32,7 +32,7 @@
 
     <div class="stat-card">
         <div class="stat-icon cyan">
-            <i class="fa-solid fa-water"></i>
+            <i class="fa-solid fa-person-swimming"></i>
         </div>
         <div>
             <p>Total Kolam Renang</p>
@@ -42,7 +42,7 @@
 
     <div class="stat-card">
         <div class="stat-icon green">
-            <i class="fa-solid fa-ticket"></i>
+            <i class="fa-solid fa-calendar-check"></i>
         </div>
         <div>
             <p>Total Reservasi</p>
@@ -52,7 +52,7 @@
 
     <div class="stat-card">
         <div class="stat-icon orange">
-            <i class="fa-solid fa-tags"></i>
+            <i class="fa-solid fa-ticket"></i>
         </div>
         <div>
             <p>Total Data Harga Tiket</p>
@@ -65,7 +65,7 @@
 {{-- PENGAJUAN ADMIN --}}
 <div class="application-card">
     <div class="application-icon">
-        <i class="fa-solid fa-user-clock"></i>
+        <i class="fa-solid fa-user-plus"></i>
     </div>
     <div class="application-info">
         <h3>Pengajuan Admin Baru</h3>
@@ -87,14 +87,14 @@
     @php
         $menus = [
             [
-                'icon' => 'fa-water',
+                'icon' => 'fa-person-swimming',
                 'title' => 'Data Kolam Renang',
                 'desc' => 'Mengelola seluruh data kolam renang.',
                 'route' => null,
                 'color' => 'blue'
             ],
             [
-                'icon' => 'fa-users-gear',
+                'icon' => 'fa-user-plus',
                 'title' => 'Data Admin Kolam',
                 'desc' => 'Mengelola akun administrator setiap kolam.',
                 'route' => null,
@@ -108,7 +108,7 @@
                 'color' => 'green'
             ],
             [
-                'icon' => 'fa-ticket',
+                'icon' => 'fa-calendar-check',
                 'title' => 'Harga Tiket',
                 'desc' => 'Memantau dan mengelola harga tiket.',
                 'route' => null,
@@ -122,7 +122,7 @@
                 'color' => 'purple'
             ],
             [
-                'icon' => 'fa-user-check',
+                'icon' => 'fa-user-plus',
                 'title' => 'Pengajuan Admin',
                 'desc' => 'Memeriksa dan menyetujui pengajuan admin.',
                 'route' => 'admin.master.applications.index',

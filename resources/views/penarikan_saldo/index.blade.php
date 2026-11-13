@@ -94,14 +94,29 @@
     .modal-card > p { margin-bottom: 20px; color: #64748b; font-size: 13px; line-height: 1.5; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 6px; color: #334155; font-size: 12px; font-weight: 700; }
-    .form-group input {
+    .form-group input, .form-group select {
         width: 100%;
         padding: 11px 12px;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         font-size: 14px;
+        background: #fff;
     }
-    .form-group input:focus { outline: 2px solid #bfdbfe; border-color: #2563eb; }
+    .form-group input:focus, .form-group select:focus { outline: 2px solid #bfdbfe; border-color: #2563eb; }
+    .balance-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 18px;
+        padding: 13px 15px;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        color: #1e40af;
+        background: #eff6ff;
+        font-size: 13px;
+    }
+    .balance-summary strong { white-space: nowrap; font-size: 15px; }
     .field-error { display: block; margin-top: 5px; color: #b91c1c; font-size: 12px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
     .button-cancel {
@@ -178,11 +193,22 @@
     <div class="modal-card">
         <h2 id="withdrawalModalTitle">Ajukan Pencairan Saldo</h2>
         <p>Isi rekening tujuan dan jumlah yang ingin dicairkan. Pastikan data rekening sudah benar.</p>
+        <div class="balance-summary">
+            <span>Saldo tersedia untuk diajukan</span>
+            <strong>Rp {{ number_format((float) $availableBalance, 2, ',', '.') }}</strong>
+        </div>
         <form action="{{ route('penarikan-saldo.store') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label for="bank_name">Bank</label>
-                <input id="bank_name" name="bank_name" value="{{ old('bank_name') }}" maxlength="100" placeholder="Contoh: BCA" required>
+                <select id="bank_name" name="bank_name" required>
+                    <option value="">-- Pilih Bank --</option>
+                    @foreach ($bankOptions as $bankCode => $bankFullName)
+                        <option value="{{ $bankCode }}" {{ old('bank_name') === $bankCode ? 'selected' : '' }}>
+                            {{ $bankCode }} ({{ $bankFullName }})
+                        </option>
+                    @endforeach
+                </select>
                 @error('bank_name') <span class="field-error">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">

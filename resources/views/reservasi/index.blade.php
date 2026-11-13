@@ -390,8 +390,37 @@
             display: flex;
             align-items: center;
             gap: 7px;
-            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .confirm-form {
+            display: inline-flex;
+            margin: 0;
+        }
+
+        .btn-confirm {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 11px;
+            border: 0;
+            border-radius: 8px;
+            color: #fff;
+            background: #16a34a;
+            font-size: 11px;
             font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-confirm:hover {
+            background: #15803d;
+        }
+
+        .payment-note {
+            color: #92400e;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         /* =========================
@@ -1234,8 +1263,8 @@
 
                 Data reservasi pada halaman ini berasal dari
                 <strong>aplikasi mobile NEXPOOL</strong>.
-                Admin dapat memantau, memeriksa,
-                dan memperbarui status reservasi yang masuk.
+                Reservasi tetap menunggu sampai pengunjung datang ke loket,
+                menunjukkan struk pembayaran, lalu admin menekan tombol konfirmasi.
 
                 <br>
 
@@ -1323,6 +1352,10 @@
 
                                     <th>
                                         Status
+                                    </th>
+
+                                    <th>
+                                        Pembayaran
                                     </th>
 
                                     <th>
@@ -1487,11 +1520,41 @@
 
                                         </td>
 
+                                        <!-- STATUS PEMBAYARAN -->
+                                        <td>
+                                            @if(($item->status_pembayaran ?? '') === 'paid')
+                                                <span class="badge badge-dikonfirmasi">Lunas</span>
+                                            @else
+                                                <span class="badge badge-menunggu">
+                                                    {{ ucfirst($item->status_pembayaran ?? 'Belum dibayar') }}
+                                                </span>
+                                            @endif
+                                        </td>
+
 
                                         <!-- AKSI -->
                                         <td>
 
                                             <div class="actions">
+
+                                                @if(($item->status_reservasi ?? '') === 'Menunggu')
+                                                    @if(($item->status_pembayaran ?? '') === 'paid')
+                                                        <form
+                                                            action="{{ route('reservasi.confirm', $item->id) }}"
+                                                            method="POST"
+                                                            class="confirm-form"
+                                                            onsubmit="return confirm('Pastikan pengunjung sudah datang dan menunjukkan struk pembayaran yang sesuai. Konfirmasi reservasi ini?')"
+                                                        >
+                                                            @csrf
+                                                            <button type="submit" class="btn-confirm">
+                                                                <i class="fa-solid fa-check"></i>
+                                                                Konfirmasi
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <span class="payment-note">Konfirmasi setelah pembayaran lunas</span>
+                                                    @endif
+                                                @endif
 
                                                 <!-- KELOLA -->
                                                 <a

@@ -82,9 +82,9 @@
         }
 
         .menu a i {
-            width: 21px;
+            width: 20px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .menu a:hover {
@@ -243,40 +243,40 @@
 
             <a href="{{ url('/admin-master/dashboard') }}"
                class="{{ request()->is('admin-master/dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-gauge-high"></i>
+                <i class="fa-solid fa-gauge-high" style="color:#bfdbfe;"></i>
                 <span>Dashboard Master</span>
             </a>
 
             @if($transactionRoute)
                 <a href="{{ route($transactionRoute) }}"
                    class="{{ request()->routeIs('admin.master.transaksi*', 'admin.master.transactions*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-wallet"></i>
+                    <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i>
                     <span>Transaksi Pembayaran</span>
                 </a>
             @else
                 <a href="#" style="opacity:.55; cursor:not-allowed"
                    onclick="return false;">
-                    <i class="fa-solid fa-wallet"></i>
+                    <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i>
                     <span>Transaksi Pembayaran</span>
                 </a>
             @endif
 
             <a href="{{ route('admin.master.penarikan-saldo.index') }}"
                class="{{ request()->routeIs('admin.master.penarikan-saldo.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-money-bill-transfer"></i>
+                <i class="fa-solid fa-money-bill-transfer" style="color:#86efac;"></i>
                 <span>Cairkan Saldo</span>
             </a>
 
             @if(\Illuminate\Support\Facades\Route::has($applicationRoute))
                 <a href="{{ route($applicationRoute) }}"
                    class="{{ request()->routeIs('admin.master.applications*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-user-check"></i>
+                    <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
                     <span>Persetujuan Admin</span>
                 </a>
             @else
                 <a href="#" style="opacity:.55; cursor:not-allowed"
                    onclick="return false;">
-                    <i class="fa-solid fa-user-check"></i>
+                    <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
                     <span>Persetujuan Admin</span>
                 </a>
             @endif

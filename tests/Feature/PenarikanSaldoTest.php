@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\PenarikanSaldo;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PenarikanSaldoTest extends TestCase
@@ -74,6 +76,11 @@ class PenarikanSaldoTest extends TestCase
             'migrations/2026_11_13_104444_add_requested_by_to_penarikan_saldos_table.php',
         );
         $requesterMigration->up();
+
+        $proofMigration = require database_path(
+            'migrations/2026_11_13_215500_add_transfer_proof_to_penarikan_saldos_table.php',
+        );
+        $proofMigration->up();
     }
 
     public function test_pool_admin_sees_only_its_withdrawals(): void
@@ -92,6 +99,10 @@ class PenarikanSaldoTest extends TestCase
             ->assertSee(route('penarikan-saldo.index'))
             ->assertSee('Ajukan Pencairan')
             ->assertSee('name="bank_name"', false)
+            ->assertSee('<select id="bank_name" name="bank_name"', false)
+            ->assertSee('BCA (Bank Central Asia)')
+            ->assertSee('BRI (Bank Rakyat Indonesia)')
+            ->assertSee('Saldo tersedia untuk diajukan')
             ->assertSee('name="account_number"', false)
             ->assertSee('name="amount"', false)
             ->assertSee('500.000,00')
@@ -219,8 +230,27 @@ class PenarikanSaldoTest extends TestCase
         $this->assertDatabaseCount('penarikan_saldos', 0);
     }
 
+    public function test_pool_admin_can_only_submit_a_bank_from_the_bank_dropdown(): void
+    {
+        $this->withSession([
+            'admin_id' => 1,
+            'admin_pool_id' => 'pool_01',
+        ])
+            ->from(route('penarikan-saldo.index'))
+            ->post(route('penarikan-saldo.store'), [
+                'bank_name' => 'Bank Tidak Terdaftar',
+                'account_number' => '1234567890',
+                'amount' => '1000',
+            ])
+            ->assertRedirect(route('penarikan-saldo.index'))
+            ->assertSessionHasErrors('bank_name');
+
+        $this->assertDatabaseCount('penarikan_saldos', 0);
+    }
+
     public function test_admin_master_can_complete_and_reject_pending_withdrawals(): void
     {
+        Storage::fake('local');
         $this->createPaidReservation('pool_01', '1000000.00');
         $completed = $this->createWithdrawal('pool_01', 'BCA', '1234567890', '500000.00');
         $rejected = $this->createWithdrawal('pool_02', 'BRI', '9876543210', '700000.00');
@@ -233,6 +263,27 @@ class PenarikanSaldoTest extends TestCase
             ->get(route('penarikan-saldo.index'))
             ->assertOk()
             ->assertSee('1.000.000,00');
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
+            ->post(route('admin.master.penarikan-saldo.proof', $completed), [
+                'transfer_proof' => UploadedFile::fake()->image('transfer.png'),
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $completed->refresh();
+        $this->assertNotNull($completed->transfer_proof_path);
+        Storage::disk('local')->assertExists($completed->transfer_proof_path);
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
+            ->get(route('admin.master.penarikan-saldo.proof.show', $completed))
+            ->assertOk();
 
         $this->withSession([
             'admin_id' => 10,
@@ -295,9 +346,55 @@ class PenarikanSaldoTest extends TestCase
             ->assertSee('BCA')
             ->assertSee('1234567890')
             ->assertSee('data-copy="1234567890"', false)
-            ->assertSee('Cairkan Saldo')
-            ->assertSee('Cairkan')
+            ->assertSee('Kirim Bukti Transfer')
+            ->assertSee('Konfirmasi Pencairan')
+            ->assertSee('disabled', false)
             ->assertSee('Tolak');
+    }
+
+    public function test_admin_master_cannot_complete_pending_withdrawal_without_transfer_proof(): void
+    {
+        $this->createPaidReservation('pool_01', '1000000.00');
+        $withdrawal = $this->createWithdrawal('pool_01', 'BCA', '1234567890', '500000.00');
+        $this->createAdminMaster();
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
+            ->from(route('admin.master.penarikan-saldo.index'))
+            ->post(route('admin.master.penarikan-saldo.complete', $withdrawal))
+            ->assertRedirect(route('admin.master.penarikan-saldo.index'))
+            ->assertSessionHasErrors('withdrawal');
+
+        $this->assertDatabaseHas('penarikan_saldos', [
+            'id' => $withdrawal->id,
+            'status' => PenarikanSaldo::STATUS_PROSES,
+            'processed_at' => null,
+        ]);
+    }
+
+    public function test_transfer_proof_upload_requires_an_allowed_file_type_and_size(): void
+    {
+        Storage::fake('local');
+        $withdrawal = $this->createWithdrawal('pool_01', 'BCA', '1234567890', '500000.00');
+        $this->createAdminMaster();
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
+            ->from(route('admin.master.penarikan-saldo.index'))
+            ->post(route('admin.master.penarikan-saldo.proof', $withdrawal), [
+                'transfer_proof' => UploadedFile::fake()->create('malware.exe', 100, 'application/octet-stream'),
+            ])
+            ->assertRedirect(route('admin.master.penarikan-saldo.index'))
+            ->assertSessionHasErrors('transfer_proof');
+
+        $this->assertDatabaseHas('penarikan_saldos', [
+            'id' => $withdrawal->id,
+            'transfer_proof_path' => null,
+        ]);
     }
 
     public function test_pending_withdrawals_do_not_reduce_admin_master_transaction_revenue(): void
@@ -324,9 +421,19 @@ class PenarikanSaldoTest extends TestCase
 
     public function test_admin_master_cannot_process_the_same_withdrawal_twice(): void
     {
+        Storage::fake('local');
         $this->createPaidReservation('pool_01', '1000000.00');
         $withdrawal = $this->createWithdrawal('pool_01', 'BCA', '1234567890', '500000.00');
         $this->createAdminMaster();
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
+            ->post(route('admin.master.penarikan-saldo.proof', $withdrawal), [
+                'transfer_proof' => UploadedFile::fake()->image('transfer.png'),
+            ])
+            ->assertRedirect();
 
         $this->withSession([
             'admin_id' => 10,

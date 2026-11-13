@@ -48,6 +48,8 @@ class HargaTiketControllerTest extends TestCase
             ->assertOk()
             ->assertSee('name="jenis_hari"', false)
             ->assertSee('name="harga"', false)
+            ->assertSee('<option value="5000"', false)
+            ->assertSee('<option value="100000"', false)
             ->assertSee('Penarikan Saldo')
             ->assertDontSee('name="kategori"', false);
 
@@ -67,14 +69,14 @@ class HargaTiketControllerTest extends TestCase
         $this->withSession($session)
             ->post('/harga-tiket', [
                 'jenis_hari' => 'Weekday',
-                'harga' => '18000',
+                'harga' => '20000',
             ])
             ->assertRedirect('/harga-tiket');
 
         $this->assertDatabaseHas('harga_tiket', [
             'pool_id' => 'pool_id_01',
             'jenis_hari' => 'Weekday',
-            'harga' => 18000,
+            'harga' => 20000,
         ]);
 
         $priceId = DB::table('harga_tiket')->value('id');
@@ -106,7 +108,7 @@ class HargaTiketControllerTest extends TestCase
             ->from('/harga-tiket/create')
             ->post('/harga-tiket', [
                 'jenis_hari' => 'Weekday',
-                'harga' => '18000',
+                'harga' => '20000',
             ])
             ->assertRedirect('/harga-tiket/create')
             ->assertSessionHasErrors(
@@ -115,6 +117,20 @@ class HargaTiketControllerTest extends TestCase
             );
 
         $this->assertDatabaseCount('harga_tiket', 1);
+    }
+
+    public function test_admin_cannot_create_ticket_price_outside_dropdown_options(): void
+    {
+        $this->withSession(['admin_id' => 1, 'admin_pool_id' => 'pool_id_01'])
+            ->from('/harga-tiket/create')
+            ->post('/harga-tiket', [
+                'jenis_hari' => 'Weekday',
+                'harga' => '22000',
+            ])
+            ->assertRedirect('/harga-tiket/create')
+            ->assertSessionHasErrors('harga');
+
+        $this->assertDatabaseCount('harga_tiket', 0);
     }
 
     public function test_ticket_price_api_returns_one_price_without_a_category(): void
