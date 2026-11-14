@@ -434,7 +434,7 @@ class PenarikanSaldoTest extends TestCase
         ]);
     }
 
-    public function test_pending_withdrawals_do_not_reduce_admin_master_transaction_revenue(): void
+    public function test_withdrawals_do_not_reduce_gross_admin_master_income(): void
     {
         $this->createPaidReservation('pool_01', '1000000.00');
         DB::table('kolam_renang')->insert([
@@ -443,7 +443,15 @@ class PenarikanSaldoTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $this->createWithdrawal('pool_01', 'BCA', '1234567890', '500000.00');
+        $withdrawal = $this->createWithdrawal(
+            'pool_01',
+            'BCA',
+            '1234567890',
+            '1500000.00',
+        );
+        $withdrawal->forceFill([
+            'status' => PenarikanSaldo::STATUS_BERHASIL,
+        ])->save();
         $this->createAdminMaster();
 
         $this->withSession([

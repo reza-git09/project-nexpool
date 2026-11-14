@@ -318,9 +318,9 @@ class ReservasiApiController extends Controller
 
             if (
                 $reservasi->tanggal_kunjungan === null
-                || ! $reservasi->tanggal_kunjungan->isAfter(today())
+                || $reservasi->tanggal_kunjungan->isBefore(today())
             ) {
-                abort(422, 'Reschedule hanya dapat dilakukan sebelum tanggal kunjungan.');
+                abort(422, 'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.');
             }
 
             $reservasi->tanggal_kunjungan = $validated['tanggal_kunjungan'];

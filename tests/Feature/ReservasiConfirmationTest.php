@@ -106,6 +106,63 @@ class ReservasiConfirmationTest extends TestCase
         ]);
     }
 
+    public function test_midtrans_notification_marks_reservation_paid_once(): void
+    {
+        $this->travelTo('2026-11-14 08:00:00');
+        $serverKey = 'test-midtrans-server-key';
+        config(['services.midtrans.server_key' => $serverKey]);
+        $reservation = $this->createReservation('pending');
+        $orderId = 'NEXPOOL-'.$reservation->kode_reservasi;
+        $reservation->forceFill(['midtrans_order_id' => $orderId])->save();
+        $notification = $this->signedMidtransNotification(
+            $orderId,
+            '25000.00',
+            $serverKey,
+        );
+
+        $this->postJson('/api/midtrans/notification', $notification)
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $firstPaidAt = $reservation->refresh()->paid_at?->toIso8601String();
+        $this->assertNotNull($firstPaidAt);
+        $this->travel(5)->minutes();
+
+        $this->postJson('/api/midtrans/notification', $notification)
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $reservation->refresh();
+        $this->assertSame('paid', $reservation->status_pembayaran);
+        $this->assertSame('TRX-'.$orderId, $reservation->midtrans_transaction_id);
+        $this->assertSame($firstPaidAt, $reservation->paid_at?->toIso8601String());
+        $this->assertDatabaseCount('reservasis', 1);
+    }
+
+    public function test_midtrans_notification_rejects_a_mismatched_amount(): void
+    {
+        $serverKey = 'test-midtrans-server-key';
+        config(['services.midtrans.server_key' => $serverKey]);
+        $reservation = $this->createReservation('pending');
+        $orderId = 'NEXPOOL-'.$reservation->kode_reservasi;
+        $reservation->forceFill(['midtrans_order_id' => $orderId])->save();
+        $notification = $this->signedMidtransNotification(
+            $orderId,
+            '25001.00',
+            $serverKey,
+        );
+
+        $this->postJson('/api/midtrans/notification', $notification)
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Nominal pembayaran tidak sesuai.');
+
+        $this->assertDatabaseHas('reservasis', [
+            'id' => $reservation->id,
+            'status_pembayaran' => 'pending',
+            'paid_at' => null,
+        ]);
+    }
+
     public function test_mobile_reschedule_updates_the_date_seen_by_pool_admin(): void
     {
         $this->travelTo('2026-11-14 08:00:00');
@@ -131,6 +188,49 @@ class ReservasiConfirmationTest extends TestCase
             ->get(route('reservasi.index'))
             ->assertOk()
             ->assertSee('25-11-2026');
+    }
+
+    public function test_mobile_reschedule_allows_a_reservation_on_its_visit_date(): void
+    {
+        $this->travelTo('2026-11-14 08:00:00');
+        $reservation = $this->createReservation('paid');
+        $reservation->forceFill([
+            'tanggal_kunjungan' => '2026-11-14',
+        ])->save();
+
+        $this->putJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-15',
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.tanggal_kunjungan', '2026-11-15');
+
+        $this->assertSame(
+            '2026-11-15',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
+    }
+
+    public function test_mobile_reschedule_rejects_a_past_visit_date(): void
+    {
+        $this->travelTo('2026-11-14 08:00:00');
+        $reservation = $this->createReservation('paid');
+
+        $this->putJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-15',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'message',
+                'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.',
+            );
+
+        $this->assertSame(
+            '2026-11-13',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
     }
 
     public function test_mobile_reschedule_requires_the_matching_phone_and_paid_status(): void
@@ -180,6 +280,29 @@ class ReservasiConfirmationTest extends TestCase
             'status_reservasi' => 'Menunggu',
             'status_pembayaran' => $paymentStatus,
         ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function signedMidtransNotification(
+        string $orderId,
+        string $grossAmount,
+        string $serverKey,
+    ): array {
+        $notification = [
+            'order_id' => $orderId,
+            'status_code' => '200',
+            'gross_amount' => $grossAmount,
+            'transaction_status' => 'settlement',
+            'transaction_id' => 'TRX-'.$orderId,
+        ];
+        $notification['signature_key'] = hash(
+            'sha512',
+            $orderId.$notification['status_code'].$grossAmount.$serverKey,
+        );
+
+        return $notification;
     }
 
     private function poolAdminSession(): array
