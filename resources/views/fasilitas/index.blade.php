@@ -751,48 +751,144 @@
            GAMBAR FASILITAS
         ========================================================= */
 
-        .facility-image {
-            width: 85px;
-            height: 65px;
-
-            object-fit: cover;
-
-            border-radius: 9px;
-
-            border: 1px solid #e2e8f0;
-
-            display: block;
-
-            background: #f1f5f9;
-        }
-
-        .no-image {
-            width: 85px;
-            height: 65px;
-
-            display: flex;
-
-            flex-direction: column;
-
+        .facility-image-link {
+            display: inline-flex;
             align-items: center;
-
-            justify-content: center;
-
-            border-radius: 9px;
-
-            background: #f1f5f9;
-
-            color: #94a3b8;
-
-            font-size: 9px;
-
-            border: 1px solid #e2e8f0;
-
-            gap: 4px;
+            gap: 5px;
+            padding: 4px 0;
+            border: 0;
+            background: transparent;
+            color: #2563eb;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
-        .no-image i {
-            font-size: 17px;
+        .facility-image-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .facility-image-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(15, 23, 42, .65);
+        }
+
+        .facility-image-overlay[hidden] {
+            display: none;
+        }
+
+        .facility-image-dialog {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 960px;
+            max-height: calc(100vh - 32px);
+            overflow: hidden;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, .3);
+        }
+
+        .facility-image-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e8ecf3;
+        }
+
+        .facility-image-title {
+            color: #172033;
+            font-size: 16px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .facility-image-close {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 9px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .facility-image-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .facility-image-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            max-height: calc(100vh - 105px);
+            overflow: auto;
+            padding: 16px;
+        }
+
+        .facility-image-preview {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: calc(100vh - 145px);
+            object-fit: contain;
+        }
+
+        .facility-image-preview[hidden],
+        .facility-image-error[hidden] {
+            display: none;
+        }
+
+        .facility-image-error {
+            color: #64748b;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        body.facility-image-modal-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 600px) {
+            .facility-image-overlay {
+                padding: 10px;
+            }
+
+            .facility-image-dialog {
+                max-height: calc(100vh - 20px);
+                border-radius: 11px;
+            }
+
+            .facility-image-header {
+                padding: 13px 15px;
+            }
+
+            .facility-image-body {
+                max-height: calc(100vh - 78px);
+                padding: 12px;
+            }
+
+            .facility-image-preview {
+                max-height: calc(100vh - 110px);
+            }
         }
 
         /* =========================================================
@@ -1187,27 +1283,7 @@
 
             <!-- ADMIN INFO -->
 
-            <div class="admin-info">
-
-                <div class="admin-text">
-
-                    <strong>
-                        {{ session('admin_pool_nama') }}
-                    </strong>
-
-                    <span>
-                        {{ session('admin_pool_id') }}
-                    </span>
-
-                </div>
-
-                <div class="avatar">
-
-                    {{ strtoupper(substr(session('admin_pool_nama'), 0, 1)) }}
-
-                </div>
-
-            </div>
+            @include('layout.partials.admin-pool-profile')
 
         </header>
 
@@ -1425,23 +1501,20 @@
 
                                             @if($item->gambar)
 
-                                                <img
-                                                    src="{{ asset('storage/' . $item->gambar) }}"
-                                                    alt="{{ $item->nama_fasilitas }}"
-                                                    class="facility-image"
+                                                <button
+                                                    type="button"
+                                                    class="facility-image-link"
+                                                    data-facility-image
+                                                    data-src="{{ asset('storage/' . $item->gambar) }}"
+                                                    data-judul="{{ $item->nama_fasilitas }}"
                                                 >
+                                                    <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                                    Lihat
+                                                </button>
 
                                             @else
 
-                                                <div class="no-image">
-
-                                                    <i class="fa-regular fa-image"></i>
-
-                                                    <span>
-                                                        Tidak ada
-                                                    </span>
-
-                                                </div>
+                                                -
 
                                             @endif
 
@@ -1531,6 +1604,94 @@
         </section>
 
     </main>
+
+    <div class="facility-image-overlay" id="facilityImageModal" hidden>
+        <section
+            class="facility-image-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="facilityImageModalTitle"
+        >
+            <div class="facility-image-header">
+                <h2 class="facility-image-title" id="facilityImageModalTitle"></h2>
+                <button
+                    type="button"
+                    class="facility-image-close"
+                    id="facilityImageModalClose"
+                    aria-label="Tutup gambar"
+                >
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="facility-image-body">
+                <img class="facility-image-preview" id="facilityImagePreview" alt="" hidden>
+                <p class="facility-image-error" id="facilityImageError" hidden>
+                    Gambar tidak dapat ditampilkan.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        (() => {
+            const modal = document.getElementById('facilityImageModal');
+            const title = document.getElementById('facilityImageModalTitle');
+            const image = document.getElementById('facilityImagePreview');
+            const errorMessage = document.getElementById('facilityImageError');
+            const closeButton = document.getElementById('facilityImageModalClose');
+            let activeTrigger = null;
+
+            function closeModal() {
+                modal.hidden = true;
+                document.body.classList.remove('facility-image-modal-open');
+                image.onload = null;
+                image.onerror = null;
+                image.removeAttribute('src');
+                image.hidden = true;
+                errorMessage.hidden = true;
+
+                if (activeTrigger) {
+                    activeTrigger.focus();
+                    activeTrigger = null;
+                }
+            }
+
+            document.querySelectorAll('[data-facility-image]').forEach((trigger) => {
+                trigger.addEventListener('click', () => {
+                    activeTrigger = trigger;
+                    title.textContent = trigger.dataset.judul;
+                    image.alt = trigger.dataset.judul;
+                    image.hidden = true;
+                    errorMessage.hidden = true;
+                    modal.hidden = false;
+                    document.body.classList.add('facility-image-modal-open');
+                    closeButton.focus();
+
+                    image.onload = () => {
+                        image.hidden = false;
+                    };
+                    image.onerror = () => {
+                        image.removeAttribute('src');
+                        image.hidden = true;
+                        errorMessage.hidden = false;
+                    };
+                    image.src = trigger.dataset.src;
+                });
+            });
+
+            closeButton.addEventListener('click', closeModal);
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.hidden) {
+                    closeModal();
+                }
+            });
+        })();
+    </script>
 
 </body>
 

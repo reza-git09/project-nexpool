@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KolamRenang;
+use App\Models\PenarikanSaldo;
 use App\Models\Reservasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -79,18 +80,70 @@ class AdminMasterTransaksiController extends Controller
             ")
             ->first();
 
-        // Pencairan tidak mengurangi pendapatan kotor dari transaksi yang sudah dibayar.
-        $pendapatanKolam = Reservasi::with('kolamRenang')
+        $statistik->total_pendapatan = Reservasi::query()
             ->where('status_pembayaran', 'paid')
-            ->selectRaw('pool_id, COUNT(*) as jumlah_transaksi, SUM(total_harga) as total_pendapatan')
-            ->groupBy('pool_id')
+            ->sum('total_harga');
+
+        $pendapatanPerKolam = Reservasi::query()
+            ->where('status_pembayaran', 'paid')
+            ->select('pool_id')
+            ->selectRaw('COUNT(*) as transaksi_berhasil, COALESCE(SUM(total_harga), 0) as total_pendapatan')
+            ->groupBy('pool_id');
+
+        $penarikanPerKolam = PenarikanSaldo::query()
+            ->where('status', PenarikanSaldo::STATUS_TERKONFIRMASI)
+            ->select('pool_id')
+            ->selectRaw('COALESCE(SUM(amount), 0) as sudah_ditarik')
+            ->groupBy('pool_id');
+
+        $pendapatanKolam = KolamRenang::query()
+            ->leftJoinSub($pendapatanPerKolam, 'pendapatan', 'kolam_renang.pool_id', '=', 'pendapatan.pool_id')
+            ->leftJoinSub($penarikanPerKolam, 'penarikan', 'kolam_renang.pool_id', '=', 'penarikan.pool_id')
+            ->select('kolam_renang.pool_id', 'kolam_renang.nama_kolam')
+            ->selectRaw('
+                COALESCE(pendapatan.transaksi_berhasil, 0) as transaksi_berhasil,
+                COALESCE(pendapatan.total_pendapatan, 0) as total_pendapatan,
+                COALESCE(penarikan.sudah_ditarik, 0) as sudah_ditarik,
+                CASE
+                    WHEN COALESCE(pendapatan.total_pendapatan, 0) > COALESCE(penarikan.sudah_ditarik, 0)
+                    THEN COALESCE(pendapatan.total_pendapatan, 0) - COALESCE(penarikan.sudah_ditarik, 0)
+                    ELSE 0
+                END as saldo_tersisa
+            ')
+            ->orderBy('kolam_renang.nama_kolam')
             ->get();
+
+        $peringkatKolam = $pendapatanKolam
+            ->filter(static fn ($kolam) => (int) $kolam->transaksi_berhasil > 0)
+            ->sort(static function ($left, $right): int {
+                $jumlahComparison = (int) $right->transaksi_berhasil <=> (int) $left->transaksi_berhasil;
+
+                return $jumlahComparison !== 0
+                    ? $jumlahComparison
+                    : (float) $right->total_pendapatan <=> (float) $left->total_pendapatan;
+            })
+            ->values();
+
+        $kolamTerlarisId = null;
+        if ($peringkatKolam->isNotEmpty()) {
+            $teratas = $peringkatKolam->first();
+            $peringkatKedua = $peringkatKolam->get(1);
+
+            if (
+                $peringkatKedua === null
+                || (int) $teratas->transaksi_berhasil !== (int) $peringkatKedua->transaksi_berhasil
+                || (float) $teratas->total_pendapatan !== (float) $peringkatKedua->total_pendapatan
+            ) {
+                $kolamTerlarisId = $teratas->pool_id;
+            }
+        }
 
         return view('admin_master.transaksi', compact(
             'transaksi',
             'kolam',
             'statistik',
-            'pendapatanKolam'
+            'pendapatanKolam',
+            'kolamTerlarisId'
         ));
     }
 }

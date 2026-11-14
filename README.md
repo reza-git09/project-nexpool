@@ -73,3 +73,11 @@ dijangkau Midtrans melalui HTTPS; alamat localhost atau IP jaringan lokal tidak
 dapat menerima notifikasi. Aplikasi juga memeriksa status transaksi melalui
 `GET /api/midtrans/status/{orderId}` agar pembayaran tetap terkonfirmasi saat
 notifikasi terlambat.
+
+## Verifikasi OTP WhatsApp
+
+Untuk mengirim OTP sungguhan, atur `OTP_DRIVER=fonnte` dan isi `FONNTE_TOKEN`
+dengan token dari Fonnte di `.env` backend. `OTP_DRIVER=log` adalah mode lokal
+yang hanya mencatat OTP ke `storage/logs/laravel.log`. Koneksi HTTPS ke Fonnte
+menggunakan CA bundle `storage/cacert.pem`; pastikan file tersebut tersedia dan
+diperbarui secara berkala.

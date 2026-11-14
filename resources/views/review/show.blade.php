@@ -646,18 +646,7 @@
                 <p>Melihat detail review pengunjung NEXPOOL</p>
             </div>
 
-            <div class="admin-info">
-
-                <div class="admin-text">
-                    <strong>{{ session('admin_nama', 'Admin NEXPOOL') }}</strong>
-                    <span>{{ session('admin_pool_id', 'Pool ID') }}</span>
-                </div>
-
-                <div class="avatar">
-                    {{ strtoupper(substr(session('admin_nama', 'A'), 0, 1)) }}
-                </div>
-
-            </div>
+            @include('layout.partials.admin-pool-profile')
 
         </header>
 

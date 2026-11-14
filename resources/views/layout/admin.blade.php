@@ -124,13 +124,7 @@
                 <h3>@yield('header-title', 'Dashboard')</h3>
                 <p>@yield('header-subtitle', 'Kelola dan pantau data NEXPOOL')</p>
             </div>
-            <div class="user-profile">
-                <div class="user-info">
-                    <div class="user-name">{{ session('admin_pool_nama', 'Admin NEXPOOL') }}</div>
-                    <div class="user-role">{{ session('admin_pool_id', 'pool_id_01') }}</div>
-                </div>
-                <div class="user-avatar">{{ strtoupper(substr(session('admin_pool_nama', 'Admin NEXPOOL'), 0, 1)) }}</div>
-            </div>
+            @include('layout.partials.admin-pool-profile')
         </header>
 
         <!-- CONTENT DINAMIS -->

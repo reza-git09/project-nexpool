@@ -316,15 +316,7 @@
         <header class="header">
             <h3>Tambah Review Pengunjung</h3>
 
-            <div class="user-profile">
-                <div class="user-meta">
-                    <strong>Admin Tiara Park</strong>
-                    <span>pool_id_01</span>
-                </div>
-                <div class="avatar">
-                    A
-                </div>
-            </div>
+            @include('layout.partials.admin-pool-profile')
         </header>
 
         <!-- CONTENT -->

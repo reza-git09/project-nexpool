@@ -170,7 +170,6 @@
 </head>
 <body>
     @php
-        $adminNama = session('admin_nama') ?? session('admin_pool_nama') ?? 'Administrator';
         $adminPoolId = session('admin_pool_id') ?? '-';
     @endphp
 
@@ -222,13 +221,7 @@
                 <h3>Dashboard</h3>
                 <p>Ringkasan aktivitas kolam renang</p>
             </div>
-            <div class="admin-info">
-                <div class="admin-text">
-                    <strong>{{ $adminNama }}</strong>
-                    <span>{{ $adminPoolId }}</span>
-                </div>
-                <div class="avatar">{{ strtoupper(substr($adminNama, 0, 1)) }}</div>
-            </div>
+            @include('layout.partials.admin-pool-profile')
         </header>
 
         <section class="content">

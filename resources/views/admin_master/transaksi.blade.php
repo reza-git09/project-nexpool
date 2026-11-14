@@ -35,12 +35,22 @@
     .trx-stat.hero span { color:rgba(255,255,255,.8); }
     .trx-stat.hero span i { background:#fff; }
 
-    /* pendapatan per kolam */
-    .trx-pools { padding:4px 20px 18px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 32px; }
-    .trx-pool-row { display:flex; justify-content:space-between; gap:10px; margin-bottom:7px; }
-    .trx-pool-row small { color:var(--muted); display:block; margin-top:2px; }
-    .trx-bar { height:7px; background:#eef1f6; border-radius:99px; overflow:hidden; }
-    .trx-bar i { display:block; height:100%; background:var(--blue); border-radius:99px; }
+    /* kartu pendapatan per kolam */
+    .trx-pools { padding:0 20px 20px; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .trx-pool-card { min-width:0; padding:14px 10px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+    .trx-pool-card.best-seller { border-color:#9bb8ff; background:linear-gradient(145deg,#f1f6ff,#fff 75%); box-shadow:0 5px 16px rgba(36,89,219,.1); }
+    .trx-pool-card-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:12px; }
+    .trx-pool-card-head h5 { flex:1 1 90px; min-width:0; margin:0; color:var(--ink); font-size:13px; font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
+    .trx-pool-badge { display:inline-flex; flex:0 0 auto; align-items:center; gap:5px; padding:5px 9px; border-radius:999px;
+                      color:#fff; background:var(--blue); font-size:10px; font-weight:800; white-space:nowrap; }
+    .trx-pool-total { display:flex; flex-direction:column; gap:3px; margin:2px 0 11px; }
+    .trx-pool-total strong { color:var(--blue); font-size:clamp(12px,1.1vw,20px); font-weight:850; line-height:1.15; }
+    .trx-pool-total span { color:var(--muted); font-size:9px; }
+    .trx-pool-divider { margin-bottom:9px; border-top:1px solid #e8ecf3; }
+    .trx-pool-metrics { display:grid; gap:8px; }
+    .trx-pool-metric { display:flex; justify-content:space-between; align-items:baseline; gap:6px; min-width:0; }
+    .trx-pool-metric span { flex:1 1 auto; min-width:0; color:var(--muted); font-size:9px; line-height:1.2; }
+    .trx-pool-metric strong { flex:0 0 auto; color:var(--ink); font-size:clamp(8px,.78vw,11px); text-align:right; white-space:nowrap; }
 
     /* filter */
     .trx-filter { padding:0 20px 16px; display:grid; grid-template-columns:1.4fr 1.2fr 1fr 1fr auto; gap:10px; align-items:end; }
@@ -79,10 +89,17 @@
     .trx-pager a { background:var(--blue-soft); color:var(--blue); }
     .trx-pager span { background:#f1f4f9; color:#a3adbd; }
 
+    @media (min-width:700px) and (max-width:1099px) {
+        .trx-pools { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; }
+        .trx-pool-card { flex:0 0 calc((100% - 28px) / 3); }
+    }
     @media (max-width:1000px) {
         .trx-filter { grid-template-columns:repeat(2,minmax(0,1fr)); }
         .trx-actions { grid-column:1 / -1; }
-        .trx-pools { grid-template-columns:1fr; }
+    }
+    @media (max-width:699px) {
+        .trx-pools { display:grid; grid-template-columns:1fr; }
+        .trx-pool-card { width:auto; }
     }
     @media (max-width:600px) {
         .trx-top { flex-direction:column; align-items:flex-start; }
@@ -110,55 +127,51 @@
             <span><i></i>Uang Berhasil Masuk</span>
             <b>Rp {{ number_format($statistik->total_pendapatan ?? 0, 0, ',', '.') }}</b>
         </div>
-        <div class="trx-stat">
-            <span><i></i>Total Transaksi</span>
-            <b>{{ number_format($statistik->total_transaksi ?? 0, 0, ',', '.') }}</b>
-        </div>
-        <div class="trx-stat" style="--c:#12864a">
-            <span><i></i>Berhasil</span>
-            <b>{{ number_format($statistik->transaksi_berhasil ?? 0) }}</b>
-        </div>
-        <div class="trx-stat" style="--c:#e0a100">
-            <span><i></i>Pending</span>
-            <b>{{ number_format($statistik->transaksi_pending ?? 0) }}</b>
-        </div>
-        <div class="trx-stat" style="--c:#98a2b3">
-            <span><i></i>Kedaluwarsa</span>
-            <b>{{ number_format($statistik->transaksi_expired ?? 0) }}</b>
-        </div>
     </div>
 
     {{-- PENDAPATAN PER KOLAM --}}
     <div class="trx-card">
         <div class="trx-card-head">
             <h4>Pendapatan per Kolam</h4>
-            <small>Hanya transaksi yang berhasil dibayar</small>
+            <small>Total pendapatan, pencairan terkonfirmasi, dan saldo tersisa</small>
         </div>
 
-        @php
-            $maxPendapatan = $pendapatanKolam->max('total_pendapatan') ?: 0;
-        @endphp
-
         <div class="trx-pools">
-            @forelse($kolam as $item)
+            @forelse($pendapatanKolam as $item)
                 @php
-                    $dataKolam = $pendapatanKolam->firstWhere('pool_id', $item->pool_id);
-                    $pendapatan = $dataKolam->total_pendapatan ?? 0;
-                    $jumlah = $dataKolam->jumlah_transaksi ?? 0;
-                    $persentase = $maxPendapatan > 0 ? ($pendapatan / $maxPendapatan) * 100 : 0;
+                    $isBestSeller = (string) $item->pool_id === (string) $kolamTerlarisId;
                 @endphp
-                <div>
-                    <div class="trx-pool-row">
-                        <div>
-                            <strong>{{ $item->nama_kolam }}</strong>
-                            <small>{{ $jumlah }} transaksi berhasil</small>
-                        </div>
-                        <strong>Rp {{ number_format($pendapatan, 0, ',', '.') }}</strong>
+                <article class="trx-pool-card {{ $isBestSeller ? 'best-seller' : '' }}">
+                    <div class="trx-pool-card-head">
+                        <h5>{{ $item->nama_kolam }}</h5>
+                        @if($isBestSeller)
+                            <span class="trx-pool-badge" title="Kolam terlaris" aria-label="Kolam terlaris">
+                                <i class="fa-solid fa-crown" aria-hidden="true"></i> Terlaris
+                            </span>
+                        @endif
                     </div>
-                    <div class="trx-bar"><i style="width: {{ $persentase }}%"></i></div>
-                </div>
+                    <div class="trx-pool-total">
+                        <strong>Rp {{ number_format((float) $item->total_pendapatan, 0, ',', '.') }}</strong>
+                        <span>Total pendapatan</span>
+                    </div>
+                    <div class="trx-pool-divider"></div>
+                    <div class="trx-pool-metrics">
+                        <div class="trx-pool-metric">
+                            <span>Transaksi berhasil</span>
+                            <strong>{{ number_format((int) $item->transaksi_berhasil, 0, ',', '.') }}</strong>
+                        </div>
+                        <div class="trx-pool-metric">
+                            <span>Sudah ditarik</span>
+                            <strong>Rp {{ number_format((float) $item->sudah_ditarik, 0, ',', '.') }}</strong>
+                        </div>
+                        <div class="trx-pool-metric">
+                            <span>Saldo tersisa</span>
+                            <strong>Rp {{ number_format((float) $item->saldo_tersisa, 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+                </article>
             @empty
-                <p style="color:var(--muted)">Belum ada data kolam renang.</p>
+                <p class="trx-empty">Belum ada data kolam renang.</p>
             @endforelse
         </div>
     </div>

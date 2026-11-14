@@ -76,6 +76,13 @@ Route::get('/admin-master/dashboard', [AdminMasterController::class, 'index'])
     ->middleware(['admin', 'admin.master', 'must.change.password'])
     ->name('admin.master.dashboard');
 
+Route::get('/admin-master/dashboard/grafik-pendapatan', [
+    AdminMasterController::class,
+    'grafikPendapatan',
+])
+    ->middleware(['admin', 'admin.master', 'must.change.password'])
+    ->name('admin.master.dashboard.grafik-pendapatan');
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN MASTER - TRANSAKSI PEMBAYARAN (WEB)

@@ -301,6 +301,7 @@
 
         <header class="header">
             <h3>Tambah Reservasi</h3>
+            @include('layout.partials.admin-pool-profile')
         </header>
 
         <section class="content">

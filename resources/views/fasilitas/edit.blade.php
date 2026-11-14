@@ -866,27 +866,7 @@
 
             </div>
 
-            <div class="admin-info">
-
-                <div class="admin-text">
-
-                    <strong>
-                        {{ session('admin_pool_nama') }}
-                    </strong>
-
-                    <span>
-                        {{ session('admin_pool_id') }}
-                    </span>
-
-                </div>
-
-                <div class="avatar">
-
-                    {{ strtoupper(substr(session('admin_pool_nama'), 0, 1)) }}
-
-                </div>
-
-            </div>
+            @include('layout.partials.admin-pool-profile')
 
         </header>
 

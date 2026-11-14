@@ -72,8 +72,8 @@ tbody tr:hover{background:#fafcff}
 .rating{color:#f59e0b;font-size:14px;white-space:nowrap}
 .rating-number{color:#64748b;font-size:10px;margin-left:4px}
 .komentar,.balasan{max-width:260px;line-height:1.5;color:#475569}
-.foto-review{width:70px;height:55px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;transition:.2s}
-.foto-review:hover{transform:scale(1.05);box-shadow:0 5px 15px rgba(15,23,42,.15)}
+.foto-review-link{display:inline-flex;align-items:center;gap:5px;padding:4px 0;border:0;background:transparent;color:#2563eb;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.foto-review-link:hover{color:#1d4ed8;text-decoration:underline}
 .tidak-ada-foto,.belum-dibalas{color:#94a3b8;font-size:11px;font-style:italic}
 .tidak-ada-foto{white-space:nowrap}
 
@@ -121,6 +121,19 @@ tbody tr:hover{background:#fafcff}
 .modal-status.menunggu{background:#fff7ed;color:#c2410c}
 .modal-status.dibalas{background:#ecfdf5;color:#047857}
 
+/* REVIEW PHOTO MODAL */
+.review-photo-overlay{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.65);backdrop-filter:blur(3px)}
+.review-photo-overlay[hidden],.review-photo-image[hidden],.review-photo-error[hidden]{display:none}
+.review-photo-dialog{display:flex;flex-direction:column;width:100%;max-width:960px;max-height:calc(100vh - 32px);overflow:hidden;border-radius:14px;background:#fff;box-shadow:0 24px 70px rgba(15,23,42,.3)}
+.review-photo-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border-bottom:1px solid #e8ecf3}
+.review-photo-title{color:#172033;font-size:16px;font-weight:700;overflow-wrap:anywhere}
+.review-photo-close{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;width:36px;height:36px;border:0;border-radius:9px;background:#f1f5f9;color:#475569;font-size:16px;cursor:pointer}
+.review-photo-close:hover{background:#fee2e2;color:#dc2626}
+.review-photo-body{display:flex;align-items:center;justify-content:center;min-height:100px;max-height:calc(100vh - 105px);overflow:auto;padding:16px}
+.review-photo-image{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 145px);object-fit:contain}
+.review-photo-error{color:#64748b;font-size:14px;text-align:center}
+body.review-photo-scroll-locked{overflow:hidden}
+
 /* EMPTY */
 .empty{text-align:center;padding:70px 30px;color:#94a3b8}
 .empty-icon{width:55px;height:55px;margin:0 auto 15px;border-radius:15px;background:#f1f5f9;color:#94a3b8;font-size:22px}
@@ -152,6 +165,11 @@ tbody tr:hover{background:#fafcff}
     .table-top{padding:16px}
     .modal{max-height:94vh}
     .modal-body{padding:17px}
+    .review-photo-overlay{padding:10px}
+    .review-photo-dialog{max-height:calc(100vh - 20px);border-radius:11px}
+    .review-photo-header{padding:13px 15px}
+    .review-photo-body{max-height:calc(100vh - 78px);padding:12px}
+    .review-photo-image{max-height:calc(100vh - 110px)}
 }
 </style>
     @include('layout.partials.sidebar-scroll')
@@ -160,7 +178,6 @@ tbody tr:hover{background:#fafcff}
 <body>
 
 @php
-    $poolNama = session('admin_pool_nama', 'Admin NEXPOOL');
     $menus = [
         ['dashboard',           'fa-gauge-high',       '#bfdbfe', 'Dashboard'],
         ['harga-tiket.index',   'fa-ticket',           '#fcd34d', 'Manajemen Tiket'],
@@ -210,13 +227,7 @@ tbody tr:hover{background:#fafcff}
             <p>Kelola dan pantau review pengunjung</p>
         </div>
 
-        <div class="admin-info">
-            <div class="admin-text">
-                <strong>{{ $poolNama }}</strong>
-                <span>{{ session('admin_pool_id', 'pool_id_01') }}</span>
-            </div>
-            <div class="avatar">{{ strtoupper(substr($poolNama, 0, 1)) }}</div>
-        </div>
+        @include('layout.partials.admin-pool-profile')
     </header>
 
     <!-- CONTENT -->
@@ -306,10 +317,14 @@ tbody tr:hover{background:#fafcff}
 
                                     <td>
                                         @if($item->foto)
-                                            <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Review"
-                                                 class="foto-review" onclick="window.open(this.src, '_blank')">
+                                            <button type="button" class="foto-review-link"
+                                                data-review-photo
+                                                data-src="{{ asset('storage/' . $item->foto) }}"
+                                                data-nama="{{ $item->nama_pengunjung }}">
+                                                <i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat
+                                            </button>
                                         @else
-                                            <span class="tidak-ada-foto">Tidak ada foto</span>
+                                            -
                                         @endif
                                     </td>
 
@@ -448,6 +463,23 @@ tbody tr:hover{background:#fafcff}
     </div>
 </div>
 
+<div class="review-photo-overlay" id="reviewPhotoModal" hidden>
+    <section class="review-photo-dialog" role="dialog" aria-modal="true" aria-labelledby="reviewPhotoTitle">
+        <div class="review-photo-header">
+            <h2 class="review-photo-title" id="reviewPhotoTitle"></h2>
+            <button type="button" class="review-photo-close" id="reviewPhotoClose" aria-label="Tutup foto">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="review-photo-body">
+            <img class="review-photo-image" id="reviewPhotoImage" alt="" hidden>
+            <p class="review-photo-error" id="reviewPhotoError" role="status" hidden>
+                Gambar tidak dapat ditampilkan.
+            </p>
+        </div>
+    </section>
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 
@@ -486,6 +518,65 @@ function closeReviewModal(event) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeReviewModal();
 });
+
+(() => {
+    const modal = $('reviewPhotoModal');
+    const title = $('reviewPhotoTitle');
+    const image = $('reviewPhotoImage');
+    const errorMessage = $('reviewPhotoError');
+    const closeButton = $('reviewPhotoClose');
+    let activeTrigger = null;
+
+    function closePhotoModal() {
+        modal.hidden = true;
+        document.body.classList.remove('review-photo-scroll-locked');
+        image.onload = null;
+        image.onerror = null;
+        image.removeAttribute('src');
+        image.hidden = true;
+        errorMessage.hidden = true;
+
+        if (activeTrigger) {
+            activeTrigger.focus();
+            activeTrigger = null;
+        }
+    }
+
+    document.querySelectorAll('[data-review-photo]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+            activeTrigger = trigger;
+            title.textContent = `Foto Review - ${trigger.dataset.nama}`;
+            image.alt = title.textContent;
+            image.hidden = true;
+            errorMessage.hidden = true;
+            modal.hidden = false;
+            document.body.classList.add('review-photo-scroll-locked');
+            closeButton.focus();
+
+            image.onload = () => {
+                image.hidden = false;
+            };
+            image.onerror = () => {
+                image.removeAttribute('src');
+                image.hidden = true;
+                errorMessage.hidden = false;
+            };
+            image.src = trigger.dataset.src;
+        });
+    });
+
+    closeButton.addEventListener('click', closePhotoModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closePhotoModal();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closePhotoModal();
+        }
+    });
+})();
 </script>
 
 </body>

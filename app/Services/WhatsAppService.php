@@ -56,8 +56,8 @@ class WhatsAppService
                 ->timeout(15)
                 ->post('https://api.fonnte.com/send', [
                     'target'  => $phone,
-                    'message' => $message,
-                ]);
+                'message' => $message,
+            ]);
 
             $json = $res->json();
 

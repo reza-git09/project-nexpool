@@ -392,6 +392,7 @@
         <!-- HEADER -->
         <header class="header">
             <h3>Pantau Reservasi</h3>
+            @include('layout.partials.admin-pool-profile')
         </header>
 
 

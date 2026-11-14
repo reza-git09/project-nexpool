@@ -995,28 +995,7 @@
             </div>
 
 
-            <div class="admin-info">
-
-                <div class="admin-text">
-
-                    <strong>
-                        {{ session('admin_pool_nama', 'Admin NEXPOOL') }}
-                    </strong>
-
-                    <span>
-                        {{ session('admin_pool_id', 'pool_id_01') }}
-                    </span>
-
-                </div>
-
-
-                <div class="avatar">
-
-                    {{ strtoupper(substr(session('admin_pool_nama', 'Admin NEXPOOL'), 0, 1)) }}
-
-                </div>
-
-            </div>
+            @include('layout.partials.admin-pool-profile')
 
 
         </header>

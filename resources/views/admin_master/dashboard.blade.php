@@ -76,80 +76,36 @@
     </div>
 </div>
 
-{{-- MENU MANAJEMEN --}}
-<div class="section-heading">
-    <h3>Manajemen NEXPOOL</h3>
-    <p>Pilih menu untuk mengelola sistem secara keseluruhan.</p>
-</div>
-
-<div class="management-grid">
-
-    @php
-        $menus = [
-            [
-                'icon' => 'fa-person-swimming',
-                'title' => 'Data Kolam Renang',
-                'desc' => 'Mengelola seluruh data kolam renang.',
-                'route' => null,
-                'color' => 'blue'
-            ],
-            [
-                'icon' => 'fa-user-plus',
-                'title' => 'Data Admin Kolam',
-                'desc' => 'Mengelola akun administrator setiap kolam.',
-                'route' => null,
-                'color' => 'cyan'
-            ],
-            [
-                'icon' => 'fa-calendar-check',
-                'title' => 'Data Reservasi',
-                'desc' => 'Memantau reservasi dari seluruh kolam.',
-                'route' => null,
-                'color' => 'green'
-            ],
-            [
-                'icon' => 'fa-calendar-check',
-                'title' => 'Harga Tiket',
-                'desc' => 'Memantau dan mengelola harga tiket.',
-                'route' => null,
-                'color' => 'orange'
-            ],
-            [
-                'icon' => 'fa-tags',
-                'title' => 'Data Promo',
-                'desc' => 'Mengelola promo seluruh kolam renang.',
-                'route' => null,
-                'color' => 'purple'
-            ],
-            [
-                'icon' => 'fa-user-plus',
-                'title' => 'Pengajuan Admin',
-                'desc' => 'Memeriksa dan menyetujui pengajuan admin.',
-                'route' => 'admin.master.applications.index',
-                'color' => 'pink'
-            ],
-        ];
-    @endphp
-
-    @foreach($menus as $menu)
-        <div class="management-card">
-            <div class="management-icon {{ $menu['color'] }}">
-                <i class="fa-solid {{ $menu['icon'] }}"></i>
-            </div>
-
-            <h4>{{ $menu['title'] }}</h4>
-            <p>{{ $menu['desc'] }}</p>
-
-            @if($menu['route'] && \Illuminate\Support\Facades\Route::has($menu['route']))
-                <a href="{{ route($menu['route']) }}" class="management-link">
-                    Buka Menu <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            @else
-                <span class="management-disabled">Menu belum tersedia</span>
-            @endif
+<div class="revenue-card">
+    <div class="revenue-card-header">
+        <div>
+            <h3 id="revenue-title">Grafik Pendapatan</h3>
+            <p id="revenue-total">Memuat total pendapatan...</p>
         </div>
-    @endforeach
-
+        <div class="revenue-filters">
+            <label>
+                <span>Kolam</span>
+                <select id="revenue-pool">
+                    <option value="">Semua kolam</option>
+                    @foreach($kolam as $item)
+                        <option value="{{ $item->pool_id }}">{{ $item->nama_kolam }}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label>
+                <span>Periode</span>
+                <select id="revenue-period">
+                    <option value="7_hari">7 hari terakhir</option>
+                    <option value="30_hari">30 hari terakhir</option>
+                    <option value="bulan_ini">Bulan ini</option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <p id="revenue-message" class="revenue-message" hidden></p>
+    <div class="revenue-chart-wrap">
+        <canvas id="revenue-chart" aria-label="Grafik pendapatan berdasarkan tanggal"></canvas>
+    </div>
 </div>
 
 @endsection
@@ -274,77 +230,196 @@
         color: #2563eb;
     }
 
-    .section-heading { margin-bottom: 18px; }
-
-    .section-heading h3 {
-        font-size: 18px;
-        margin-bottom: 6px;
-    }
-
-    .section-heading p {
-        font-size: 12px;
-        color: #8490a3;
-    }
-
-    .management-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-    }
-
-    .management-card {
+    .revenue-card {
         background: white;
         border-radius: 13px;
         padding: 22px;
         box-shadow: 0 3px 15px rgba(15,23,42,.05);
-        transition: .2s;
     }
 
-    .management-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 22px rgba(15,23,42,.09);
+    .revenue-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 18px;
     }
 
-    .management-card h4 {
-        font-size: 14px;
-        margin: 15px 0 8px;
+    .revenue-card-header h3 {
+        font-size: 18px;
+        margin-bottom: 7px;
     }
 
-    .management-card p {
+    .revenue-card-header p,
+    .revenue-filters label span,
+    .revenue-message {
         color: #8490a3;
         font-size: 12px;
-        line-height: 1.6;
-        min-height: 38px;
-        margin-bottom: 15px;
     }
 
-    .management-link {
-        color: #2563eb;
-        font-size: 12px;
-        font-weight: bold;
+    .revenue-filters {
+        display: flex;
+        gap: 12px;
     }
 
-    .management-link i { margin-left: 5px; }
+    .revenue-filters label {
+        display: grid;
+        gap: 6px;
+    }
 
-    .management-disabled {
-        color: #9ca3af;
+    .revenue-filters select {
+        min-width: 150px;
+        padding: 9px 11px;
+        border: 1px solid #dbe2ea;
+        border-radius: 8px;
+        background: white;
+        color: #172033;
         font-size: 12px;
+    }
+
+    .revenue-chart-wrap {
+        position: relative;
+        height: 310px;
+    }
+
+    .revenue-message {
+        margin-bottom: 12px;
+        text-align: center;
     }
 
     @media(max-width: 1100px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        .management-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media(max-width: 600px) {
-        .stats-grid, .management-grid {
-            grid-template-columns: 1fr;
-        }
+        .stats-grid { grid-template-columns: 1fr; }
 
         .master-welcome {
             align-items: flex-start;
             flex-direction: column;
         }
+
+        .revenue-card-header { flex-direction: column; }
+        .revenue-filters { width: 100%; }
+        .revenue-filters label { flex: 1; min-width: 0; }
+        .revenue-filters select { min-width: 0; width: 100%; }
+        .revenue-chart-wrap { height: 250px; }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script>
+    (() => {
+        const poolSelect = document.getElementById('revenue-pool');
+        const periodSelect = document.getElementById('revenue-period');
+        const title = document.getElementById('revenue-title');
+        const total = document.getElementById('revenue-total');
+        const message = document.getElementById('revenue-message');
+        const context = document.getElementById('revenue-chart').getContext('2d');
+        const rupiah = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            maximumFractionDigits: 0
+        });
+        const dateFormat = new Intl.DateTimeFormat('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'Asia/Jakarta'
+        });
+        let chart;
+
+        async function updateChart() {
+            const params = new URLSearchParams({
+                pool_id: poolSelect.value,
+                periode: periodSelect.value
+            });
+            const response = await fetch(`{{ route('admin.master.dashboard.grafik-pendapatan') }}?${params}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error('Grafik pendapatan gagal dimuat.');
+            }
+
+            const data = await response.json();
+            title.textContent = `Pendapatan: ${data.pool_name} (${data.period_name})`;
+            total.textContent = `Total pendapatan: ${rupiah.format(data.total)}`;
+            message.hidden = data.has_transactions;
+            message.textContent = data.has_transactions
+                ? ''
+                : 'Belum ada transaksi pada periode ini.';
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            const labels = data.labels.map((value) => {
+                return new Date(`${value}T12:00:00+07:00`);
+            });
+
+            chart = new Chart(context, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Pendapatan',
+                        data: data.values,
+                        backgroundColor: 'rgba(37, 99, 235, 0.72)',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            ticks: {
+                                callback: (_value, index) => dateFormat.format(labels[index])
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => rupiah.format(value) }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => dateFormat.format(labels[items[0].dataIndex]),
+                                label: (item) => `Pendapatan: ${rupiah.format(item.raw)}`
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        [poolSelect, periodSelect].forEach((select) => {
+            select.addEventListener('change', () => {
+                updateChart().catch((error) => {
+                    if (chart) {
+                        chart.destroy();
+                        chart = null;
+                    }
+                    message.hidden = false;
+                    message.textContent = error.message;
+                });
+            });
+        });
+
+        updateChart().catch((error) => {
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
+            message.hidden = false;
+            message.textContent = error.message;
+        });
+    })();
+</script>
 @endpush
