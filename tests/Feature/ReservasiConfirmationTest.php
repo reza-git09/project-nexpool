@@ -41,7 +41,8 @@ class ReservasiConfirmationTest extends TestCase
         $this->withSession($this->poolAdminSession())
             ->get(route('reservasi.index'))
             ->assertOk()
-            ->assertSee('Lunas')
+            ->assertSee('Status')
+            ->assertDontSee('Lunas')
             ->assertSee('Kelola')
             ->assertDontSee('btn-confirm')
             ->assertDontSee('reservasi.confirm');

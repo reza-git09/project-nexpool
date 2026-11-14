@@ -1296,10 +1296,6 @@
                                     </th>
 
                                     <th>
-                                        Pembayaran
-                                    </th>
-
-                                    <th>
                                         Aksi
                                     </th>
 
@@ -1460,18 +1456,6 @@
                                             @endif
 
                                         </td>
-
-                                        <!-- STATUS PEMBAYARAN -->
-                                        <td>
-                                            @if(($item->status_pembayaran ?? '') === 'paid')
-                                                <span class="badge badge-dikonfirmasi">Lunas</span>
-                                            @else
-                                                <span class="badge badge-menunggu">
-                                                    {{ ucfirst($item->status_pembayaran ?? 'Belum dibayar') }}
-                                                </span>
-                                            @endif
-                                        </td>
-
 
                                         <!-- AKSI -->
                                         <td>
