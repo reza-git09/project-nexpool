@@ -70,6 +70,26 @@
     .status-proses { color: #92400e; background: #fef3c7; }
     .status-berhasil { color: #166534; background: #dcfce7; }
     .status-ditolak { color: #991b1b; background: #fee2e2; }
+    .proof-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+    .proof-link:hover { color: #1e40af; }
+    .proof-preview {
+        display: block;
+        width: 84px;
+        height: 60px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        object-fit: cover;
+        background: #f8fafc;
+    }
     .empty-state { padding: 36px 20px; color: #64748b; text-align: center; }
     .pagination-wrapper { padding: 16px 20px; }
     .modal-overlay {
@@ -174,6 +194,29 @@
                         <span class="status-badge status-{{ $withdrawal->status }}">
                             {{ $withdrawal->status_label }}
                         </span>
+                        @if ($withdrawal->transfer_proof_path)
+                            @php
+                                $proofExtension = strtolower(pathinfo($withdrawal->transfer_proof_path, PATHINFO_EXTENSION));
+                                $proofUrl = route('penarikan-saldo.proof.show', $withdrawal);
+                            @endphp
+                            <a class="proof-link" href="{{ $proofUrl }}" target="_blank" rel="noopener">
+                                @if (in_array($proofExtension, ['jpg', 'jpeg', 'png'], true))
+                                    <img class="proof-preview" src="{{ $proofUrl }}" alt="Bukti transfer dari Admin Master">
+                                @else
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                @endif
+                                Lihat bukti transfer
+                            </a>
+                            @if ($withdrawal->transfer_proof_uploaded_at)
+                                <div class="field-error" style="color:#64748b">
+                                    Bukti dikirim {{ $withdrawal->transfer_proof_uploaded_at->format('d/m/Y H:i') }}
+                                </div>
+                            @endif
+                        @else
+                            <div class="field-error" style="color:#64748b">
+                                Bukti transfer belum tersedia.
+                            </div>
+                        @endif
                         @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_DITOLAK && $withdrawal->rejection_reason)
                             <div class="field-error">{{ $withdrawal->rejection_reason }}</div>
                         @endif

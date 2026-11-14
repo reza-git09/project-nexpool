@@ -114,7 +114,11 @@ class PenarikanSaldoController extends Controller
         ]);
 
         $newPath = $validated['transfer_proof']->store('withdrawal-proofs', 'local');
-        if ($newPath === false) {
+        if ($newPath === false || ! Storage::disk('local')->exists($newPath)) {
+            if ($newPath !== false) {
+                Storage::disk('local')->delete($newPath);
+            }
+
             throw new RuntimeException('Bukti transfer gagal disimpan.');
         }
 
@@ -153,6 +157,11 @@ class PenarikanSaldoController extends Controller
 
     public function showTransferProof(PenarikanSaldo $withdrawal)
     {
+        $isAdminMaster = session('admin_role') === 'admin_master';
+        $isOwningPoolAdmin = session('admin_role') === 'admin_pool'
+            && session('admin_pool_id') === $withdrawal->pool_id;
+
+        abort_unless($isAdminMaster || $isOwningPoolAdmin, 403, 'Anda tidak memiliki akses ke bukti transfer ini.');
         abort_if($withdrawal->transfer_proof_path === null, 404);
 
         $disk = Storage::disk('local');
@@ -161,6 +170,12 @@ class PenarikanSaldoController extends Controller
         return $disk->response(
             $withdrawal->transfer_proof_path,
             basename($withdrawal->transfer_proof_path),
+            [
+                'Content-Type' => $disk->mimeType($withdrawal->transfer_proof_path) ?: 'application/octet-stream',
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control' => 'private, no-store',
+            ],
+            'inline',
         );
     }
 

@@ -1028,10 +1028,10 @@
                                 class="form-control"
                                 value="{{ old('harga', (int) $hargaTiket->harga) }}"
                                 min="1000"
-                                max="99999"
+                                max="9999999999"
                                 step="1"
                                 placeholder="Contoh: 20000"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
                                 required>
 
                             <div class="form-hint">
@@ -1039,7 +1039,7 @@
                                 <i class="fa-solid fa-circle-info"></i>
 
                                 <span>
-                                    Harga tiket dapat diisi dari Rp1.000 sampai Rp99.999.
+                                    Harga tiket dapat diisi dari Rp1.000 sampai Rp9.999.999.999.
                                 </span>
 
                             </div>

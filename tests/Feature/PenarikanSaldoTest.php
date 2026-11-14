@@ -282,8 +282,45 @@ class PenarikanSaldoTest extends TestCase
             'admin_id' => 10,
             'admin_role' => 'admin_master',
         ])
+            ->get(route('admin.master.penarikan-saldo.index'))
+            ->assertOk()
+            ->assertSee('Pratinjau bukti transfer')
+            ->assertSee(route('admin.master.penarikan-saldo.proof.show', $completed), false);
+
+        $this->withSession([
+            'admin_id' => 10,
+            'admin_role' => 'admin_master',
+        ])
             ->get(route('admin.master.penarikan-saldo.proof.show', $completed))
             ->assertOk();
+
+        $this->withSession([
+            'admin_id' => 1,
+            'admin_pool_id' => 'pool_01',
+            'admin_role' => 'admin_pool',
+        ])
+            ->get(route('penarikan-saldo.index'))
+            ->assertOk()
+            ->assertSee('Lihat bukti transfer')
+            ->assertSee(route('penarikan-saldo.proof.show', $completed), false);
+
+        $this->withSession([
+            'admin_id' => 1,
+            'admin_pool_id' => 'pool_01',
+            'admin_role' => 'admin_pool',
+        ])
+            ->get(route('penarikan-saldo.proof.show', $completed))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png')
+            ->assertHeader('Content-Disposition', 'inline; filename='.basename($completed->transfer_proof_path));
+
+        $this->withSession([
+            'admin_id' => 2,
+            'admin_pool_id' => 'pool_02',
+            'admin_role' => 'admin_pool',
+        ])
+            ->get(route('penarikan-saldo.proof.show', $completed))
+            ->assertForbidden();
 
         $this->withSession([
             'admin_id' => 10,

@@ -86,5 +86,6 @@ Route::get('/reviews/{id}', [ReviewApiController::class, 'show']);
 // =========================================================
 Route::get('/reservasi', [ReservasiApiController::class, 'index']);
 Route::post('/reservasi', [ReservasiApiController::class, 'store']);
+Route::put('/reservasi/kode/{kode}/reschedule', [ReservasiApiController::class, 'rescheduleByKode']);
 Route::get('/reservasi/kode/{kode}', [ReservasiApiController::class, 'showByKode']);
 Route::get('/reservasi/{id}', [ReservasiApiController::class, 'show']);

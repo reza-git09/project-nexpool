@@ -34,16 +34,17 @@ class ReservasiConfirmationTest extends TestCase
         });
     }
 
-    public function test_paid_reservation_stays_waiting_until_admin_confirms_at_the_counter(): void
+    public function test_paid_reservation_waits_for_status_change_in_manage_form(): void
     {
         $reservation = $this->createReservation('paid');
 
         $this->withSession($this->poolAdminSession())
             ->get(route('reservasi.index'))
             ->assertOk()
-            ->assertSee('Reservasi tetap menunggu')
             ->assertSee('Lunas')
-            ->assertSee('Konfirmasi');
+            ->assertSee('Kelola')
+            ->assertDontSee('btn-confirm')
+            ->assertDontSee('reservasi.confirm');
 
         $this->assertDatabaseHas('reservasis', [
             'id' => $reservation->id,
@@ -52,12 +53,14 @@ class ReservasiConfirmationTest extends TestCase
         ]);
     }
 
-    public function test_admin_confirms_a_paid_reservation_after_receipt_check(): void
+    public function test_admin_changes_paid_reservation_to_confirmed_through_manage_form(): void
     {
         $reservation = $this->createReservation('paid');
 
         $this->withSession($this->poolAdminSession())
-            ->post(route('reservasi.confirm', $reservation))
+            ->put(route('reservasi.update', $reservation), [
+                'status_reservasi' => 'Dikonfirmasi',
+            ])
             ->assertRedirect(route('reservasi.dikonfirmasi'))
             ->assertSessionHas('success');
 
@@ -68,26 +71,9 @@ class ReservasiConfirmationTest extends TestCase
         ]);
     }
 
-    public function test_unpaid_reservation_cannot_be_confirmed(): void
+    public function test_unpaid_reservation_cannot_be_changed_to_confirmed(): void
     {
         $reservation = $this->createReservation('pending');
-
-        $this->withSession($this->poolAdminSession())
-            ->from(route('reservasi.index'))
-            ->post(route('reservasi.confirm', $reservation))
-            ->assertRedirect(route('reservasi.index'))
-            ->assertSessionHasErrors('reservasi');
-
-        $this->assertDatabaseHas('reservasis', [
-            'id' => $reservation->id,
-            'status_reservasi' => 'Menunggu',
-            'status_pembayaran' => 'pending',
-        ]);
-    }
-
-    public function test_admin_cannot_bypass_counter_confirmation_through_edit_status(): void
-    {
-        $reservation = $this->createReservation('paid');
 
         $this->withSession($this->poolAdminSession())
             ->from(route('reservasi.edit', $reservation))
@@ -100,6 +86,7 @@ class ReservasiConfirmationTest extends TestCase
         $this->assertDatabaseHas('reservasis', [
             'id' => $reservation->id,
             'status_reservasi' => 'Menunggu',
+            'status_pembayaran' => 'pending',
         ]);
     }
 
@@ -108,13 +95,75 @@ class ReservasiConfirmationTest extends TestCase
         $reservation = $this->createReservation('paid', 'pool_id_02');
 
         $this->withSession($this->poolAdminSession())
-            ->post(route('reservasi.confirm', $reservation))
+            ->put(route('reservasi.update', $reservation), [
+                'status_reservasi' => 'Dikonfirmasi',
+            ])
             ->assertForbidden();
 
         $this->assertDatabaseHas('reservasis', [
             'id' => $reservation->id,
             'status_reservasi' => 'Menunggu',
         ]);
+    }
+
+    public function test_mobile_reschedule_updates_the_date_seen_by_pool_admin(): void
+    {
+        $this->travelTo('2026-11-14 08:00:00');
+        $reservation = $this->createReservation('paid');
+        $reservation->forceFill([
+            'tanggal_kunjungan' => '2026-11-20',
+        ])->save();
+
+        $this->putJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-25',
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.tanggal_kunjungan', '2026-11-25');
+
+        $this->assertSame(
+            '2026-11-25',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
+
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.index'))
+            ->assertOk()
+            ->assertSee('25-11-2026');
+    }
+
+    public function test_mobile_reschedule_requires_the_matching_phone_and_paid_status(): void
+    {
+        $this->travelTo('2026-11-14 08:00:00');
+        $paidReservation = $this->createReservation('paid');
+        $paidReservation->forceFill([
+            'tanggal_kunjungan' => '2026-11-20',
+        ])->save();
+
+        $this->putJson('/api/reservasi/kode/'.$paidReservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '089999999999',
+            'tanggal_kunjungan' => '2026-11-25',
+        ])->assertForbidden();
+
+        $unpaidReservation = $this->createReservation('pending');
+        $unpaidReservation->forceFill([
+            'tanggal_kunjungan' => '2026-11-20',
+        ])->save();
+
+        $this->putJson('/api/reservasi/kode/'.$unpaidReservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-25',
+        ])->assertUnprocessable();
+
+        $this->assertSame(
+            '2026-11-20',
+            $paidReservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
+        $this->assertSame(
+            '2026-11-20',
+            $unpaidReservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
     }
 
     private function createReservation(string $paymentStatus, string $poolId = 'pool_id_01'): Reservasi

@@ -105,8 +105,11 @@ class LaporanPenjualanTiketTest extends TestCase
             ->assertDontSee('Pendapatan Tiket per Hari')
             ->assertDontSee('7 hari')
             ->assertSee('100.000')
-            ->assertSee('2 tiket dewasa')
-            ->assertSee('1 tiket anak');
+            ->assertSee('Jumlah tiket terjual')
+            ->assertSee('3')
+            ->assertSee('<th>Tiket</th>', false)
+            ->assertDontSee('<th>Dewasa</th>', false)
+            ->assertDontSee('<th>Anak</th>', false);
     }
 
     public function test_print_view_includes_all_monthly_rows_instead_of_only_the_current_page(): void

@@ -73,9 +73,10 @@
         .lp .detail-table th:nth-child(2) { width: 18%; }
         .lp .detail-table th:nth-child(3) { width: 20%; }
         .lp .detail-table th:nth-child(4) { width: 12%; }
-        .lp .detail-table th:nth-child(5), .lp .detail-table th:nth-child(6) { width: 7%; }
-        .lp .detail-table th:nth-child(7) { width: 17%; }
-        .lp .detail-table th:nth-child(8) { width: 14%; }
+        .lp .detail-table th:nth-child(5) { width: 9%; }
+        .lp .detail-table th:nth-child(6) { width: 22%; }
+        .lp .detail-table th:nth-child(7) { width: 14%; }
+        .lp .detail-table td:nth-child(6) { white-space: nowrap; }
         .lp .detail-table .customer-phone { display: block; margin-top: 2px; color: #333; font-size: 8pt; }
         .lp .report-note { margin: 8px 0 0; font-size: 8pt; }
         .lp .signature { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 22px; break-inside: avoid; }
@@ -189,8 +190,7 @@
     @php
         $displayRows = $isPrintView ? $printRows : $rows;
         $rowCount = $isPrintView ? $printRows->count() : $rows->total();
-        $detailTotalDewasa = $displayRows->sum('dewasa');
-        $detailTotalAnak = $displayRows->sum('anak');
+        $detailTotalTiket = $displayRows->sum(fn ($row) => $row['dewasa'] + $row['anak']);
         $detailTotalPendapatan = $displayRows->sum('total');
         $kolamTotalTransaksi = collect($perKolam)->sum('trx');
         $kolamTotalTiket = collect($perKolam)->sum('tiket');
@@ -232,8 +232,8 @@
                         <td>{{ number_format($summary['trx'], 0, ',', '.') }}</td>
                     </tr>
                     <tr>
-                        <th>Jumlah tiket terjual (dewasa / anak)</th>
-                        <td>{{ number_format($summary['dewasa'] + $summary['anak'], 0, ',', '.') }} ({{ number_format($summary['dewasa'], 0, ',', '.') }} tiket dewasa / {{ number_format($summary['anak'], 0, ',', '.') }} tiket anak)</td>
+                        <th>Jumlah tiket terjual</th>
+                        <td>{{ number_format($summary['dewasa'] + $summary['anak'], 0, ',', '.') }}</td>
                     </tr>
                     <tr>
                         <th>Rata-rata pendapatan per transaksi</th>
@@ -294,8 +294,7 @@
                             <th>Kode Reservasi</th>
                             <th>Nama Pemesan</th>
                             <th>Tanggal</th>
-                            <th>Dewasa</th>
-                            <th>Anak</th>
+                            <th>Tiket</th>
                             <th>Pendapatan</th>
                             <th>Status</th>
                         </tr>
@@ -312,8 +311,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $r['tanggal'] }}</td>
-                                <td class="num">{{ number_format($r['dewasa'], 0, ',', '.') }}</td>
-                                <td class="num">{{ number_format($r['anak'], 0, ',', '.') }}</td>
+                                <td class="num">{{ number_format($r['dewasa'] + $r['anak'], 0, ',', '.') }}</td>
                                 <td class="num">Rp {{ number_format($r['total'], 0, ',', '.') }}</td>
                                 <td>
                                     @if ($isPrintView)
@@ -324,15 +322,14 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="empty">Tidak ada penjualan tiket pada bulan ini.</td></tr>
+                            <tr><td colspan="7" class="empty">Tidak ada penjualan tiket pada bulan ini.</td></tr>
                         @endforelse
                     </tbody>
                     @if ($isPrintView)
                         <tfoot>
                             <tr>
                                 <td colspan="4" class="report-total-label">TOTAL</td>
-                                <td class="num">{{ number_format($detailTotalDewasa, 0, ',', '.') }}</td>
-                                <td class="num">{{ number_format($detailTotalAnak, 0, ',', '.') }}</td>
+                                <td class="num">{{ number_format($detailTotalTiket, 0, ',', '.') }}</td>
                                 <td class="num">Rp {{ number_format($detailTotalPendapatan, 0, ',', '.') }}</td>
                                 <td></td>
                             </tr>

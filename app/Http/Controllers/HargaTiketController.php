@@ -27,18 +27,29 @@ class HargaTiketController extends Controller
     // Menyimpan harga tiket baru
     public function store(Request $request)
     {
-        // 1. Validasi ketat: Murni angka, 4-5 digit, rentang Rp1.000 - Rp99.999
-        $request->validate([
+        $priceOptions = range(5000, 100000, 5000);
+        $validated = $request->validate([
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
-                Rule::in(range(5000, 100000, 5000)),
+                Rule::in([...$priceOptions, 'custom']),
+            ],
+            'harga_custom' => [
+                'nullable',
+                'required_if:harga,custom',
+                'integer',
+                'min:1000',
+                'max:9999999999',
             ],
         ], [
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
-            'harga.in' => 'Harga tiket harus dipilih dari Rp5.000 hingga Rp100.000 dengan kenaikan Rp5.000.',
+            'harga.in' => 'Pilih harga yang tersedia atau opsi harga custom.',
+            'harga_custom.required_if' => 'Harga custom wajib diisi.',
+            'harga_custom.integer' => 'Harga custom harus berupa bilangan bulat.',
+            'harga_custom.min' => 'Harga custom minimal Rp1.000.',
+            'harga_custom.max' => 'Harga custom maksimal Rp9.999.999.999.',
         ]);
 
         // 2. Cek kombinasi ganda (pool_id + jenis_hari)
@@ -56,7 +67,9 @@ class HargaTiketController extends Controller
         HargaTiket::create([
             'pool_id' => session('admin_pool_id'),
             'jenis_hari' => $request->jenis_hari,
-            'harga' => (int) $request->harga,
+            'harga' => $validated['harga'] === 'custom'
+                ? (int) $validated['harga_custom']
+                : (int) $validated['harga'],
         ]);
 
         return redirect()
@@ -90,20 +103,20 @@ class HargaTiketController extends Controller
             'harga' => [
                 'required',
                 'regex:/^[0-9]+$/',
-                'digits_between:4,5',
+                'digits_between:4,10',
                 'integer',
                 'min:1000',
-                'max:99999',
+                'max:9999999999',
             ],
         ], [
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
             'harga.regex' => 'Harga tiket hanya boleh diisi oleh angka saja (tanpa huruf, titik, atau koma).',
-            'harga.digits_between' => 'Harga tiket harus berjumlah 4 hingga 5 digit angka.',
+            'harga.digits_between' => 'Harga tiket harus berjumlah 4 hingga 10 digit angka.',
             'harga.integer' => 'Harga tiket harus berupa bilangan bulat.',
             'harga.min' => 'Harga tiket minimal Rp1.000.',
-            'harga.max' => 'Harga tiket maksimal Rp99.999.',
+            'harga.max' => 'Harga tiket maksimal Rp9.999.999.999.',
         ]);
 
         // 2. Cek apakah jenis hari baru sudah ada di record lain (kecuali data ini sendiri)

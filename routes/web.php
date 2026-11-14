@@ -161,6 +161,10 @@ Route::post('/penarikan-saldo', [PenarikanSaldoController::class, 'store'])
     ->middleware(['admin', 'must.change.password'])
     ->name('penarikan-saldo.store');
 
+Route::get('/penarikan-saldo/{withdrawal}/bukti', [PenarikanSaldoController::class, 'showTransferProof'])
+    ->middleware(['admin', 'must.change.password'])
+    ->name('penarikan-saldo.proof.show');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -228,10 +232,6 @@ Route::resource('kolam-renang', KolamRenangController::class)
 Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi'])
     ->middleware(['admin', 'must.change.password'])
     ->name('reservasi.dikonfirmasi');
-
-Route::post('/reservasi/{reservasi}/konfirmasi', [ReservasiController::class, 'confirm'])
-    ->middleware(['admin', 'must.change.password'])
-    ->name('reservasi.confirm');
 
 Route::resource('reservasi', ReservasiController::class)
     ->middleware(['admin', 'must.change.password']);

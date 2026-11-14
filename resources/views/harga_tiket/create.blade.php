@@ -848,9 +848,32 @@
                                             Rp{{ number_format($harga, 0, ',', '.') }}
                                         </option>
                                     @endforeach
+                                    <option value="custom" {{ old('harga') === 'custom' ? 'selected' : '' }}>
+                                        Custom
+                                    </option>
                                 </select>
 
                             </div>
+
+                            <div class="input-wrapper" id="harga-custom-wrapper" style="margin-top: 10px;" hidden>
+                                <i class="fa-solid fa-pen input-icon"></i>
+                                <input
+                                    type="number"
+                                    id="harga_custom"
+                                    name="harga_custom"
+                                    min="1000"
+                                    max="9999999999"
+                                    step="1"
+                                    value="{{ old('harga_custom') }}"
+                                    placeholder="Masukkan harga custom, minimal Rp1.000"
+                                    disabled>
+                            </div>
+
+                            @error('harga_custom')
+                                <div class="error">
+                                    {{ $message }}
+                                </div>
+                            @enderror
 
 
                             <div class="harga-info">
@@ -858,7 +881,7 @@
                                 <i class="fa-solid fa-circle-info"></i>
 
                                 <span>
-                                    Pilih harga tiket dari Rp5.000 hingga Rp100.000.
+                                    Pilih harga Rp5.000 hingga Rp100.000, atau pilih Custom untuk memasukkan nominal sendiri.
                                 </span>
 
                             </div>
@@ -909,6 +932,22 @@
         </section>
 
     </main>
+
+    <script>
+        const priceSelect = document.getElementById('harga');
+        const customPriceWrapper = document.getElementById('harga-custom-wrapper');
+        const customPriceInput = document.getElementById('harga_custom');
+
+        function toggleCustomPrice() {
+            const isCustomPrice = priceSelect.value === 'custom';
+            customPriceWrapper.hidden = !isCustomPrice;
+            customPriceInput.disabled = !isCustomPrice;
+            customPriceInput.required = isCustomPrice;
+        }
+
+        priceSelect.addEventListener('change', toggleCustomPrice);
+        toggleCustomPrice();
+    </script>
 
 </body>
 

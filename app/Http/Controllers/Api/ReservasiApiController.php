@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservasi;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ReservasiApiController extends Controller
@@ -271,5 +272,79 @@ class ReservasiApiController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Mengubah tanggal kunjungan reservasi lunas dari aplikasi mobile.
+     */
+    public function rescheduleByKode(Request $request, string $kode): JsonResponse
+    {
+        $validated = $request->validate([
+            'no_hp' => ['required', 'string', 'max:20'],
+            'tanggal_kunjungan' => ['required', 'date_format:Y-m-d', 'after:today'],
+        ], [
+            'no_hp.required' => 'Nomor HP pemesan wajib diisi.',
+            'tanggal_kunjungan.required' => 'Tanggal kunjungan baru wajib dipilih.',
+            'tanggal_kunjungan.date_format' => 'Format tanggal kunjungan tidak valid.',
+            'tanggal_kunjungan.after' => 'Tanggal kunjungan baru harus setelah hari ini.',
+        ]);
+
+        $reservasi = DB::transaction(function () use ($kode, $validated): ?Reservasi {
+            $reservasi = Reservasi::where('kode_reservasi', $kode)
+                ->lockForUpdate()
+                ->first();
+
+            if ($reservasi === null) {
+                return null;
+            }
+
+            $savedPhone = preg_replace('/\D+/', '', (string) $reservasi->no_hp);
+            $providedPhone = preg_replace('/\D+/', '', $validated['no_hp']);
+
+            if ($savedPhone === '' || ! hash_equals($savedPhone, $providedPhone)) {
+                abort(403, 'Data pemesan tidak cocok dengan reservasi.');
+            }
+
+            if ($reservasi->status_pembayaran !== 'paid') {
+                abort(422, 'Reservasi hanya dapat dijadwalkan ulang setelah pembayaran lunas.');
+            }
+
+            if (
+                $reservasi->status_reservasi === 'Dibatalkan'
+                || $reservasi->status_reservasi === 'Selesai'
+            ) {
+                abort(422, 'Reservasi yang dibatalkan atau selesai tidak dapat dijadwalkan ulang.');
+            }
+
+            if (
+                $reservasi->tanggal_kunjungan === null
+                || ! $reservasi->tanggal_kunjungan->isAfter(today())
+            ) {
+                abort(422, 'Reschedule hanya dapat dilakukan sebelum tanggal kunjungan.');
+            }
+
+            $reservasi->tanggal_kunjungan = $validated['tanggal_kunjungan'];
+            $reservasi->save();
+
+            return $reservasi->refresh();
+        });
+
+        if ($reservasi === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode reservasi tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tanggal kunjungan berhasil dijadwalkan ulang.',
+            'data' => [
+                'kode_reservasi' => $reservasi->kode_reservasi,
+                'tanggal_kunjungan' => $reservasi->tanggal_kunjungan?->format('Y-m-d'),
+                'status_reservasi' => $reservasi->status_reservasi,
+                'status_pembayaran' => $reservasi->status_pembayaran,
+            ],
+        ]);
     }
 }

@@ -50,6 +50,8 @@ class HargaTiketControllerTest extends TestCase
             ->assertSee('name="harga"', false)
             ->assertSee('<option value="5000"', false)
             ->assertSee('<option value="100000"', false)
+            ->assertSee('<option value="custom"', false)
+            ->assertSee('name="harga_custom"', false)
             ->assertSee('Penarikan Saldo')
             ->assertDontSee('name="kategori"', false);
 
@@ -119,16 +121,34 @@ class HargaTiketControllerTest extends TestCase
         $this->assertDatabaseCount('harga_tiket', 1);
     }
 
-    public function test_admin_cannot_create_ticket_price_outside_dropdown_options(): void
+    public function test_admin_can_create_a_custom_ticket_price(): void
+    {
+        $this->withSession(['admin_id' => 1, 'admin_pool_id' => 'pool_id_01'])
+            ->post('/harga-tiket', [
+                'jenis_hari' => 'Weekday',
+                'harga' => 'custom',
+                'harga_custom' => '125000',
+            ])
+            ->assertRedirect('/harga-tiket');
+
+        $this->assertDatabaseHas('harga_tiket', [
+            'pool_id' => 'pool_id_01',
+            'jenis_hari' => 'Weekday',
+            'harga' => 125000,
+        ]);
+    }
+
+    public function test_admin_cannot_create_a_custom_ticket_price_below_minimum(): void
     {
         $this->withSession(['admin_id' => 1, 'admin_pool_id' => 'pool_id_01'])
             ->from('/harga-tiket/create')
             ->post('/harga-tiket', [
                 'jenis_hari' => 'Weekday',
-                'harga' => '22000',
+                'harga' => 'custom',
+                'harga_custom' => '999',
             ])
             ->assertRedirect('/harga-tiket/create')
-            ->assertSessionHasErrors('harga');
+            ->assertSessionHasErrors('harga_custom');
 
         $this->assertDatabaseCount('harga_tiket', 0);
     }

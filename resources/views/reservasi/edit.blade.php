@@ -590,6 +590,7 @@
                                 <option
                                     value="Dikonfirmasi"
                                     {{ old('status_reservasi', $reservasi->status_reservasi) == 'Dikonfirmasi' ? 'selected' : '' }}
+                                    {{ ($reservasi->status_pembayaran ?? '') !== 'paid' ? 'disabled' : '' }}
                                 >
                                     Dikonfirmasi
                                 </option>
@@ -600,7 +601,10 @@
                             </select>
 
                             <div class="status-note">
-                                Admin hanya dapat mengubah status reservasi.
+                                Setelah pengunjung datang dan struk pembayaran lunas diperiksa, ubah status menjadi Dikonfirmasi.
+                                @if(($reservasi->status_pembayaran ?? '') !== 'paid')
+                                    Pembayaran belum lunas, sehingga status Dikonfirmasi belum dapat dipilih.
+                                @endif
                             </div>
 
                         </div>

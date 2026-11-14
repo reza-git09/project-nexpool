@@ -71,7 +71,10 @@
     }
     .proof-form { flex-wrap: wrap; }
     .proof-form input[type="file"] { width: 100%; max-width: 250px; font-size: 11px; }
-    .proof-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; color: #1d4ed8; font-size: 11px; font-weight: 700; }
+    .proof-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 7px; color: #1d4ed8; font-size: 11px; font-weight: 700; }
+    .proof-preview { display: block; width: 76px; height: 54px; border: 1px solid #cbd5e1; border-radius: 6px; object-fit: cover; background: #f8fafc; }
+    .selected-proof-preview { display: block; max-width: 180px; max-height: 120px; margin-top: 7px; border: 1px solid #cbd5e1; border-radius: 6px; object-fit: contain; background: #f8fafc; }
+    .selected-proof-name { margin-top: 5px; color: #64748b; font-size: 10px; }
     .proof-meta { margin-top: 5px; color: #64748b; font-size: 10px; }
     .button-complete, .button-reject, .button-proof {
         border: 0;
@@ -142,18 +145,31 @@
                     <td>Rp {{ number_format((float) $withdrawal->amount, 2, ',', '.') }}</td>
                     <td class="action-cell">
                         <span class="status-badge status-{{ $withdrawal->status }}">{{ $withdrawal->status_label }}</span>
-                        @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_PROSES)
-                            @if ($withdrawal->transfer_proof_path)
-                                <a class="proof-link" href="{{ route('admin.master.penarikan-saldo.proof.show', $withdrawal) }}" target="_blank" rel="noopener">
-                                    <i class="fa-solid fa-paperclip"></i> Lihat bukti transfer
-                                </a>
-                                @if ($withdrawal->transfer_proof_uploaded_at)
-                                    <div class="proof-meta">Dikirim {{ $withdrawal->transfer_proof_uploaded_at->format('d/m/Y H:i') }}</div>
+                        @if ($withdrawal->transfer_proof_path)
+                            @php
+                                $proofExtension = strtolower(pathinfo($withdrawal->transfer_proof_path, PATHINFO_EXTENSION));
+                                $proofUrl = route('admin.master.penarikan-saldo.proof.show', $withdrawal);
+                            @endphp
+                            <a class="proof-link" href="{{ $proofUrl }}" target="_blank" rel="noopener">
+                                @if (in_array($proofExtension, ['jpg', 'jpeg', 'png'], true))
+                                    <img class="proof-preview" src="{{ $proofUrl }}" alt="Pratinjau bukti transfer">
+                                @else
+                                    <i class="fa-solid fa-file-pdf"></i>
                                 @endif
+                                Lihat bukti transfer
+                            </a>
+                            @if ($withdrawal->transfer_proof_uploaded_at)
+                                <div class="proof-meta">Dikirim {{ $withdrawal->transfer_proof_uploaded_at->format('d/m/Y H:i') }}</div>
                             @endif
+                        @endif
+                        @if ($withdrawal->status === \App\Models\PenarikanSaldo::STATUS_PROSES)
                             <form class="action-form proof-form" action="{{ route('admin.master.penarikan-saldo.proof', $withdrawal) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <input type="file" name="transfer_proof" accept=".jpg,.jpeg,.png,.pdf" aria-label="Pilih bukti transfer" required>
+                                <input type="file" name="transfer_proof" accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf" aria-label="Pilih bukti transfer" data-proof-input required>
+                                <div class="selected-proof" data-proof-preview hidden aria-live="polite">
+                                    <img class="selected-proof-preview" alt="Pratinjau gambar bukti transfer" hidden>
+                                    <div class="selected-proof-name"></div>
+                                </div>
                                 <button class="button-proof" type="submit">
                                     <i class="fa-solid fa-upload"></i>
                                     {{ $withdrawal->transfer_proof_path ? 'Ganti Bukti' : 'Kirim Bukti Transfer' }}
@@ -191,6 +207,37 @@
 
 @push('scripts')
 <script>
+    document.querySelectorAll('[data-proof-input]').forEach((input) => {
+        const preview = input.closest('form').querySelector('[data-proof-preview]');
+        const image = preview.querySelector('img');
+        const fileName = preview.querySelector('.selected-proof-name');
+        let previewUrl = null;
+
+        input.addEventListener('change', () => {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                previewUrl = null;
+            }
+
+            const [file] = input.files || [];
+            preview.hidden = !file;
+            image.hidden = true;
+            image.removeAttribute('src');
+            fileName.textContent = '';
+
+            if (!file) {
+                return;
+            }
+
+            fileName.textContent = `Siap dikirim: ${file.name}`;
+            if (file.type.startsWith('image/')) {
+                previewUrl = URL.createObjectURL(file);
+                image.src = previewUrl;
+                image.hidden = false;
+            }
+        });
+    });
+
     document.querySelectorAll('.copy-button').forEach((button) => {
         button.addEventListener('click', async () => {
             const accountNumber = button.dataset.copy;
