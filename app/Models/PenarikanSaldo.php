@@ -16,6 +16,8 @@ class PenarikanSaldo extends Model
 
     public const STATUS_BERHASIL = 'berhasil';
 
+    public const STATUS_TERKONFIRMASI = 'terkonfirmasi';
+
     public const STATUS_DITOLAK = 'ditolak';
 
     protected $fillable = [
@@ -67,6 +69,7 @@ class PenarikanSaldo extends Model
         return match ($this->status) {
             self::STATUS_PROSES => 'Diproses',
             self::STATUS_BERHASIL => 'Berhasil/Dicairkan',
+            self::STATUS_TERKONFIRMASI => 'Terkonfirmasi',
             self::STATUS_DITOLAK => 'Ditolak',
             default => ucfirst($this->status),
         };

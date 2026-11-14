@@ -52,7 +52,7 @@ class AdminMasterController extends Controller
 
         $totalPenarikan = PenarikanSaldo::where(
             'status',
-            PenarikanSaldo::STATUS_BERHASIL
+            PenarikanSaldo::STATUS_TERKONFIRMASI
         )->sum('amount');
 
         $totalPendapatan = max((float) $totalPendapatan - (float) $totalPenarikan, 0.0);

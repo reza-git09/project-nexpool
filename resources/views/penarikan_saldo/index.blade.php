@@ -68,28 +68,24 @@
         font-weight: 700;
     }
     .status-proses { color: #92400e; background: #fef3c7; }
-    .status-berhasil { color: #166534; background: #dcfce7; }
+    .status-berhasil, .status-terkonfirmasi { color: #166534; background: #dcfce7; }
     .status-ditolak { color: #991b1b; background: #fee2e2; }
     .proof-link {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        gap: 7px;
         margin-top: 8px;
+        padding: 7px 11px;
+        border: 1px solid #bfdbfe;
+        border-radius: 7px;
         color: #1d4ed8;
+        background: #eff6ff;
         font-size: 12px;
         font-weight: 700;
-        text-decoration: none;
+        cursor: pointer;
     }
-    .proof-link:hover { color: #1e40af; }
-    .proof-preview {
-        display: block;
-        width: 84px;
-        height: 60px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        object-fit: cover;
-        background: #f8fafc;
-    }
+    .proof-link:hover { color: #1e40af; background: #dbeafe; }
     .empty-state { padding: 36px 20px; color: #64748b; text-align: center; }
     .pagination-wrapper { padding: 16px 20px; }
     .modal-overlay {
@@ -138,6 +134,7 @@
     }
     .balance-summary strong { white-space: nowrap; font-size: 15px; }
     .field-error { display: block; margin-top: 5px; color: #b91c1c; font-size: 12px; }
+    .field-help { display: block; margin-top: 5px; color: #64748b; font-size: 11px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
     .button-cancel {
         border: 1px solid #cbd5e1;
@@ -147,6 +144,48 @@
         background: #fff;
         font-weight: 600;
         cursor: pointer;
+    }
+    .proof-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, .72);
+        backdrop-filter: blur(3px);
+    }
+    .proof-modal[hidden] { display: none; }
+    .proof-modal-card {
+        position: relative;
+        width: min(100%, 900px);
+        max-height: 90vh;
+        padding: 18px;
+        border: 1px solid rgba(255,255,255,.35);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, .3);
+    }
+    .proof-modal-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .proof-modal-heading h2 { margin: 0; color: #172033; font-size: 16px; }
+    .proof-modal-close {
+        width: 34px;
+        height: 34px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        color: #475569;
+        background: #fff;
+        font-size: 18px;
+        cursor: pointer;
+    }
+    .proof-modal-image {
+        display: block;
+        max-width: 100%;
+        max-height: calc(90vh - 100px);
+        margin: 0 auto;
+        border-radius: 8px;
+        object-fit: contain;
     }
     @media (max-width: 600px) {
         .withdrawal-heading { align-items: flex-start; flex-direction: column; }
@@ -165,7 +204,7 @@
 </div>
 
 <div class="notice">
-    Saldo tersedia saat ini: <strong>Rp {{ number_format((float) $availableBalance, 2, ',', '.') }}</strong>.<br>
+    Saldo tersedia saat ini: <strong>Rp {{ number_format((float) $availableBalance, 2, ',', '.') }}</strong><br>
     Transfer ke rekening dilakukan oleh Admin Master di luar aplikasi. Status akan berubah setelah pengajuan diproses.
 </div>
 
@@ -195,18 +234,13 @@
                             {{ $withdrawal->status_label }}
                         </span>
                         @if ($withdrawal->transfer_proof_path)
-                            @php
-                                $proofExtension = strtolower(pathinfo($withdrawal->transfer_proof_path, PATHINFO_EXTENSION));
-                                $proofUrl = route('penarikan-saldo.proof.show', $withdrawal);
-                            @endphp
-                            <a class="proof-link" href="{{ $proofUrl }}" target="_blank" rel="noopener">
-                                @if (in_array($proofExtension, ['jpg', 'jpeg', 'png'], true))
-                                    <img class="proof-preview" src="{{ $proofUrl }}" alt="Bukti transfer dari Admin Master">
-                                @else
-                                    <i class="fa-solid fa-file-pdf"></i>
-                                @endif
-                                Lihat bukti transfer
-                            </a>
+                            <button
+                                class="proof-link"
+                                type="button"
+                                data-proof-preview-url="{{ route('penarikan-saldo.proof.show', $withdrawal) }}"
+                            >
+                                <i class="fa-regular fa-image"></i> Lihat
+                            </button>
                             @if ($withdrawal->transfer_proof_uploaded_at)
                                 <div class="field-error" style="color:#64748b">
                                     Bukti dikirim {{ $withdrawal->transfer_proof_uploaded_at->format('d/m/Y H:i') }}
@@ -230,6 +264,16 @@
     @if ($withdrawals->hasPages())
         <div class="pagination-wrapper">{{ $withdrawals->links() }}</div>
     @endif
+</div>
+
+<div class="proof-modal" id="proofPreviewModal" role="dialog" aria-modal="true" aria-labelledby="proofPreviewTitle" hidden>
+    <div class="proof-modal-card">
+        <div class="proof-modal-heading">
+            <h2 id="proofPreviewTitle">Bukti Transfer</h2>
+            <button class="proof-modal-close" type="button" data-close-proof aria-label="Tutup preview">&times;</button>
+        </div>
+        <img class="proof-modal-image" data-proof-image alt="Bukti transfer pencairan saldo">
+    </div>
 </div>
 
 <div class="modal-overlay {{ $errors->any() ? 'active' : '' }}" id="withdrawalModal" role="dialog" aria-modal="true" aria-labelledby="withdrawalModalTitle">
@@ -261,8 +305,9 @@
             </div>
             <div class="form-group">
                 <label for="amount_display">Jumlah Saldo (Rp)</label>
-                <input id="amount_display" type="text" inputmode="decimal" autocomplete="off" value="{{ old('amount') }}" placeholder="Contoh: 20.000" required>
+                <input id="amount_display" type="text" inputmode="decimal" autocomplete="off" data-max-amount="50000000" value="{{ old('amount') }}" placeholder="Contoh: 20.000" required>
                 <input id="amount" name="amount" type="hidden" value="{{ old('amount') }}">
+                <span class="field-help">Maksimal Rp 50.000.000 per pengajuan; nominal lebih akan dibatasi.</span>
                 @error('amount') <span class="field-error">{{ $message }}</span> @enderror
             </div>
             <div class="modal-actions">
@@ -282,6 +327,9 @@
     const accountNumberInput = document.getElementById('account_number');
     const amountDisplayInput = document.getElementById('amount_display');
     const amountInput = document.getElementById('amount');
+    const maximumWithdrawalAmount = Number(amountDisplayInput.dataset.maxAmount);
+    const proofPreviewModal = document.getElementById('proofPreviewModal');
+    const proofImage = proofPreviewModal.querySelector('[data-proof-image]');
 
     const sanitizeAccountNumber = () => {
         accountNumberInput.value = accountNumberInput.value.replace(/\D/g, '').slice(0, 30);
@@ -308,6 +356,19 @@
 
     const updateAmount = () => {
         const { integerPart, decimalPart } = parseAmount(amountDisplayInput.value);
+        const parsedAmount = Number(integerPart + (decimalPart.length > 0 ? `.${decimalPart}` : ''));
+        if (parsedAmount > maximumWithdrawalAmount) {
+            const maximumAmount = String(maximumWithdrawalAmount);
+            amountDisplayInput.value = formatAmount(maximumAmount);
+            amountInput.value = maximumAmount;
+            amountDisplayInput.setSelectionRange(
+                amountDisplayInput.value.length,
+                amountDisplayInput.value.length,
+            );
+
+            return;
+        }
+
         const caretPosition = amountDisplayInput.selectionStart ?? amountDisplayInput.value.length;
         const digitsBeforeCaret = amountDisplayInput.value.slice(0, caretPosition).replace(/\D/g, '').length;
         const formattedInteger = formatAmount(integerPart);
@@ -328,12 +389,19 @@
         amountDisplayInput.setSelectionRange(nextCaretPosition, nextCaretPosition);
     };
 
-    amountDisplayInput.addEventListener('input', updateAmount);
+    amountDisplayInput.addEventListener('input', () => {
+        amountDisplayInput.setCustomValidity('');
+        updateAmount();
+    });
     amountDisplayInput.form.addEventListener('submit', (event) => {
         updateAmount();
         if (!amountInput.value || Number(amountInput.value) <= 0) {
             event.preventDefault();
             amountDisplayInput.setCustomValidity('Masukkan nominal pencairan yang valid.');
+            amountDisplayInput.reportValidity();
+        } else if (Number(amountInput.value) > maximumWithdrawalAmount) {
+            event.preventDefault();
+            amountDisplayInput.setCustomValidity('Maksimal jumlah pencairan per pengajuan adalah Rp 50.000.000.');
             amountDisplayInput.reportValidity();
         } else {
             amountDisplayInput.setCustomValidity('');
@@ -352,6 +420,30 @@
     withdrawalModal.addEventListener('click', (event) => {
         if (event.target === withdrawalModal) {
             withdrawalModal.classList.remove('active');
+        }
+    });
+
+    const closeProofPreview = () => {
+        proofPreviewModal.hidden = true;
+        proofImage.removeAttribute('src');
+    };
+
+    document.querySelectorAll('[data-proof-preview-url]').forEach((button) => {
+        button.addEventListener('click', () => {
+            proofImage.src = button.dataset.proofPreviewUrl;
+            proofPreviewModal.hidden = false;
+        });
+    });
+
+    proofPreviewModal.querySelector('[data-close-proof]').addEventListener('click', closeProofPreview);
+    proofPreviewModal.addEventListener('click', (event) => {
+        if (event.target === proofPreviewModal) {
+            closeProofPreview();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !proofPreviewModal.hidden) {
+            closeProofPreview();
         }
     });
 </script>
