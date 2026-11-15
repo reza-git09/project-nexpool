@@ -17,7 +17,7 @@
         }
 
         body {
-            background: #f4f7fc;
+            background: #f6f8fc;
             color: #172033;
         }
 
@@ -25,100 +25,131 @@
 
         .sidebar {
             position: fixed;
-            width: 255px;
-            height: 100vh;
             left: 0;
             top: 0;
-            padding: 25px 16px;
-            background: linear-gradient(180deg, #101c36, #14213d, #101b32);
-            color: white;
+            width: 255px;
+            height: 100vh;
+            padding: 24px 16px;
+            background: linear-gradient(180deg, #101c36 0%, #14213d 55%, #101b32 100%);
+            color: #fff;
             z-index: 1000;
-            box-shadow: 8px 0 30px rgba(15,23,42,.08);
+            box-shadow: 8px 0 30px rgba(15, 23, 42, .08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .logo {
+            flex: 0 0 auto;
             text-align: center;
-            padding: 8px 10px 28px;
-            margin-bottom: 28px;
-            border-bottom: 1px solid rgba(255,255,255,.1);
+            padding: 6px 10px 28px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
         }
 
         .logo h2 {
-            font-size: 24px;
-            letter-spacing: 2px;
+            font-size: 22px;
+            letter-spacing: 1px;
         }
 
         .logo p {
-            color: #93a4c0;
+            color: #91a0b9;
             font-size: 10px;
-            letter-spacing: 2px;
-            margin-top: 6px;
+            letter-spacing: 1.3px;
+            margin-top: 5px;
         }
 
         .menu-title {
-            color: #8191ad;
+            flex: 0 0 auto;
+            color: #73819b;
             font-size: 10px;
             font-weight: bold;
-            letter-spacing: 1.5px;
             padding: 0 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
         .menu {
             display: flex;
+            flex: 1 1 auto;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, .35) transparent;
         }
 
-        .menu a {
+        .menu::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .menu::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, .35);
+            border-radius: 8px;
+        }
+
+        .menu a, .logout a {
             display: flex;
             align-items: center;
             gap: 13px;
-            padding: 14px 13px;
+            padding: 12px 13px;
             border-radius: 10px;
-            color: #cbd5e1;
             font-size: 13px;
-            transition: .2s;
         }
 
-        .menu a i {
-            width: 20px;
-            text-align: center;
-            font-size: 15px;
+        .menu a {
+            position: relative;
+            flex: 0 0 auto;
+            color: #cbd5e1;
+            font-weight: 500;
+            transition: background .2s, color .2s, transform .2s;
         }
+
+        .menu a i, .logout a i { width: 20px; text-align: center; }
+        .menu a i { font-size: 15px; }
 
         .menu a:hover {
-            background: rgba(255,255,255,.08);
-            color: white;
+            background: rgba(255, 255, 255, .07);
+            color: #fff;
+            transform: translateX(2px);
         }
 
         .menu a.active {
             background: linear-gradient(90deg, #2563eb, #1d4ed8);
-            color: white;
-            box-shadow: 0 8px 20px rgba(37,99,235,.25);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+        }
+
+        .menu a.active::before {
+            content: "";
+            position: absolute;
+            left: -16px;
+            top: 8px;
+            width: 3px;
+            height: calc(100% - 16px);
+            border-radius: 0 5px 5px 0;
+            background: #60a5fa;
         }
 
         .logout {
-            position: absolute;
-            bottom: 22px;
-            left: 16px;
-            right: 16px;
-            border-top: 1px solid rgba(255,255,255,.1);
-            padding-top: 15px;
+            flex: 0 0 auto;
+            margin-top: 10px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
         }
 
         .logout a {
-            display: flex;
-            gap: 13px;
-            align-items: center;
-            padding: 12px;
             color: #fca5a5;
-            border-radius: 9px;
-            font-size: 13px;
+            transition: .2s;
         }
 
         .logout a:hover {
-            background: rgba(239,68,68,.12);
+            background: rgba(239, 68, 68, .12);
+            color: #fecaca;
         }
 
         .main {
@@ -141,13 +172,14 @@
 
         .header h3 {
             font-size: 18px;
-            color: #172033;
+            font-weight: 700;
+            color: #111827;
         }
 
         .header p {
             font-size: 11px;
             color: #8a94a6;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
         .user-profile {
@@ -166,19 +198,21 @@
         .user-role {
             color: #8a94a6;
             font-size: 11px;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
-        .avatar {
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 42px;
             height: 42px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             border-radius: 12px;
-            color: white;
-            font-weight: bold;
             background: linear-gradient(135deg,#2563eb,#38bdf8);
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(37,99,235,.2);
         }
 
         .content {
@@ -186,25 +220,35 @@
             max-width: 1700px;
         }
 
-        @media(max-width: 800px) {
+        @media (max-width: 1000px) {
+            .sidebar { width: 220px; }
+            .main { margin-left: 220px; }
+            .content { padding: 25px; }
+        }
+
+        @media (max-width: 800px) {
             .sidebar {
                 width: 70px;
-                padding: 20px 9px;
+                padding: 20px 10px 14px;
             }
 
-            .logo h2, .logo p, .menu-title,
-            .menu a span, .logout span, .user-info {
+            .logo { padding-bottom: 20px; }
+            .logo h2, .logo p, .menu-title, .menu a span, .logout span, .user-info {
                 display: none;
             }
 
             .menu a, .logout a {
                 justify-content: center;
-                padding: 14px 5px;
             }
 
+            .menu a {
+                padding: 13px 8px;
+            }
+
+            .menu a.active::before { left: -10px; }
             .main { margin-left: 70px; }
-            .header { padding: 0 16px; }
-            .content { padding: 20px 15px; }
+            .header { padding: 0 20px; }
+            .content { padding: 20px; }
         }
     </style>
 
@@ -234,7 +278,7 @@
 
         <div class="logo">
             <h2>NEXPOOL</h2>
-            <p>ADMIN MASTER</p>
+            <p>ADMINISTRATOR</p>
         </div>
 
         <div class="menu-title">MENU UTAMA</div>
@@ -244,7 +288,7 @@
             <a href="{{ url('/admin-master/dashboard') }}"
                class="{{ request()->is('admin-master/dashboard') ? 'active' : '' }}">
                 <i class="fa-solid fa-gauge-high" style="color:#bfdbfe;"></i>
-                <span>Dashboard Master</span>
+                <span>Dashboard</span>
             </a>
 
             @if($transactionRoute)
@@ -296,9 +340,9 @@
 
         <header class="header">
 
-            <div>
-                <h3>@yield('header-title', 'Dashboard Master')</h3>
-                <p>@yield('header-subtitle', 'Pusat pengawasan sistem NEXPOOL')</p>
+            <div class="header-left">
+                <h3>@yield('header-title', 'Dashboard')</h3>
+                <p>@yield('header-subtitle', 'Kelola dan pantau data NEXPOOL')</p>
             </div>
 
             <div class="user-profile">
@@ -309,7 +353,7 @@
                     <div class="user-role">SUPER ADMIN</div>
                 </div>
 
-                <div class="avatar">
+                <div class="user-avatar">
                     {{ strtoupper(substr(session('admin_nama', 'A'), 0, 1)) }}
                 </div>
             </div>

@@ -1,9 +1,9 @@
 
 @extends('layout.admin_master')
 
-@section('title', 'Dashboard Admin Master')
-@section('header-title', 'Dashboard Admin Master')
-@section('header-subtitle', 'Pusat pengelolaan seluruh kolam renang NEXPOOL')
+@section('title', 'Dashboard - NEXPOOL')
+@section('header-title', 'Dashboard')
+@section('header-subtitle', 'Kelola dan pantau seluruh kolam renang NEXPOOL')
 
 @section('content')
 
