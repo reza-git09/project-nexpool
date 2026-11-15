@@ -39,6 +39,17 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('login.process');
 
+Route::get('/login/otp', [AuthController::class, 'showOtpForm'])
+    ->name('login.otp');
+
+Route::post('/login/otp', [AuthController::class, 'verifyOtp'])
+    ->middleware('throttle:10,1')
+    ->name('login.otp.verify');
+
+Route::post('/login/otp/resend', [AuthController::class, 'resendOtp'])
+    ->middleware('throttle:3,1')
+    ->name('login.otp.resend');
+
 Route::get('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
