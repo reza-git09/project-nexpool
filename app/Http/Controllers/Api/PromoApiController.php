@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -14,18 +15,24 @@ class PromoApiController extends Controller
      * GET /api/promo
      *
      * Daftar promo yang AKTIF dan MASIH BERLAKU (hari ini ada di antara
-     * tanggal mulai dan tanggal selesai).
+     * tanggal mulai dan tanggal selesai). Tanggal pemesanan dapat dipilih
+     * melalui parameter tanggal_kunjungan.
      *
      * Opsional:
      *   ?pool_id=pool_id_01  -> promo kolam tersebut + promo umum (tanpa pool_id)
+     *   ?tanggal_kunjungan=2026-11-21 -> cek periode untuk tanggal kunjungan
      *   ?semua=1             -> tampilkan semua promo tanpa saring status/tanggal
      *                           (berguna untuk mengecek data di browser)
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'pool_id' => ['nullable', 'string', 'max:255'],
+            'tanggal_kunjungan' => ['nullable', 'date_format:Y-m-d'],
+        ]);
         $table = $this->tableName();
 
-        if (!$table) {
+        if (! $table) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tabel promo tidak ditemukan.',
@@ -36,23 +43,24 @@ class PromoApiController extends Controller
         $query = DB::table($table);
 
         // Saring per kolam (kalau tabel punya kolom pool_id)
-        if ($request->filled('pool_id') && Schema::hasColumn($table, 'pool_id')) {
-            $query->where(function ($w) use ($request) {
-                $w->where('pool_id', $request->pool_id)
-                  ->orWhereNull('pool_id');
+        if (! empty($validated['pool_id']) && Schema::hasColumn($table, 'pool_id')) {
+            $query->where(function ($w) use ($validated) {
+                $w->where('pool_id', $validated['pool_id'])
+                    ->orWhereNull('pool_id');
             });
         }
 
-        $today = Carbon::today();
+        $targetDate = Carbon::parse($validated['tanggal_kunjungan'] ?? today())
+            ->startOfDay();
         $semua = $request->boolean('semua');
 
         $data = $query->get()
-            ->filter(function ($row) use ($today, $semua) {
+            ->filter(function ($row) use ($targetDate, $semua) {
                 if ($semua) {
                     return true;
                 }
 
-                if (!$this->isActive($row)) {
+                if (! $this->isActive($row)) {
                     return false;
                 }
 
@@ -63,10 +71,10 @@ class PromoApiController extends Controller
                     'tanggal_selesai', 'tgl_selesai', 'tanggal_berakhir', 'selesai', 'end_date',
                 ]));
 
-                if ($mulai && $today->lt($mulai)) {
+                if ($mulai && $targetDate->lt($mulai)) {
                     return false; // belum mulai
                 }
-                if ($selesai && $today->gt($selesai)) {
+                if ($selesai && $targetDate->gt($selesai)) {
                     return false; // sudah berakhir
                 }
 
@@ -132,7 +140,7 @@ class PromoApiController extends Controller
 
     private function parseDate($value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 
@@ -189,16 +197,16 @@ class PromoApiController extends Controller
             || str_contains($j, 'potongan');
 
         // Jenis tidak dikenali -> tebak dari nilainya
-        if (!$persen && !$nominal) {
+        if (! $persen && ! $nominal) {
             $persen = $nilai > 0 && $nilai <= 100;
         }
 
         if ($persen) {
             $angka = rtrim(rtrim(number_format($nilai, 2, '.', ''), '0'), '.');
 
-            return 'Hemat ' . $angka . '%';
+            return 'Hemat '.$angka.'%';
         }
 
-        return 'Potongan Rp' . number_format($nilai, 0, ',', '.');
+        return 'Potongan Rp'.number_format($nilai, 0, ',', '.');
     }
 }

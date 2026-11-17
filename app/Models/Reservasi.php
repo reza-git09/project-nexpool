@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\KolamRenang;
 
 class Reservasi extends Model
 {
@@ -18,6 +17,8 @@ class Reservasi extends Model
         'jumlah_dewasa',
         'jumlah_anak',
         'total_harga',
+        'nama_promo',
+        'potongan_promo',
         'status_reservasi',
         'status_pembayaran',
         'payment_method',
@@ -32,6 +33,7 @@ class Reservasi extends Model
         'jumlah_dewasa' => 'integer',
         'jumlah_anak' => 'integer',
         'total_harga' => 'decimal:2',
+        'potongan_promo' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 
