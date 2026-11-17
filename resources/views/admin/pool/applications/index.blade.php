@@ -31,7 +31,6 @@
     .alert { padding:13px 16px; border-radius:9px; margin-bottom:18px; font-size:13px; }
     .alert-success { background:#d1fae5; color:#065f46; }
     .alert-danger { background:#fee2e2; color:#991b1b; }
-    .validation-list { margin:8px 0 0 20px; }
     .pagination-wrapper { padding:16px; display:flex; justify-content:flex-end; }
     .modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.62); align-items:center; justify-content:center; padding:18px; }
     .modal-overlay.active { display:flex; }
@@ -45,7 +44,17 @@
     .form-field label { color:#334155; font-size:12px; font-weight:700; }
     .form-field input, .form-field select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:11px 12px; outline:none; font-size:13px; }
     .form-field input:focus, .form-field select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .form-field .field-help { color:#64748b; font-size:11px; }
     .field-error { color:#dc2626; font-size:11px; }
+    .phone-input { display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:8px; }
+    .phone-input:focus-within { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .phone-prefix { padding:0 0 0 12px; color:#475569; font-size:13px; }
+    .form-field .phone-input input { min-width:0; border:0; box-shadow:none; }
+    .password-input-wrap { position:relative; }
+    .form-field .password-input-wrap input { padding-right:42px; }
+    .password-toggle { position:absolute; top:50%; right:12px; transform:translateY(-50%); border:0; background:transparent; color:#94a3b8; cursor:pointer; font-size:17px; line-height:1; padding:3px; }
+    .password-toggle:hover, .password-toggle:focus-visible { color:#475569; }
+    .btn-primary:disabled { background:#94a3b8; cursor:not-allowed; }
     .modal-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:20px; }
     .detail-list { display:grid; grid-template-columns:150px 1fr; gap:13px 16px; font-size:13px; }
     .detail-list dt { color:#64748b; }
@@ -65,17 +74,6 @@
     @if(session('success'))
         <div class="alert alert-success" role="status">{{ session('success') }}</div>
     @endif
-    @if($errors->any())
-        <div class="alert alert-danger" role="alert">
-            Periksa kembali data pengajuan.
-            <ul class="validation-list">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <div class="application-heading">
         <div>
             <h2>Riwayat Pengajuan Admin</h2>
@@ -133,47 +131,51 @@
                 <h3 id="registrationTitle">Daftarkan Admin</h3>
                 <button type="button" class="modal-close" aria-label="Tutup" onclick="closeModal('registrationModal')">&times;</button>
             </div>
-            <form method="POST" action="{{ route('admin.pool.applications.store') }}">
+            <form id="registrationForm" method="POST" action="{{ route('admin.pool.applications.store') }}" novalidate>
                 @csrf
                 <div class="form-grid">
                     <div class="form-field full">
                         <label for="full_name">Nama lengkap</label>
-                        <input id="full_name" name="full_name" value="{{ old('full_name') }}" required maxlength="255" autocomplete="name">
-                        @error('full_name')<span class="field-error">{{ $message }}</span>@enderror
+                        <input id="full_name" name="full_name" value="{{ old('full_name') }}" required maxlength="255" autocomplete="off" aria-describedby="full_name_error">
+                        <span id="full_name_error" class="field-error" @if(!$errors->has('full_name')) hidden @endif>{{ $errors->first('full_name') }}</span>
                     </div>
                     <div class="form-field">
                         <label for="email">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required maxlength="255" autocomplete="email">
-                        @error('email')<span class="field-error">{{ $message }}</span>@enderror
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="namaanda@gmail.com" required maxlength="255" autocomplete="email" aria-describedby="email_error">
+                        <span id="email_error" class="field-error" @if(!$errors->has('email')) hidden @endif>{{ $errors->first('email') }}</span>
                     </div>
                     <div class="form-field">
                         <label for="phone">Nomor HP aktif</label>
-                        <input id="phone" name="phone" type="tel" value="{{ old('phone') }}" required minlength="9" maxlength="20" autocomplete="tel">
-                        @error('phone')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-field full">
-                        <label for="position">Jabatan</label>
-                        <select id="position" name="position" required>
-                            <option value="">Pilih jabatan</option>
-                            <option value="kasir_tiket" @selected(old('position') === 'kasir_tiket')>Kasir Tiket</option>
-                            <option value="pengelola_fasilitas" @selected(old('position') === 'pengelola_fasilitas')>Pengelola Fasilitas</option>
-                            <option value="staf_admin" @selected(old('position') === 'staf_admin')>Staf Admin</option>
-                        </select>
-                        @error('position')<span class="field-error">{{ $message }}</span>@enderror
+                        <div class="phone-input">
+                            <span class="phone-prefix" aria-hidden="true">+62</span>
+                            <input id="phone" name="phone" type="text" value="{{ old('phone') }}" placeholder="81234567890" inputmode="numeric" pattern="8[0-9]{8,10}" maxlength="11" required autocomplete="off" aria-describedby="phone_error">
+                        </div>
+                        <span id="phone_error" class="field-error" @if(!$errors->has('phone')) hidden @endif>{{ $errors->first('phone') }}</span>
                     </div>
                     <div class="form-field">
                         <label for="password">Password</label>
-                        <input id="password" name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password">
-                        @error('password')<span class="field-error">{{ $message }}</span>@enderror
+                        <div class="password-input-wrap">
+                            <input id="password" name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password" aria-describedby="password_error">
+                            <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Tampilkan password" aria-pressed="false">
+                                <i class="ti ti-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <span id="password_error" class="field-error" @if(!$errors->has('password')) hidden @endif>{{ $errors->first('password') }}</span>
                     </div>
                     <div class="form-field">
                         <label for="password_confirmation">Konfirmasi password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required minlength="8" maxlength="72" autocomplete="new-password">
+                        <div class="password-input-wrap">
+                            <input id="password_confirmation" name="password_confirmation" type="password" required minlength="8" maxlength="72" autocomplete="new-password" aria-describedby="password_confirmation_error">
+                            <button type="button" class="password-toggle" data-password-toggle="password_confirmation" aria-label="Tampilkan password" aria-pressed="false">
+                                <i class="ti ti-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <span id="password_confirmation_error" class="field-error" @if(!$errors->has('password_confirmation')) hidden @endif>{{ $errors->first('password_confirmation') }}</span>
                     </div>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal('registrationModal')">Batal</button>
-                    <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Kirim</button>
+                    <button id="registrationSubmit" type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Kirim</button>
                 </div>
             </form>
         </section>
@@ -202,6 +204,7 @@
 <script>
     function openRegistrationModal() {
         const modal = document.getElementById('registrationModal');
+        resetPasswordToggles();
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
         document.getElementById('full_name').focus();
@@ -230,7 +233,130 @@
         const modal = document.getElementById(id);
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        if (id === 'registrationModal') {
+            resetPasswordToggles();
+        }
     }
+
+    const registrationForm = document.getElementById('registrationForm');
+    const registrationFields = ['full_name', 'email', 'phone', 'password', 'password_confirmation'];
+    const emailPattern = /^[a-z0-9._%+\-]+@gmail\.com$/;
+    const phoneErrorMessage = 'Nomor HP tidak valid';
+
+    function setFieldError(field, message) {
+        const error = document.getElementById(`${field.id}_error`);
+        error.textContent = message;
+        error.hidden = message === '';
+        field.setAttribute('aria-invalid', message === '' ? 'false' : 'true');
+    }
+
+    function validateField(field) {
+        let message = '';
+        const value = field.value.trim();
+
+        if (field.id === 'full_name') {
+            if (value === '') {
+                message = 'Nama lengkap wajib diisi';
+            } else if (Array.from(value).length > 255) {
+                message = 'Nama terlalu panjang';
+            }
+        } else if (field.id === 'email') {
+            field.value = value.toLowerCase();
+            if (field.value === '') {
+                message = 'Email wajib diisi';
+            } else if (field.validity.typeMismatch || !emailPattern.test(field.value)) {
+                message = 'Gunakan email @gmail.com';
+            } else if (field.value.length > 255) {
+                message = 'Email tidak valid';
+            }
+        } else if (field.id === 'phone') {
+            if (field.value === '') {
+                message = 'Nomor HP wajib diisi';
+            } else if (!/^8[0-9]{8,10}$/.test(field.value)) {
+                message = phoneErrorMessage;
+            }
+        } else if (field.id === 'password') {
+            if (field.value === '') {
+                message = 'Password wajib diisi';
+            } else if (Array.from(field.value).length < 8) {
+                message = 'Password minimal 8 karakter';
+            } else if (Array.from(field.value).length > 72 || new TextEncoder().encode(field.value).length > 72) {
+                message = 'Password terlalu panjang';
+            }
+        } else if (field.id === 'password_confirmation') {
+            if (field.value === '') {
+                message = 'Konfirmasi password wajib diisi';
+            } else if (field.value !== document.getElementById('password').value) {
+                message = 'Konfirmasi password tidak sama';
+            }
+        }
+
+        setFieldError(field, message);
+        return message === '';
+    }
+
+    registrationFields.forEach((id) => {
+        const field = document.getElementById(id);
+        field.addEventListener('blur', () => validateField(field));
+    });
+
+    function normalizePhoneInput(value) {
+        let digits = value.replace(/\D/g, '');
+        while (digits.startsWith('62') || digits.startsWith('0')) {
+            digits = digits.startsWith('62') ? digits.slice(2) : digits.slice(1);
+        }
+        return digits.slice(0, 11);
+    }
+
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (event) => {
+        event.target.value = normalizePhoneInput(event.target.value);
+    });
+    phoneInput.addEventListener('paste', (event) => {
+        event.preventDefault();
+        phoneInput.value = normalizePhoneInput(event.clipboardData.getData('text'));
+        phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            const visible = input.type === 'password';
+            input.type = visible ? 'text' : 'password';
+            button.setAttribute('aria-label', visible ? 'Sembunyikan password' : 'Tampilkan password');
+            button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+            button.querySelector('i').className = visible ? 'ti ti-eye-off' : 'ti ti-eye';
+        });
+    });
+
+    function resetPasswordToggles() {
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            input.type = 'password';
+            button.setAttribute('aria-label', 'Tampilkan password');
+            button.setAttribute('aria-pressed', 'false');
+            button.querySelector('i').className = 'ti ti-eye';
+        });
+    }
+
+    registrationForm.addEventListener('submit', (event) => {
+        const valid = registrationFields
+            .map((id) => validateField(document.getElementById(id)))
+            .every(Boolean);
+
+        if (!valid) {
+            event.preventDefault();
+            registrationFields
+                .map((id) => document.getElementById(id))
+                .find((field) => field.getAttribute('aria-invalid') === 'true')
+                ?.focus();
+            return;
+        }
+
+        const submitButton = document.getElementById('registrationSubmit');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Mengirim...';
+    });
 
     document.querySelectorAll('.modal-overlay').forEach((modal) => {
         modal.addEventListener('click', (event) => {
@@ -240,7 +366,7 @@
         });
     });
 
-    @if($errors->any())
+    @if($errors->hasAny(['full_name', 'email', 'phone', 'password', 'password_confirmation']))
         openRegistrationModal();
     @endif
 </script>

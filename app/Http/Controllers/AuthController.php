@@ -52,12 +52,8 @@ class AuthController extends Controller
                 ->first();
 
             if ($rejectedApp) {
-                $reason = $rejectedApp->rejection_reason
-                    ? ' Alasan: '.$rejectedApp->rejection_reason
-                    : '';
-
                 return back()
-                    ->with('error', 'Pengajuan Anda telah ditolak.'.$reason)
+                    ->with('error', 'Pengajuan Anda telah ditolak.')
                     ->withInput($request->except('password'));
             }
         }
