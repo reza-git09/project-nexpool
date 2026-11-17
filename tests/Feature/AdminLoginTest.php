@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -59,12 +60,63 @@ class AdminLoginTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->post('/login', [
-            'email' => 'ADMIN@example.test',
-            'password' => 'secret-password',
-        ])
+        $user = User::query()->where('email', 'admin@example.test')->firstOrFail();
+
+        $this->withSession(['admin_otp_user_id' => $user->getKey()])
+            ->post('/login', [
+                'email' => 'ADMIN@example.test',
+                'password' => 'secret-password',
+            ])
             ->assertRedirect('/admin-master/dashboard')
             ->assertSessionHas('admin_role', 'admin_master');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertFalse(session()->has('admin_otp_user_id'));
+    }
+
+    public function test_admin_pool_can_log_in_without_admin_master_otp(): void
+    {
+        DB::table('users')->insert([
+            'name' => 'Admin Kolam',
+            'username' => 'admin_kolam',
+            'email' => 'kolam@example.test',
+            'password' => Hash::make('secret-password'),
+            'role' => 'admin_pool',
+            'must_change_password' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->post('/login', [
+            'email' => 'kolam@example.test',
+            'password' => 'secret-password',
+        ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionHas('admin_role', 'admin_pool');
+    }
+
+    public function test_admin_master_cannot_log_in_with_an_incorrect_password(): void
+    {
+        DB::table('users')->insert([
+            'name' => 'Admin Master',
+            'username' => 'admin_master',
+            'email' => 'admin@example.test',
+            'password' => Hash::make('secret-password'),
+            'role' => 'admin_master',
+            'must_change_password' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->from('/login')
+            ->post('/login', [
+                'email' => 'admin@example.test',
+                'password' => 'incorrect-password',
+            ])
+            ->assertRedirect('/login')
+            ->assertSessionHas('error', 'Email atau password salah.');
+
+        $this->assertGuest();
     }
 
     public function test_admin_login_does_not_accept_a_username_instead_of_an_email(): void

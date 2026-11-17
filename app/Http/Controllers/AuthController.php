@@ -64,11 +64,6 @@ class AuthController extends Controller
 
         // Verifikasi password.
         if ($user && Hash::check($request->password, $user->password)) {
-            // Admin Master wajib verifikasi OTP email dulu sebelum benar-benar login.
-            if ($user->isAdminMaster()) {
-                return $this->startOtpChallenge($request, $user);
-            }
-
             return $this->completeLogin($request, $user);
         }
 
@@ -171,39 +166,13 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    /**
-     * Password Admin Master benar: kirim OTP ke email, tapi BELUM login.
-     */
-    private function startOtpChallenge(Request $request, User $user): RedirectResponse
-    {
-        if (blank($user->email)) {
-            return back()
-                ->with('error', 'Akun ini belum memiliki email untuk menerima kode OTP.')
-                ->withInput($request->except('password'));
-        }
-
-        try {
-            app(AdminLoginOtpService::class)->issue($user);
-        } catch (Throwable $exception) {
-            report($exception);
-
-            return back()
-                ->with('error', 'Kode OTP gagal dikirim ke email. Periksa pengaturan email lalu coba lagi.')
-                ->withInput($request->except('password'));
-        }
-
-        $request->session()->regenerate();
-        $request->session()->put(self::OTP_SESSION_KEY, $user->getKey());
-
-        return redirect()->route('login.otp');
-    }
-
-    /**
-     * Proses login yang sama persis seperti sebelumnya (dipanggil langsung
-     * untuk Admin Kolam, dan setelah OTP benar untuk Admin Master).
-     */
+    /** Finalisasi autentikasi dan arahkan user ke dashboard berdasarkan role. */
     private function completeLogin(Request $request, User $user): RedirectResponse
     {
+        if ($user->isAdminMaster()) {
+            $request->session()->forget(self::OTP_SESSION_KEY);
+        }
+
         Auth::login($user);
         $request->session()->regenerate();
 
