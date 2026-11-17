@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PoolAdminApplicationController extends Controller
 {
@@ -35,7 +36,9 @@ class PoolAdminApplicationController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('admin.pool.applications.index', compact('applications'));
+        $positions = AdminApplication::POSITIONS;
+
+        return view('admin.pool.applications.index', compact('applications', 'positions'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -65,6 +68,7 @@ class PoolAdminApplicationController extends Controller
                 'max:255',
                 'regex:/^[a-z0-9._%+\-]+@gmail\.com$/',
             ],
+            'position' => ['bail', 'required', 'string', Rule::in(array_keys(AdminApplication::POSITIONS))],
             'phone' => [
                 'bail',
                 'required',
@@ -93,6 +97,9 @@ class PoolAdminApplicationController extends Controller
             'email.email' => 'Gunakan email @gmail.com',
             'email.max' => 'Email tidak valid',
             'email.regex' => 'Gunakan email @gmail.com',
+            'position.required' => 'Jabatan wajib dipilih',
+            'position.string' => 'Jabatan tidak valid',
+            'position.in' => 'Pilih jabatan yang tersedia',
             'phone.required' => 'Nomor HP wajib diisi',
             'phone.string' => 'Nomor HP tidak valid',
             'phone.regex' => 'Nomor HP tidak valid',
@@ -145,6 +152,7 @@ class PoolAdminApplicationController extends Controller
             'username' => $username,
             'email' => $validated['email'],
             'phone' => $validated['phone'],
+            'position' => $validated['position'],
             'pool_id' => $poolId,
             'access_code' => Str::upper(Str::random(20)),
             'password_hash' => Hash::make($validated['password']),

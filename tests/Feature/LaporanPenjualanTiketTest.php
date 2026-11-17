@@ -155,12 +155,12 @@ class LaporanPenjualanTiketTest extends TestCase
             ->assertSessionHasErrors('bulan');
     }
 
-    public function test_it_downloads_an_excel_compatible_csv_for_the_selected_month(): void
+    public function test_it_downloads_a_formatted_excel_workbook_for_the_selected_month(): void
     {
         DB::table('reservasis')->insert([
             'kode_reservasi' => 'TIKET-EKSPOR',
             'pool_id' => 'pool_id_01',
-            'nama_pengunjung' => 'Pengunjung Ekspor',
+            'nama_pengunjung' => 'Pengunjung & Ekspor',
             'no_hp' => '081234567890',
             'tanggal_kunjungan' => '2026-11-05',
             'jumlah_dewasa' => 1,
@@ -169,12 +169,28 @@ class LaporanPenjualanTiketTest extends TestCase
             'status_reservasi' => 'Selesai',
         ]);
 
-        $this->withSession([
+        $response = $this->withSession([
             'admin_id' => 1,
             'admin_pool_id' => 'pool_id_01',
             'admin_pool_nama' => 'Tiara Park',
         ])->get('/laporan-penjualan/export?bulan=2026-11')
-            ->assertDownload('laporan-penjualan-tiket-2026-11.csv');
+            ->assertStreamed()
+            ->assertDownload('laporan-penjualan-tiket-2026-11.xls')
+            ->assertHeader('content-type', 'application/vnd.ms-excel; charset=UTF-8');
+
+        $workbook = $response->streamedContent();
+
+        $this->assertStringContainsString('<?mso-application progid="Excel.Sheet"?>', $workbook);
+        $this->assertStringContainsString('<Column ss:Width="145"/>', $workbook);
+        $this->assertStringNotContainsString('<FreezePanes/>', $workbook);
+        $this->assertStringContainsString('Pengunjung &amp; Ekspor', $workbook);
+        $this->assertStringContainsString('081234567890', $workbook);
+        $this->assertStringContainsString('05/11/2026', $workbook);
+        $this->assertStringContainsString('ss:Format="&quot;Rp&quot; #,##0"', $workbook);
+        $this->assertStringNotContainsString('####', $workbook);
+
+        $document = new \DOMDocument;
+        $this->assertTrue($document->loadXML($workbook));
     }
 
     public function test_it_denies_the_report_when_the_admin_pool_is_missing(): void

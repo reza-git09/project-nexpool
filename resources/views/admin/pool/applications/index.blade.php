@@ -145,6 +145,16 @@
                         <span id="email_error" class="field-error" @if(!$errors->has('email')) hidden @endif>{{ $errors->first('email') }}</span>
                     </div>
                     <div class="form-field">
+                        <label for="position">Jabatan</label>
+                        <select id="position" name="position" required aria-describedby="position_error">
+                            <option value="" disabled @selected(old('position') === null)>Pilih jabatan</option>
+                            @foreach($positions as $value => $label)
+                                <option value="{{ $value }}" @selected(old('position') === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <span id="position_error" class="field-error" @if(!$errors->has('position')) hidden @endif>{{ $errors->first('position') }}</span>
+                    </div>
+                    <div class="form-field">
                         <label for="phone">Nomor HP aktif</label>
                         <div class="phone-input">
                             <span class="phone-prefix" aria-hidden="true">+62</span>
@@ -239,7 +249,7 @@
     }
 
     const registrationForm = document.getElementById('registrationForm');
-    const registrationFields = ['full_name', 'email', 'phone', 'password', 'password_confirmation'];
+    const registrationFields = ['full_name', 'email', 'position', 'phone', 'password', 'password_confirmation'];
     const emailPattern = /^[a-z0-9._%+\-]+@gmail\.com$/;
     const phoneErrorMessage = 'Nomor HP tidak valid';
 
@@ -268,6 +278,10 @@
                 message = 'Gunakan email @gmail.com';
             } else if (field.value.length > 255) {
                 message = 'Email tidak valid';
+            }
+        } else if (field.id === 'position') {
+            if (value === '') {
+                message = 'Jabatan wajib dipilih';
             }
         } else if (field.id === 'phone') {
             if (field.value === '') {
@@ -366,7 +380,7 @@
         });
     });
 
-    @if($errors->hasAny(['full_name', 'email', 'phone', 'password', 'password_confirmation']))
+    @if($errors->hasAny(['full_name', 'email', 'position', 'phone', 'password', 'password_confirmation']))
         openRegistrationModal();
     @endif
 </script>

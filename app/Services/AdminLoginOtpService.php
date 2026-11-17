@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
- * Kode OTP login Admin Master (dikirim lewat email).
+ * Kode OTP login pertama Admin Kolam (dikirim lewat email).
  *
  *  - kode 6 angka, disimpan sebagai hash (HMAC), bukan teks biasa
  *  - berlaku 5 menit, sekali pakai
