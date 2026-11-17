@@ -40,6 +40,10 @@ class AdminApplication extends Model
     // Label tampilan jabatan
     public function getPositionLabelAttribute(): string
     {
+        if (! $this->position) {
+            return '-';
+        }
+
         return match ($this->position) {
             'kasir_tiket' => 'Kasir Tiket',
             'pengelola_fasilitas' => 'Pengelola Fasilitas',

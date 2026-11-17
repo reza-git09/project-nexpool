@@ -74,6 +74,8 @@ class AdminApplicationFlowTest extends TestCase
 
         $migration = require base_path('database/migrations/2026_11_11_121113_add_password_hash_to_admin_applications_table.php');
         $migration->up();
+        $positionMigration = require base_path('database/migrations/2026_11_17_000001_make_admin_application_position_nullable.php');
+        $positionMigration->up();
 
         DB::table('pools')->insert([
             ['pool_id' => 'pool_a', 'name' => 'Kolam A', 'created_at' => now(), 'updated_at' => now()],
@@ -92,6 +94,7 @@ class AdminApplicationFlowTest extends TestCase
         $input['pool_id'] = 'pool_b';
         $input['status'] = AdminApplication::STATUS_APPROVED;
         $input['password_hash'] = 'attacker-supplied-hash';
+        $input['position'] = 'kasir_tiket';
 
         $response = $this->actingAs($poolAdmin)->withSession($this->poolSession($poolAdmin))->post(
             route('admin.pool.applications.store'),
@@ -101,12 +104,14 @@ class AdminApplicationFlowTest extends TestCase
         $response->assertRedirect(route('admin.pool.applications.index'));
         $this->assertDatabaseHas('admin_applications', [
             'full_name' => 'Admin Baru',
-            'email' => 'admin.baru@example.test',
+            'email' => 'admin.baru@gmail.com',
             'pool_id' => 'pool_a',
             'status' => AdminApplication::STATUS_PENDING,
+            'phone' => '6281234567890',
+            'position' => null,
         ]);
 
-        $application = AdminApplication::query()->where('email', 'admin.baru@example.test')->firstOrFail();
+        $application = AdminApplication::query()->where('email', 'admin.baru@gmail.com')->firstOrFail();
         $this->assertTrue(Hash::check('strong-password-123', $application->password_hash));
         $this->assertNotSame('strong-password-123', $application->password_hash);
         $this->assertArrayNotHasKey('password_hash', $application->toArray());
@@ -116,14 +121,15 @@ class AdminApplicationFlowTest extends TestCase
     public function test_pool_admin_only_sees_applications_for_their_own_pool(): void
     {
         $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
-        $this->storeApplication('Applicant A', 'applicant-a@example.test', 'pool_a');
-        $this->storeApplication('Applicant B', 'applicant-b@example.test', 'pool_b', 'strong-password-123', '08123456788');
+        $this->storeApplication('Applicant A', 'applicant-a@gmail.com', 'pool_a');
+        $this->storeApplication('Applicant B', 'applicant-b@gmail.com', 'pool_b', 'strong-password-123', '628123456788');
 
         $this->actingAs($poolAdmin)
             ->withSession($this->poolSession($poolAdmin))
             ->get(route('admin.pool.applications.index'))
             ->assertOk()
             ->assertSee('Applicant A')
+            ->assertSee('data-position="Staf Admin"', false)
             ->assertDontSee('Applicant B');
     }
 
@@ -132,7 +138,7 @@ class AdminApplicationFlowTest extends TestCase
         Mail::fake();
 
         $master = $this->createAdmin('master@example.test', null, 'admin_master');
-        $application = $this->storeApplication('Admin Baru', 'admin.baru@example.test', 'pool_a', 'strong-password-123');
+        $application = $this->storeApplication('Admin Baru', 'admin.baru@gmail.com', 'pool_a', 'strong-password-123');
 
         $response = $this->actingAs($master)
             ->withSession($this->masterSession($master))
@@ -145,19 +151,19 @@ class AdminApplicationFlowTest extends TestCase
             'password_hash' => null,
         ]);
         $this->assertDatabaseHas('users', [
-            'email' => 'admin.baru@example.test',
+            'email' => 'admin.baru@gmail.com',
             'pool_id' => 'pool_a',
             'role' => 'admin_pool',
             'must_change_password' => false,
         ]);
 
-        $newAdmin = User::query()->where('email', 'admin.baru@example.test')->firstOrFail();
+        $newAdmin = User::query()->where('email', 'admin.baru@gmail.com')->firstOrFail();
         $this->assertTrue(Hash::check('strong-password-123', $newAdmin->password));
 
         Mail::assertSent(AdminApplicationApproved::class, fn (AdminApplicationApproved $mail): bool => $mail->plainPassword === null);
 
         $this->post(route('login.process'), [
-            'email' => 'admin.baru@example.test',
+            'email' => 'admin.baru@gmail.com',
             'password' => 'strong-password-123',
         ])->assertRedirect('/dashboard')
             ->assertSessionHas('admin_role', 'admin_pool')
@@ -175,7 +181,7 @@ class AdminApplicationFlowTest extends TestCase
         Mail::fake();
 
         $master = $this->createAdmin('master@example.test', null, 'admin_master');
-        $application = $this->storeApplication('Admin Ditolak', 'ditolak@example.test', 'pool_a', 'strong-password-123');
+        $application = $this->storeApplication('Admin Ditolak', 'ditolak@gmail.com', 'pool_a', 'strong-password-123');
 
         $this->actingAs($master)
             ->withSession($this->masterSession($master))
@@ -190,14 +196,14 @@ class AdminApplicationFlowTest extends TestCase
             'password_hash' => null,
             'rejection_reason' => 'Data identitas belum dapat diverifikasi.',
         ]);
-        $this->assertDatabaseMissing('users', ['email' => 'ditolak@example.test']);
+        $this->assertDatabaseMissing('users', ['email' => 'ditolak@gmail.com']);
         Mail::assertSent(AdminApplicationRejected::class);
     }
 
     public function test_admin_master_detail_does_not_render_password_or_password_hash(): void
     {
         $master = $this->createAdmin('master@example.test', null, 'admin_master');
-        $application = $this->storeApplication('Admin Baru', 'admin.baru@example.test', 'pool_a', 'strong-password-123');
+        $application = $this->storeApplication('Admin Baru', 'admin.baru@gmail.com', 'pool_a', 'strong-password-123');
 
         $response = $this->actingAs($master)
             ->withSession($this->masterSession($master))
@@ -206,6 +212,7 @@ class AdminApplicationFlowTest extends TestCase
         $response->assertOk()
             ->assertSee('Detail')
             ->assertSee('Kolam A')
+            ->assertSee('data-position="Staf Admin"', false)
             ->assertDontSee($application->password_hash)
             ->assertDontSee('strong-password-123')
             ->assertDontSee('password_hash');
@@ -230,17 +237,17 @@ class AdminApplicationFlowTest extends TestCase
     public function test_duplicate_email_and_mismatched_password_are_rejected(): void
     {
         $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
-        $this->createAdmin('already-used@example.test', 'pool_b');
+        $this->createAdmin('already-used@gmail.com', 'pool_b');
 
         $this->actingAs($poolAdmin)
             ->withSession($this->poolSession($poolAdmin))
             ->from(route('admin.pool.applications.index'))
             ->post(route('admin.pool.applications.store'), array_merge(
                 $this->applicationInput(),
-                ['email' => 'already-used@example.test', 'password_confirmation' => 'not-the-same']
+                ['email' => 'already-used@gmail.com', 'password_confirmation' => 'not-the-same']
             ))
             ->assertRedirect(route('admin.pool.applications.index'))
-            ->assertSessionHasErrors(['email', 'password']);
+            ->assertSessionHasErrors(['email', 'password_confirmation']);
 
         $this->assertDatabaseCount('admin_applications', 0);
     }
@@ -248,9 +255,9 @@ class AdminApplicationFlowTest extends TestCase
     public function test_duplicate_phone_number_is_rejected(): void
     {
         $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
-        DB::table('pengunjung')->insert(['no_hp' => '08111111111']);
+        DB::table('pengunjung')->insert(['no_hp' => '62811111111']);
 
-        $input = array_merge($this->applicationInput(), ['phone' => '08111111111']);
+        $input = array_merge($this->applicationInput(), ['phone' => '8111111111']);
 
         $this->actingAs($poolAdmin)
             ->withSession($this->poolSession($poolAdmin))
@@ -260,6 +267,144 @@ class AdminApplicationFlowTest extends TestCase
             ->assertSessionHasErrors('phone');
 
         $this->assertDatabaseCount('admin_applications', 0);
+    }
+
+    public function test_gmail_addresses_are_normalized_and_non_gmail_addresses_are_rejected(): void
+    {
+        $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
+        $input = array_merge($this->applicationInput(), [
+            'email' => ' Budi.Santoso+baru@GMAIL.COM ',
+            'phone' => '+6281234567890',
+        ]);
+
+        $this->actingAs($poolAdmin)
+            ->withSession($this->poolSession($poolAdmin))
+            ->post(route('admin.pool.applications.store'), $input)
+            ->assertRedirect(route('admin.pool.applications.index'));
+
+        $this->assertDatabaseHas('admin_applications', [
+            'email' => 'budi.santoso+baru@gmail.com',
+            'phone' => '6281234567890',
+        ]);
+
+        foreach ([
+            'apabebas@yahoo.com',
+            'apabebas@gmail.co',
+            'apabebas@gmail',
+            '@gmail.com',
+            'apabebas@mail.gmail.com',
+        ] as $email) {
+            $this->actingAs($poolAdmin)
+                ->withSession($this->poolSession($poolAdmin))
+                ->from(route('admin.pool.applications.index'))
+                ->post(route('admin.pool.applications.store'), array_merge(
+                    $this->applicationInput(),
+                    ['email' => $email]
+                ))
+                ->assertRedirect(route('admin.pool.applications.index'))
+                ->assertSessionHasErrors('email');
+        }
+
+        $this->assertDatabaseCount('admin_applications', 1);
+    }
+
+    public function test_phone_prefixes_are_removed_and_canonical_numbers_are_stored(): void
+    {
+        $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
+
+        foreach ([
+            ['081234567890', '6281234567890'],
+            ['6281234567891', '6281234567891'],
+            ['+6281234567892', '6281234567892'],
+        ] as $index => [$inputPhone, $storedPhone]) {
+            $input = array_merge($this->applicationInput(), [
+                'email' => 'admin.baru'.$index.'@gmail.com',
+                'phone' => $inputPhone,
+            ]);
+
+            $this->actingAs($poolAdmin)
+                ->withSession($this->poolSession($poolAdmin))
+                ->post(route('admin.pool.applications.store'), $input)
+                ->assertRedirect(route('admin.pool.applications.index'));
+
+            $this->assertDatabaseHas('admin_applications', ['phone' => $storedPhone]);
+        }
+    }
+
+    public function test_invalid_phone_lengths_and_prefixes_are_rejected(): void
+    {
+        $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
+
+        foreach (['81abc', '7123456789', '8123', '812345678901'] as $index => $phone) {
+            $input = array_merge($this->applicationInput(), [
+                'email' => 'invalid.phone'.$index.'@gmail.com',
+                'phone' => $phone,
+            ]);
+
+            $this->actingAs($poolAdmin)
+                ->withSession($this->poolSession($poolAdmin))
+                ->from(route('admin.pool.applications.index'))
+                ->post(route('admin.pool.applications.store'), $input)
+                ->assertRedirect(route('admin.pool.applications.index'))
+                ->assertSessionHasErrors('phone');
+        }
+
+        $this->assertDatabaseCount('admin_applications', 0);
+    }
+
+    public function test_application_view_reopens_registration_modal_and_displays_field_errors(): void
+    {
+        $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
+
+        $this->actingAs($poolAdmin)
+            ->withSession($this->poolSession($poolAdmin))
+            ->from(route('admin.pool.applications.index'))
+            ->post(route('admin.pool.applications.store'), array_merge(
+                $this->applicationInput(),
+                ['email' => 'admin.baru@yahoo.com']
+            ))
+            ->assertRedirect(route('admin.pool.applications.index'));
+
+        $this->actingAs($poolAdmin)
+            ->get(route('admin.pool.applications.index'))
+            ->assertOk()
+            ->assertSee('openRegistrationModal();', false)
+            ->assertSee('Gunakan email @gmail.com')
+            ->assertDontSee('Periksa kembali data pengajuan.')
+            ->assertDontSee('name="position"', false)
+            ->assertSee('novalidate', false)
+            ->assertSee('name="phone"', false)
+            ->assertSee('aria-label="Tampilkan password"', false);
+    }
+
+    public function test_missing_position_is_safe_when_approving_an_application(): void
+    {
+        Mail::fake();
+
+        $master = $this->createAdmin('master@example.test', null, 'admin_master');
+        $application = AdminApplication::create([
+            'full_name' => 'Admin Tanpa Jabatan',
+            'username' => 'applicant_null',
+            'email' => 'tanpa.jabatan@gmail.com',
+            'phone' => '6281234567890',
+            'position' => null,
+            'pool_id' => 'pool_a',
+            'access_code' => 'A'.str_repeat('B', 19),
+            'password_hash' => Hash::make('strong-password-123'),
+            'status' => AdminApplication::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($master)
+            ->withSession($this->masterSession($master))
+            ->post(route('admin.master.applications.approve', $application))
+            ->assertRedirect();
+
+        $this->assertSame('-', $application->fresh()->position_label);
+        $this->assertDatabaseHas('users', [
+            'email' => 'tanpa.jabatan@gmail.com',
+            'position' => null,
+        ]);
+        Mail::assertSent(AdminApplicationApproved::class);
     }
 
     public function test_passwords_longer_than_the_bcrypt_byte_limit_are_rejected(): void
@@ -285,7 +430,7 @@ class AdminApplicationFlowTest extends TestCase
     {
         $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
         $input = array_merge($this->applicationInput(), [
-            'email' => ['admin.baru@example.test'],
+            'email' => ['admin.baru@gmail.com'],
             'password' => ['strong-password-123'],
             'password_confirmation' => 'strong-password-123',
         ]);
@@ -325,7 +470,7 @@ class AdminApplicationFlowTest extends TestCase
         string $email,
         string $poolId,
         string $password = 'strong-password-123',
-        string $phone = '08123456789'
+        string $phone = '6281234567890'
     ): AdminApplication {
         return AdminApplication::create([
             'full_name' => $name,
@@ -347,9 +492,8 @@ class AdminApplicationFlowTest extends TestCase
     {
         return [
             'full_name' => 'Admin Baru',
-            'email' => 'admin.baru@example.test',
-            'phone' => '08198765432',
-            'position' => 'staf_admin',
+            'email' => 'admin.baru@gmail.com',
+            'phone' => '81234567890',
             'password' => 'strong-password-123',
             'password_confirmation' => 'strong-password-123',
         ];
