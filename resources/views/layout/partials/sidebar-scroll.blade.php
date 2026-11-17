@@ -1,4 +1,35 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
 <style>
+    .sidebar .menu a,
+    .sidebar .logout a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .sidebar .menu a i,
+    .sidebar .logout a i {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 20px;
+        color: #9fb3d1;
+        font-size: 20px;
+        line-height: 1;
+        text-align: center;
+    }
+
+    .sidebar .menu a:hover i,
+    .sidebar .menu a.active i {
+        color: #ffffff;
+    }
+
+    .sidebar .logout a,
+    .sidebar .logout a:hover,
+    .sidebar .logout a i {
+        color: #f2a3a3;
+    }
+
     .sidebar {
         display: flex;
         flex-direction: column;

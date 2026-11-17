@@ -179,15 +179,15 @@ body.review-photo-scroll-locked{overflow:hidden}
 
 @php
     $menus = [
-        ['dashboard',           'fa-gauge-high',       '#bfdbfe', 'Dashboard'],
-        ['harga-tiket.index',   'fa-ticket',           '#fcd34d', 'Manajemen Tiket'],
-        ['fasilitas.index',     'fa-person-swimming',  '#67e8f9', 'Fasilitas'],
-        ['reservasi.index',     'fa-calendar-check',   '#6ee7b7', 'Reservasi'],
-        ['promo.index',         'fa-tags',             '#c4b5fd', 'Promo'],
-        ['review.index',        'fa-star',             '#fde047', 'Review'],
-        ['admin.pool.applications.index', 'fa-user-plus', '#86efac', 'Tambah Admin'],
-        ['admin.laporan.penjualan', 'fa-chart-column', '#60a5fa', 'Laporan Penjualan Tiket'],
-        ['penarikan-saldo.index', 'fa-money-bill-transfer', '#86efac', 'Penarikan Saldo'],
+        ['dashboard',           'ti-layout-dashboard', 'Dashboard'],
+        ['harga-tiket.index',   'ti-ticket', 'Manajemen Tiket'],
+        ['fasilitas.index',     'ti-pool', 'Fasilitas'],
+        ['reservasi.index',     'ti-calendar-check', 'Reservasi'],
+        ['promo.index',         'ti-discount-2', 'Promo'],
+        ['review.index',        'ti-star', 'Review'],
+        ['admin.pool.applications.index', 'ti-user-plus', 'Tambah Admin'],
+        ['admin.laporan.penjualan', 'ti-chart-bar', 'Laporan Penjualan Tiket'],
+        ['penarikan-saldo.index', 'ti-cash', 'Penarikan Saldo'],
     ];
 @endphp
 
@@ -201,9 +201,9 @@ body.review-photo-scroll-locked{overflow:hidden}
     <div class="menu-title">Menu Utama</div>
 
     <div class="menu">
-        @foreach($menus as [$rute, $ikon, $warna, $label])
+        @foreach($menus as [$rute, $ikon, $label])
             <a href="{{ route($rute) }}" @if($rute === 'review.index' || ($rute === 'admin.pool.applications.index' && request()->routeIs('admin.pool.applications*'))) class="active" @elseif($rute === 'penarikan-saldo.index' && request()->routeIs('penarikan-saldo.*')) class="active" @endif>
-                <i class="fa-solid {{ $ikon }}" style="color:{{ $warna }};"></i>
+                <i class="ti {{ $ikon }}" aria-hidden="true"></i>
                 <span>{{ $label }}</span>
             </a>
         @endforeach
@@ -211,7 +211,7 @@ body.review-photo-scroll-locked{overflow:hidden}
 
     <div class="logout">
         <a href="{{ route('logout') }}">
-            <i class="fa-solid fa-right-from-bracket" style="color:#f87171;"></i>
+            <i class="ti ti-logout" aria-hidden="true"></i>
             <span>Logout</span>
         </a>
     </div>

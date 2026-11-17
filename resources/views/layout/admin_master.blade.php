@@ -7,6 +7,7 @@
     <title>@yield('title', 'NEXPOOL Admin Master')</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
     <style>
         * {
@@ -95,7 +96,7 @@
         .menu a, .logout a {
             display: flex;
             align-items: center;
-            gap: 13px;
+            gap: 12px;
             padding: 12px 13px;
             border-radius: 10px;
             font-size: 13px;
@@ -109,8 +110,18 @@
             transition: background .2s, color .2s, transform .2s;
         }
 
-        .menu a i, .logout a i { width: 20px; text-align: center; }
-        .menu a i { font-size: 15px; }
+        .menu a i, .logout a i {
+            flex: 0 0 24px;
+            width: 24px;
+            height: 20px;
+            color: #9fb3d1;
+            font-size: 20px;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .menu a:hover i, .menu a.active i { color: #fff; }
+        .logout a i { color: #f2a3a3; }
 
         .menu a:hover {
             background: rgba(255, 255, 255, .07);
@@ -143,13 +154,13 @@
         }
 
         .logout a {
-            color: #fca5a5;
+            color: #f2a3a3;
             transition: .2s;
         }
 
         .logout a:hover {
             background: rgba(239, 68, 68, .12);
-            color: #fecaca;
+            color: #f2a3a3;
         }
 
         .main {
@@ -287,40 +298,40 @@
 
             <a href="{{ url('/admin-master/dashboard') }}"
                class="{{ request()->is('admin-master/dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-gauge-high" style="color:#bfdbfe;"></i>
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
                 <span>Dashboard</span>
             </a>
 
             @if($transactionRoute)
                 <a href="{{ route($transactionRoute) }}"
                    class="{{ request()->routeIs('admin.master.transaksi*', 'admin.master.transactions*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i>
+                    <i class="ti ti-credit-card" aria-hidden="true"></i>
                     <span>Transaksi Pembayaran</span>
                 </a>
             @else
                 <a href="#" style="opacity:.55; cursor:not-allowed"
                    onclick="return false;">
-                    <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i>
+                    <i class="ti ti-credit-card" aria-hidden="true"></i>
                     <span>Transaksi Pembayaran</span>
                 </a>
             @endif
 
             <a href="{{ route('admin.master.penarikan-saldo.index') }}"
                class="{{ request()->routeIs('admin.master.penarikan-saldo.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-money-bill-transfer" style="color:#86efac;"></i>
+                <i class="ti ti-cash" aria-hidden="true"></i>
                 <span>Cairkan Saldo</span>
             </a>
 
             @if(\Illuminate\Support\Facades\Route::has($applicationRoute))
                 <a href="{{ route($applicationRoute) }}"
                    class="{{ request()->routeIs('admin.master.applications*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
+                    <i class="ti ti-user-check" aria-hidden="true"></i>
                     <span>Persetujuan Admin</span>
                 </a>
             @else
                 <a href="#" style="opacity:.55; cursor:not-allowed"
                    onclick="return false;">
-                    <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
+                    <i class="ti ti-user-check" aria-hidden="true"></i>
                     <span>Persetujuan Admin</span>
                 </a>
             @endif
@@ -329,7 +340,7 @@
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                <i class="fa-solid fa-right-from-bracket"></i>
+                <i class="ti ti-logout" aria-hidden="true"></i>
                 <span>Logout</span>
             </a>
         </div>

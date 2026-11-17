@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
     <title>Dashboard - NEXPOOL</title>
 
     <style>
@@ -27,18 +28,19 @@
         .menu::-webkit-scrollbar { width:5px; }
         .menu::-webkit-scrollbar-thumb { background:rgba(148,163,184,.35); border-radius:8px; }
         .menu a {
-            position:relative; display:flex; align-items:center; gap:13px;
+            position:relative; display:flex; align-items:center; gap:12px;
             padding:12px 13px; border-radius:10px; color:#cbd5e1;
             flex:0 0 auto; font-size:13px; font-weight:500; transition:.2s;
         }
-        .menu a i { width:20px; text-align:center; font-size:15px; }
+        .menu a i,.logout i { flex:0 0 24px; width:24px; height:20px; color:#9fb3d1; text-align:center; font-size:20px; line-height:1; }
+        .menu a:hover i,.menu a.active i { color:#fff; }
+        .logout i { color:#f2a3a3; }
         .menu a:hover { background:rgba(255,255,255,.07); color:white; transform:translateX(2px); }
         .menu a.active { background:linear-gradient(90deg,#2563eb,#1d4ed8); color:white; box-shadow:0 8px 20px rgba(37,99,235,.25); }
         .menu a.active::before { content:""; position:absolute; left:-16px; top:8px; width:3px; height:calc(100% - 16px); border-radius:0 5px 5px 0; background:#60a5fa; }
         .logout { flex:0 0 auto; margin-top:10px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); }
-        .logout a { display:flex; align-items:center; gap:13px; padding:12px 13px; border-radius:10px; color:#fca5a5; font-size:13px; }
-        .logout a:hover { background:rgba(239,68,68,.12); color:#fecaca; }
-        .logout i { width:20px; text-align:center; }
+        .logout a { display:flex; align-items:center; gap:12px; padding:12px 13px; border-radius:10px; color:#f2a3a3; font-size:13px; }
+        .logout a:hover { background:rgba(239,68,68,.12); color:#f2a3a3; }
 
         .main { margin-left:255px; min-height:100vh; }
         .header {
@@ -182,35 +184,35 @@
         <div class="menu-title">Menu Utama</div>
         <nav class="menu">
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-gauge-high" style="color:#bfdbfe;"></i><span>Dashboard</span>
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i><span>Dashboard</span>
             </a>
             <a href="{{ route('harga-tiket.index') }}" class="{{ request()->routeIs('harga-tiket*') ? 'active' : '' }}">
-                <i class="fa-solid fa-ticket" style="color:#fcd34d;"></i><span>Manajemen Tiket</span>
+                <i class="ti ti-ticket" aria-hidden="true"></i><span>Manajemen Tiket</span>
             </a>
             <a href="{{ route('fasilitas.index') }}" class="{{ request()->routeIs('fasilitas*') ? 'active' : '' }}">
-                <i class="fa-solid fa-person-swimming" style="color:#67e8f9;"></i><span>Fasilitas</span>
+                <i class="ti ti-pool" aria-hidden="true"></i><span>Fasilitas</span>
             </a>
             <a href="{{ route('reservasi.index') }}" class="{{ request()->routeIs('reservasi*') ? 'active' : '' }}">
-                <i class="fa-solid fa-calendar-check" style="color:#6ee7b7;"></i><span>Reservasi</span>
+                <i class="ti ti-calendar-check" aria-hidden="true"></i><span>Reservasi</span>
             </a>
             <a href="{{ route('promo.index') }}" class="{{ request()->routeIs('promo*') ? 'active' : '' }}">
-                <i class="fa-solid fa-tags" style="color:#c4b5fd;"></i><span>Promo</span>
+                <i class="ti ti-discount-2" aria-hidden="true"></i><span>Promo</span>
             </a>
             <a href="{{ route('review.index') }}" class="{{ request()->routeIs('review*') ? 'active' : '' }}">
-                <i class="fa-solid fa-star" style="color:#fde047;"></i><span>Review</span>
+                <i class="ti ti-star" aria-hidden="true"></i><span>Review</span>
             </a>
             <a href="{{ route('admin.pool.applications.index') }}" class="{{ request()->routeIs('admin.pool.applications*') ? 'active' : '' }}">
-                <i class="fa-solid fa-user-plus" style="color:#86efac;"></i><span>Tambah Admin</span>
+                <i class="ti ti-user-plus" aria-hidden="true"></i><span>Tambah Admin</span>
             </a>
             <a href="{{ route('admin.laporan.penjualan') }}" class="{{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-column" style="color:#60a5fa;"></i><span>Laporan Penjualan Tiket</span>
+                <i class="ti ti-chart-bar" aria-hidden="true"></i><span>Laporan Penjualan Tiket</span>
             </a>
             @include('layout.partials.penarikan-saldo-link')
         </nav>
 
         <div class="logout">
             <a href="{{ route('logout') }}">
-                <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                <i class="ti ti-logout" aria-hidden="true"></i><span>Logout</span>
             </a>
         </div>
     </aside>

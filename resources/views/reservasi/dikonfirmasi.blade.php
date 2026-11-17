@@ -897,52 +897,45 @@
         <div class="menu">
 
             <a href="{{ route('dashboard') }}">
-                <i class="fa-solid fa-gauge-high"
-                    style="color:#bfdbfe;"></i>
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i></i>
                 <span>Dashboard</span>
             </a>
 
             <a href="{{ route('harga-tiket.index') }}">
-                <i class="fa-solid fa-ticket"
-                    style="color:#fcd34d;"></i>
+                <i class="ti ti-ticket" aria-hidden="true"></i></i>
                 <span>Manajemen Tiket</span>
             </a>
 
             <a href="{{ route('fasilitas.index') }}">
-                <i class="fa-solid fa-person-swimming"
-                    style="color:#67e8f9;"></i>
+                <i class="ti ti-pool" aria-hidden="true"></i></i>
                 <span>Fasilitas</span>
             </a>
 
             <a href="{{ route('reservasi.index') }}"
                 class="active">
 
-                <i class="fa-solid fa-calendar-check"
-                    style="color:#6ee7b7;"></i>
+                <i class="ti ti-calendar-check" aria-hidden="true"></i></i>
 
                 <span>Reservasi</span>
 
             </a>
 
             <a href="{{ route('promo.index') }}">
-                <i class="fa-solid fa-tags"
-                    style="color:#c4b5fd;"></i>
+                <i class="ti ti-discount-2" aria-hidden="true"></i></i>
                 <span>Promo</span>
             </a>
 
             <a href="{{ route('review.index') }}">
-                <i class="fa-solid fa-star"
-                    style="color:#fde047;"></i>
+                <i class="ti ti-star" aria-hidden="true"></i></i>
                 <span>Review</span>
             </a>
             <a href="{{ route('admin.pool.applications.index') }}" class="{{ request()->routeIs('admin.pool.applications*') ? 'active' : '' }}">
-                <i class="fa-solid fa-user-plus" style="color:#86efac;"></i>
+                <i class="ti ti-user-plus" aria-hidden="true"></i></i>
                 <span>Tambah Admin</span>
             </a>
 
             <a href="{{ route('admin.laporan.penjualan') }}">
-                <i class="fa-solid fa-chart-column"
-                    style="color:#60a5fa;"></i>
+                <i class="ti ti-chart-bar" aria-hidden="true"></i></i>
                 <span>Laporan Penjualan Tiket</span>
             </a>
             @include('layout.partials.penarikan-saldo-link')
@@ -953,8 +946,7 @@
 
             <a href="{{ route('logout') }}">
 
-                <i class="fa-solid fa-right-from-bracket"
-                    style="color:#f87171;"></i>
+                <i class="ti ti-logout" aria-hidden="true"></i></i>
 
                 <span>Logout</span>
 
