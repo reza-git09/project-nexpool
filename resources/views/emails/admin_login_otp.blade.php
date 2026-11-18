@@ -43,7 +43,7 @@
                             </h1>
                             <p style="margin:0 0 32px;font-size:14px;line-height:1.7;color:#6b7280;text-align:center;">
                                 Gunakan kode di bawah untuk masuk ke akun<br>
-                                <span style="color:#374151;font-weight:600;">Admin Master</span>.
+                                <span style="color:#374151;font-weight:600;">Admin Kolam Renang</span>.
                             </p>
 
                             <!-- Kode -->

@@ -3,14 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\HargaTiket;
+use App\Models\Promo;
 use App\Models\Reservasi;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ReservasiApiController extends Controller
 {
+    private const ADMIN_FEE = 2000;
+
     /**
      * GET SEMUA RESERVASI
      *
@@ -49,7 +55,6 @@ class ReservasiApiController extends Controller
         }
     }
 
-
     /**
      * POST RESERVASI
      *
@@ -66,36 +71,41 @@ class ReservasiApiController extends Controller
                 'nama_pengunjung' => [
                     'required',
                     'string',
-                    'max:255'
+                    'max:255',
                 ],
 
                 'no_hp' => [
                     'required',
                     'string',
-                    'max:20'
+                    'max:20',
                 ],
 
                 'tanggal_kunjungan' => [
                     'required',
-                    'date'
+                    'date',
                 ],
 
                 'jumlah_dewasa' => [
                     'required',
                     'integer',
-                    'min:0'
+                    'min:0',
                 ],
 
                 'jumlah_anak' => [
                     'required',
                     'integer',
-                    'min:0'
+                    'min:0',
+                ],
+
+                'promo_id' => [
+                    'nullable',
+                    'integer',
                 ],
 
                 'total_harga' => [
                     'required',
                     'numeric',
-                    'min:0'
+                    'min:0',
                 ],
             ]);
 
@@ -112,6 +122,58 @@ class ReservasiApiController extends Controller
                 ], 422);
             }
 
+            $tanggalKunjungan = Carbon::parse($validated['tanggal_kunjungan']);
+            $jenisHari = $tanggalKunjungan->isWeekend() ? 'Weekend' : 'Weekday';
+            $hargaTiket = HargaTiket::query()
+                ->where('pool_id', $validated['pool_id'])
+                ->where('jenis_hari', $jenisHari)
+                ->value('harga');
+
+            if ($hargaTiket === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Harga tiket untuk kolam dan tanggal tersebut belum tersedia.',
+                ], 422);
+            }
+
+            $hargaDewasa = (int) round((float) $hargaTiket);
+            $subtotalTiket = $validated['jumlah_dewasa'] * $hargaDewasa;
+            $subtotal = $subtotalTiket + self::ADMIN_FEE;
+            $promo = null;
+            $potonganPromo = 0;
+
+            if (! empty($validated['promo_id'])) {
+                $promo = Promo::query()
+                    ->whereKey($validated['promo_id'])
+                    ->where('pool_id', $validated['pool_id'])
+                    ->where('status', true)
+                    ->whereDate('tanggal_mulai', '<=', $tanggalKunjungan)
+                    ->whereDate('tanggal_selesai', '>=', $tanggalKunjungan)
+                    ->first();
+
+                if ($promo === null) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Promo tidak aktif atau tidak berlaku untuk kolam dan tanggal kunjungan ini.',
+                    ], 422);
+                }
+
+                $nilaiDiskon = (float) $promo->nilai_diskon;
+                $potonganPromo = $promo->jenis_diskon === 'Persentase'
+                    ? (int) round($subtotalTiket * $nilaiDiskon / 100)
+                    : (int) round($nilaiDiskon);
+                $potonganPromo = max(0, min($subtotalTiket, $potonganPromo));
+            }
+
+            $totalHarga = $subtotal - $potonganPromo;
+
+            if ((int) round((float) $validated['total_harga']) !== $totalHarga) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Total pembayaran berubah. Periksa kembali harga tiket dan promo.',
+                ], 422);
+            }
+
             /*
              * Membuat kode reservasi otomatis.
              *
@@ -120,9 +182,9 @@ class ReservasiApiController extends Controller
              */
             do {
                 $kodeReservasi =
-                    'RSV-' .
-                    now()->format('Ymd') .
-                    '-' .
+                    'RSV-'.
+                    now()->format('Ymd').
+                    '-'.
                     strtoupper(Str::random(6));
 
             } while (
@@ -140,14 +202,12 @@ class ReservasiApiController extends Controller
                 'pool_id' => $validated['pool_id'],
                 'nama_pengunjung' => $validated['nama_pengunjung'],
                 'no_hp' => $validated['no_hp'],
-                'tanggal_kunjungan' =>
-                    $validated['tanggal_kunjungan'],
-                'jumlah_dewasa' =>
-                    $validated['jumlah_dewasa'],
-                'jumlah_anak' =>
-                    $validated['jumlah_anak'],
-                'total_harga' =>
-                    $validated['total_harga'],
+                'tanggal_kunjungan' => $validated['tanggal_kunjungan'],
+                'jumlah_dewasa' => $validated['jumlah_dewasa'],
+                'jumlah_anak' => $validated['jumlah_anak'],
+                'total_harga' => $totalHarga,
+                'nama_promo' => $promo?->nama_promo,
+                'potongan_promo' => $potonganPromo,
                 'status_reservasi' => 'Menunggu',
             ]);
 
@@ -156,32 +216,24 @@ class ReservasiApiController extends Controller
                 'message' => 'Reservasi berhasil dibuat',
                 'data' => [
                     'id' => $reservasi->id,
-                    'kode_reservasi' =>
-                        $reservasi->kode_reservasi,
-                    'pool_id' =>
-                        $reservasi->pool_id,
-                    'nama_pengunjung' =>
-                        $reservasi->nama_pengunjung,
-                    'no_hp' =>
-                        $reservasi->no_hp,
-                    'tanggal_kunjungan' =>
-                        $reservasi->tanggal_kunjungan,
-                    'jumlah_dewasa' =>
-                        $reservasi->jumlah_dewasa,
-                    'jumlah_anak' =>
-                        $reservasi->jumlah_anak,
-                    'total_harga' =>
-                        $reservasi->total_harga,
-                    'status_reservasi' =>
-                        $reservasi->status_reservasi,
-                    'created_at' =>
-                        $reservasi->created_at,
-                    'updated_at' =>
-                        $reservasi->updated_at,
+                    'kode_reservasi' => $reservasi->kode_reservasi,
+                    'pool_id' => $reservasi->pool_id,
+                    'nama_pengunjung' => $reservasi->nama_pengunjung,
+                    'no_hp' => $reservasi->no_hp,
+                    'tanggal_kunjungan' => $reservasi->tanggal_kunjungan,
+                    'jumlah_dewasa' => $reservasi->jumlah_dewasa,
+                    'jumlah_anak' => $reservasi->jumlah_anak,
+                    'nama_promo' => $reservasi->nama_promo,
+                    'potongan_promo' => $reservasi->potongan_promo,
+                    'subtotal_harga' => $subtotal,
+                    'total_harga' => $reservasi->total_harga,
+                    'status_reservasi' => $reservasi->status_reservasi,
+                    'created_at' => $reservasi->created_at,
+                    'updated_at' => $reservasi->updated_at,
                 ],
             ], 201);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
 
             return response()->json([
                 'success' => false,
@@ -199,7 +251,6 @@ class ReservasiApiController extends Controller
         }
     }
 
-
     /**
      * GET DETAIL RESERVASI
      *
@@ -212,7 +263,7 @@ class ReservasiApiController extends Controller
 
             $reservasi = Reservasi::find($id);
 
-            if (!$reservasi) {
+            if (! $reservasi) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Reservasi tidak ditemukan',
@@ -235,7 +286,6 @@ class ReservasiApiController extends Controller
         }
     }
 
-
     /**
      * GET RESERVASI BERDASARKAN KODE RESERVASI
      *
@@ -251,7 +301,7 @@ class ReservasiApiController extends Controller
                 $kode
             )->first();
 
-            if (!$reservasi) {
+            if (! $reservasi) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Kode reservasi tidak ditemukan',

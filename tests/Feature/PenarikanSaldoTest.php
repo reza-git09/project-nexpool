@@ -383,6 +383,7 @@ class PenarikanSaldoTest extends TestCase
             ->get(route('admin.master.penarikan-saldo.index'))
             ->assertOk()
             ->assertSee('Detail')
+            ->assertSee('<i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat', false)
             ->assertSee('<span class="status-badge status-terkonfirmasi">Terkonfirmasi</span>', false)
             ->assertSee(route('admin.master.penarikan-saldo.proof.show', $completed), false);
 
@@ -401,6 +402,7 @@ class PenarikanSaldoTest extends TestCase
             ->get(route('penarikan-saldo.index'))
             ->assertOk()
             ->assertSee('Lihat')
+            ->assertSee('<i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat', false)
             ->assertSee('data-proof-preview-url="'.route('penarikan-saldo.proof.show', $completed).'"', false)
             ->assertSee('id="proofPreviewModal"', false)
             ->assertDontSee('<img class="proof-preview"', false);
@@ -487,6 +489,7 @@ class PenarikanSaldoTest extends TestCase
             ->assertSee('data-amount="Rp 500.000,00"', false)
             ->assertSee('data-status="Diproses"', false)
             ->assertSee('Detail')
+            ->assertSee('<i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat', false)
             ->assertSee('type="file"', false)
             ->assertSee('data-detail-proof-form', false)
             ->assertSee('data-proof-upload-url=', false)

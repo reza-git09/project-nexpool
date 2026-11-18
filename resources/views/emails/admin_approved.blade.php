@@ -41,8 +41,8 @@
 
         <p><strong>Gunakan kredensial berikut untuk login:</strong></p>
         <div class="cred-box">
-            <p class="label">Username</p>
-            <p class="value">{{ $application->username }}</p>
+            <p class="label">Email</p>
+            <p class="value">{{ $application->email }}</p>
             @if($plainPassword)
                 <p class="label" style="margin-top:14px;">Password Sementara</p>
                 <p class="value">{{ $plainPassword }}</p>
@@ -51,9 +51,11 @@
             @endif
         </div>
 
+        <p>Pada login pertama, masukkan kode OTP yang dikirim ke email ini untuk memverifikasi akun Anda.</p>
+
         @if($plainPassword)
             <div class="warning">
-                ⚠️ <strong>Penting:</strong> Anda akan diminta mengganti password ini saat pertama kali login. Jaga kerahasiaan password Anda.
+                ⚠️ <strong>Penting:</strong> Setelah verifikasi OTP, Anda akan diminta mengganti password ini. Jaga kerahasiaan password Anda.
             </div>
         @endif
 

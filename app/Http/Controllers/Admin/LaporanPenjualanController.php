@@ -117,7 +117,7 @@ class LaporanPenjualanController extends Controller
     }
 
     // ------------------------------------------------------------------
-    // Export CSV (bisa dibuka di Excel)
+    // Export a formatted Excel-compatible workbook.
     // ------------------------------------------------------------------
     public function export(Request $request)
     {
@@ -137,16 +137,47 @@ class LaporanPenjualanController extends Controller
             ->orderByDesc($s['tanggal'])
             ->when($s['id'], fn ($q) => $q->orderByDesc('id'));
 
-        $filename = 'laporan-penjualan-tiket-'.$f['bulan'].'.csv';
+        $filename = 'laporan-penjualan-tiket-'.$f['bulan'].'.xls';
 
-        return new StreamedResponse(function () use ($query, $s, $names, $f) {
-            $out = fopen('php://output', 'w');
-            fwrite($out, "\xEF\xBB\xBF"); // BOM supaya Excel baca UTF-8
-            $period = $this->periodeLabel($f);
-            fputcsv($out, ['LAPORAN PENJUALAN TIKET NEXPOOL'], ';');
-            fputcsv($out, ['Periode', $period], ';');
-            fputcsv($out, [], ';');
-            fputcsv($out, ['No', 'Kode Reservasi', 'Nama Pengunjung', 'No. HP', 'Tanggal Kunjungan', 'Kolam', 'Tiket Dewasa', 'Tiket Anak', 'Jumlah Tiket', 'Pendapatan Tiket (Rp)', 'Status'], ';');
+        return new StreamedResponse(function () use ($query, $s, $names, $f): void {
+            echo '<?xml version="1.0" encoding="UTF-8"?>';
+            echo '<?mso-application progid="Excel.Sheet"?>';
+            echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"'
+                .' xmlns:o="urn:schemas-microsoft-com:office:office"'
+                .' xmlns:x="urn:schemas-microsoft-com:office:excel"'
+                .' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"'
+                .' xmlns:html="http://www.w3.org/TR/REC-html40">';
+            echo '<Styles>';
+            echo '<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Color="#1F2937"/></Style>';
+            echo '<Style ss:ID="Title"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="16" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1D4ED8" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="PeriodLabel"><Font ss:Bold="1" ss:Color="#475569"/><Interior ss:Color="#EFF6FF" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="Period"><Font ss:Bold="1" ss:Color="#1D4ED8"/><Interior ss:Color="#EFF6FF" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="Header"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1E3A8A" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="Text"><Alignment ss:Vertical="Center" ss:WrapText="1"/></Style>';
+            echo '<Style ss:ID="Phone"><Alignment ss:Vertical="Center"/><NumberFormat ss:Format="@"/></Style>';
+            echo '<Style ss:ID="Date"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>';
+            echo '<Style ss:ID="Number"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="#,##0"/></Style>';
+            echo '<Style ss:ID="Currency"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="&quot;Rp&quot; #,##0"/></Style>';
+            echo '<Style ss:ID="Status"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1" ss:Color="#166534"/><Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="TotalText"><Font ss:Bold="1" ss:Color="#172033"/><Interior ss:Color="#DBEAFE" ss:Pattern="Solid"/></Style>';
+            echo '<Style ss:ID="TotalNumber"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:Bold="1"/><Interior ss:Color="#DBEAFE" ss:Pattern="Solid"/><NumberFormat ss:Format="#,##0"/></Style>';
+            echo '<Style ss:ID="TotalCurrency"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:Bold="1"/><Interior ss:Color="#DBEAFE" ss:Pattern="Solid"/><NumberFormat ss:Format="&quot;Rp&quot; #,##0"/></Style>';
+            echo '</Styles>';
+            echo '<Worksheet ss:Name="Laporan Penjualan"><Table ss:ExpandedColumnCount="11">';
+
+            foreach ([40, 125, 155, 115, 115, 135, 80, 80, 90, 145, 100] as $width) {
+                echo '<Column ss:Width="'.$width.'"/>';
+            }
+
+            echo '<Row ss:Height="32">'.$this->spreadsheetCell('LAPORAN PENJUALAN TIKET NEXPOOL', 'Title', 'String', 10).'</Row>';
+            echo '<Row ss:Height="24">'.$this->spreadsheetCell('Periode', 'PeriodLabel')
+                .$this->spreadsheetCell($this->periodeLabel($f), 'Period', 'String', 9).'</Row>';
+            echo '<Row/>';
+            echo '<Row ss:Height="34">';
+            foreach (['No', 'Kode Reservasi', 'Nama Pengunjung', 'No. HP', 'Tanggal Kunjungan', 'Kolam', 'Tiket Dewasa', 'Tiket Anak', 'Jumlah Tiket', 'Pendapatan Tiket (Rp)', 'Status'] as $heading) {
+                echo $this->spreadsheetCell($heading, 'Header');
+            }
+            echo '</Row>';
 
             $no = 0;
             $totalAll = 0;
@@ -158,26 +189,46 @@ class LaporanPenjualanController extends Controller
                 $totalAll += $m['total'];
                 $totalDewasa += $m['dewasa'];
                 $totalAnak += $m['anak'];
-                fputcsv($out, [
-                    $no,
-                    $this->csvSafe($m['kode']),
-                    $this->csvSafe($m['nama']),
-                    $this->csvSafe("'".$m['hp']),
-                    $m['tanggal'],
-                    $this->csvSafe($m['kolam']),
-                    $m['dewasa'],
-                    $m['anak'],
-                    $m['dewasa'] + $m['anak'],
-                    (int) round($m['total']),
-                    $this->csvSafe($m['status']),
-                ], ';');
+                echo '<Row ss:AutoFitHeight="1">'
+                    .$this->spreadsheetCell($no, 'Number', 'Number')
+                    .$this->spreadsheetCell($m['kode'])
+                    .$this->spreadsheetCell($m['nama'])
+                    .$this->spreadsheetCell($m['hp'], 'Phone')
+                    .$this->spreadsheetCell($m['tanggal'], 'Date')
+                    .$this->spreadsheetCell($m['kolam'])
+                    .$this->spreadsheetCell($m['dewasa'], 'Number', 'Number')
+                    .$this->spreadsheetCell($m['anak'], 'Number', 'Number')
+                    .$this->spreadsheetCell($m['dewasa'] + $m['anak'], 'Number', 'Number')
+                    .$this->spreadsheetCell((int) round($m['total']), 'Currency', 'Number')
+                    .$this->spreadsheetCell($m['status'], 'Status')
+                    .'</Row>';
             }
-            fputcsv($out, ['', '', 'TOTAL', '', '', '', $totalDewasa, $totalAnak, $totalDewasa + $totalAnak, (int) round($totalAll), ''], ';');
-            fclose($out);
+
+            echo '<Row ss:Height="25">'
+                .$this->spreadsheetCell('', 'TotalText')
+                .$this->spreadsheetCell('', 'TotalText')
+                .$this->spreadsheetCell('TOTAL', 'TotalText')
+                .$this->spreadsheetCell('', 'TotalText')
+                .$this->spreadsheetCell('', 'TotalText')
+                .$this->spreadsheetCell('', 'TotalText')
+                .$this->spreadsheetCell($totalDewasa, 'TotalNumber', 'Number')
+                .$this->spreadsheetCell($totalAnak, 'TotalNumber', 'Number')
+                .$this->spreadsheetCell($totalDewasa + $totalAnak, 'TotalNumber', 'Number')
+                .$this->spreadsheetCell((int) round($totalAll), 'TotalCurrency', 'Number')
+                .$this->spreadsheetCell('', 'TotalText')
+                .'</Row></Table></Worksheet></Workbook>';
         }, 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
+    }
+
+    private function spreadsheetCell(string|int|float $value, string $style = 'Text', string $type = 'String', ?int $mergeAcross = null): string
+    {
+        $mergeAttribute = $mergeAcross === null ? '' : ' ss:MergeAcross="'.$mergeAcross.'"';
+        $escapedValue = htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES | ENT_SUBSTITUTE | ENT_DISALLOWED, 'UTF-8');
+
+        return '<Cell ss:StyleID="'.$style.'"'.$mergeAttribute.'><Data ss:Type="'.$type.'">'.$escapedValue.'</Data></Cell>';
     }
 
     // ------------------------------------------------------------------
@@ -410,12 +461,6 @@ class LaporanPenjualanController extends Controller
         }
 
         return 'neutral';
-    }
-
-    private function csvSafe(string $v): string
-    {
-        // Cegah formula injection di Excel (=, +, -, @)
-        return $v !== '' && in_array($v[0], ['=', '+', '-', '@'], true) ? "'".$v : $v;
     }
 
     private function periodeLabel(array $f): string

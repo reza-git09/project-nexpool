@@ -163,7 +163,7 @@
 
 @section('content')
 <div class="withdrawal-notice">
-    Periksa informasi pengajuan melalui tombol <strong>Detail</strong>. Setelah transfer dilakukan di luar sistem,
+    Periksa informasi pengajuan melalui tombol <strong>Lihat</strong>. Setelah transfer dilakukan di luar sistem,
     pilih bukti transfer JPG, JPEG, atau PNG (maksimal 5 MB), lalu tekan <strong>Kirim</strong> untuk menyimpan bukti
     sekaligus mengonfirmasi pencairan.
 </div>
@@ -221,7 +221,7 @@
                                         data-proof-show-url="{{ route('admin.master.penarikan-saldo.proof.show', $withdrawal) }}"
                                     @endif
                                 >
-                                    <i class="fa-regular fa-eye"></i> Detail
+                                    <i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat
                                 </button>
                             </div>
                         </td>
@@ -273,7 +273,7 @@
             rel="noopener"
             hidden
         >
-            <i class="fa-regular fa-image"></i> Lihat bukti transfer
+            <i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat bukti transfer
         </a>
         <form
             class="detail-proof-form"

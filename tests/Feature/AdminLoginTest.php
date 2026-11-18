@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -24,6 +25,7 @@ class AdminLoginTest extends TestCase
             $table->string('password');
             $table->string('role')->nullable();
             $table->boolean('must_change_password')->default(false);
+            $table->boolean('first_login_otp_verified')->nullable()->default(true);
             $table->string('full_name')->nullable();
             $table->rememberToken();
             $table->timestamps();
@@ -49,6 +51,8 @@ class AdminLoginTest extends TestCase
 
     public function test_admin_can_log_in_with_email_and_password_without_selecting_a_pool(): void
     {
+        Mail::fake();
+
         DB::table('users')->insert([
             'name' => 'Admin Master',
             'username' => 'admin_master',
@@ -56,6 +60,7 @@ class AdminLoginTest extends TestCase
             'password' => Hash::make('secret-password'),
             'role' => 'admin_master',
             'must_change_password' => false,
+            'first_login_otp_verified' => false,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -72,10 +77,13 @@ class AdminLoginTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
         $this->assertFalse(session()->has('admin_otp_user_id'));
+        Mail::assertNothingSent();
     }
 
     public function test_admin_pool_can_log_in_without_admin_master_otp(): void
     {
+        Mail::fake();
+
         DB::table('users')->insert([
             'name' => 'Admin Kolam',
             'username' => 'admin_kolam',
@@ -93,6 +101,34 @@ class AdminLoginTest extends TestCase
         ])
             ->assertRedirect('/dashboard')
             ->assertSessionHas('admin_role', 'admin_pool');
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_existing_admin_pool_without_an_otp_marker_can_log_in_directly(): void
+    {
+        Mail::fake();
+
+        DB::table('users')->insert([
+            'name' => 'Admin Kolam Lama',
+            'username' => 'admin_kolam_lama',
+            'email' => 'kolam.lama@example.test',
+            'password' => Hash::make('secret-password'),
+            'role' => 'admin_pool',
+            'must_change_password' => false,
+            'first_login_otp_verified' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->post('/login', [
+            'email' => 'kolam.lama@example.test',
+            'password' => 'secret-password',
+        ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionHas('admin_role', 'admin_pool');
+
+        Mail::assertNothingSent();
     }
 
     public function test_admin_master_cannot_log_in_with_an_incorrect_password(): void

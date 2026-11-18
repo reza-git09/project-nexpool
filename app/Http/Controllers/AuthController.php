@@ -15,7 +15,7 @@ use Throwable;
 
 class AuthController extends Controller
 {
-    /** Kunci session untuk user Admin Master yang sudah benar password tapi belum verifikasi OTP. */
+    /** Kunci session untuk user yang sudah benar password tapi belum verifikasi OTP pertama. */
     private const OTP_SESSION_KEY = 'admin_otp_user_id';
 
     public function showLoginForm(): View
@@ -23,7 +23,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request, AdminLoginOtpService $otp): RedirectResponse
     {
         $email = strtolower(trim($request->input('email', '')));
         $request->merge(['email' => $email]);
@@ -60,6 +60,10 @@ class AuthController extends Controller
 
         // Verifikasi password.
         if ($user && Hash::check($request->password, $user->password)) {
+            if ($user->role === 'admin_pool' && $user->first_login_otp_verified === false) {
+                return $this->startOtpChallenge($request, $user, $otp);
+            }
+
             return $this->completeLogin($request, $user);
         }
 
@@ -103,6 +107,7 @@ class AuthController extends Controller
 
         switch ($result['status']) {
             case 'ok':
+                $user->update(['first_login_otp_verified' => true]);
                 $request->session()->forget(self::OTP_SESSION_KEY);
 
                 return $this->completeLogin($request, $user);
@@ -165,9 +170,7 @@ class AuthController extends Controller
     /** Finalisasi autentikasi dan arahkan user ke dashboard berdasarkan role. */
     private function completeLogin(Request $request, User $user): RedirectResponse
     {
-        if ($user->isAdminMaster()) {
-            $request->session()->forget(self::OTP_SESSION_KEY);
-        }
+        $request->session()->forget(self::OTP_SESSION_KEY);
 
         Auth::login($user);
         $request->session()->regenerate();
@@ -202,7 +205,25 @@ class AuthController extends Controller
         return redirect()->intended('/dashboard');
     }
 
-    /** User yang sedang menunggu verifikasi OTP (hanya Admin Master). */
+    private function startOtpChallenge(Request $request, User $user, AdminLoginOtpService $otp): RedirectResponse
+    {
+        try {
+            $otp->issue($user);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()
+                ->with('error', 'Kode OTP gagal dikirim. Coba lagi sebentar.')
+                ->withInput($request->except('password'));
+        }
+
+        $request->session()->regenerate();
+        $request->session()->put(self::OTP_SESSION_KEY, $user->getKey());
+
+        return redirect()->route('login.otp');
+    }
+
+    /** User Admin Kolam yang belum menyelesaikan verifikasi OTP pertama. */
     private function pendingOtpUser(Request $request): ?User
     {
         $id = $request->session()->get(self::OTP_SESSION_KEY);
@@ -213,7 +234,7 @@ class AuthController extends Controller
 
         $user = User::find($id);
 
-        if (! $user || ! $user->isAdminMaster()) {
+        if (! $user || $user->role !== 'admin_pool' || $user->first_login_otp_verified !== false) {
             $request->session()->forget(self::OTP_SESSION_KEY);
 
             return null;

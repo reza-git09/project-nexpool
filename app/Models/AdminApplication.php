@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdminApplication extends Model
 {
+    public const POSITIONS = [
+        'kasir_tiket' => 'Kasir Tiket',
+        'pengelola_fasilitas' => 'Pengelola Fasilitas',
+        'staf_admin' => 'Staf Admin',
+    ];
+
     const STATUS_PENDING = 'pending';
 
     const STATUS_APPROVED = 'approved';
@@ -44,12 +50,7 @@ class AdminApplication extends Model
             return '-';
         }
 
-        return match ($this->position) {
-            'kasir_tiket' => 'Kasir Tiket',
-            'pengelola_fasilitas' => 'Pengelola Fasilitas',
-            'staf_admin' => 'Staf Admin',
-            default => ucfirst($this->position),
-        };
+        return self::POSITIONS[$this->position] ?? ucfirst($this->position);
     }
 
     // Label tampilan status

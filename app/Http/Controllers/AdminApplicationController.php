@@ -104,6 +104,7 @@ class AdminApplicationController extends Controller
                 'password' => $passwordHash,
                 'role' => 'admin_pool',
                 'must_change_password' => $plainPassword !== null,
+                'first_login_otp_verified' => false,
             ]);
 
             $application->update([

@@ -19,7 +19,7 @@ class AdminLoginOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Kode OTP Login Admin Master NEXPOOL',
+            subject: 'Kode OTP Login Admin Kolam NEXPOOL',
         );
     }
 

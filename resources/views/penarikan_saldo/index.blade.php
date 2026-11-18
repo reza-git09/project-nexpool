@@ -239,7 +239,7 @@
                                 type="button"
                                 data-proof-preview-url="{{ route('penarikan-saldo.proof.show', $withdrawal) }}"
                             >
-                                <i class="fa-regular fa-image"></i> Lihat
+                                <i class="fa-regular fa-eye" aria-hidden="true"></i> Lihat
                             </button>
                             @if ($withdrawal->transfer_proof_uploaded_at)
                                 <div class="field-error" style="color:#64748b">
