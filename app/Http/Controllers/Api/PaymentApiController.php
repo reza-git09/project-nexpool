@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\RescheduleRequest;
 use App\Models\Reservasi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -216,7 +217,7 @@ class PaymentApiController extends Controller
 
             $message = str_contains($exception->getMessage(), 'HTTP status code: 401')
                 ? 'Midtrans menolak Server Key (HTTP 401). Periksa bahwa MIDTRANS_SERVER_KEY adalah Server Key Sandbox saat MIDTRANS_IS_PRODUCTION=false, lalu bersihkan config dan restart server Laravel.'
-                : (config('app.debug') ? 'Gagal membuat QRIS: ' . $exception->getMessage() : 'Gagal membuat QRIS. Silakan coba lagi.');
+                : (config('app.debug') ? 'Gagal membuat QRIS: '.$exception->getMessage() : 'Gagal membuat QRIS. Silakan coba lagi.');
 
             return response()->json([
                 'status' => 'error',
@@ -225,8 +226,293 @@ class PaymentApiController extends Controller
         }
     }
 
+    public function createRescheduleQris(
+        Request $request,
+        string $kode,
+        RescheduleRequest $rescheduleRequest,
+    ): JsonResponse {
+        $validated = $request->validate([
+            'reservation_code' => ['required', 'string'],
+            'no_hp' => ['required', 'string', 'max:20'],
+            'customer_name' => ['nullable', 'string', 'max:255'],
+            'customer_email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        return DB::transaction(function () use (
+            $validated,
+            $kode,
+            $rescheduleRequest,
+        ): JsonResponse {
+            $rescheduleRequest = RescheduleRequest::query()
+                ->whereKey($rescheduleRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $reservation = $rescheduleRequest->reservasi;
+
+            abort_unless(
+                $reservation !== null
+                    && $reservation->kode_reservasi === $kode
+                    && $validated['reservation_code'] === $kode,
+                404,
+                'Pengajuan reschedule tidak ditemukan.',
+            );
+
+            $savedPhone = preg_replace('/\D+/', '', (string) $reservation->no_hp);
+            $providedPhone = preg_replace('/\D+/', '', $validated['no_hp']);
+            abort_unless(
+                $savedPhone !== '' && hash_equals($savedPhone, $providedPhone),
+                403,
+                'Data pemesan tidak cocok dengan reservasi.',
+            );
+
+            if ($rescheduleRequest->status !== RescheduleRequest::STATUS_AWAITING_PAYMENT) {
+                abort(422, 'Pengajuan reschedule belum disetujui atau sudah selesai.');
+            }
+
+            if ($rescheduleRequest->expires_at?->isPast()) {
+                $rescheduleRequest->forceFill([
+                    'status' => RescheduleRequest::STATUS_EXPIRED,
+                ])->save();
+
+                return response()->json([
+                    'message' => 'Persetujuan reschedule sudah kedaluwarsa.',
+                ], 422);
+            }
+
+            if (
+                $reservation->status_pembayaran !== 'paid'
+                || in_array($reservation->status_reservasi, ['Dibatalkan', 'Selesai'], true)
+            ) {
+                $rescheduleRequest->forceFill([
+                    'status' => RescheduleRequest::STATUS_EXPIRED,
+                ])->save();
+
+                return response()->json([
+                    'message' => 'Tiket tidak lagi memenuhi syarat untuk reschedule.',
+                ], 422);
+            }
+
+            if ($rescheduleRequest->selisih_harga < 1) {
+                abort(422, 'Pengajuan ini tidak memerlukan pembayaran selisih.');
+            }
+
+            if ($rescheduleRequest->payment_status === 'paid') {
+                return response()->json([
+                    'status' => 'success',
+                    'order_id' => $rescheduleRequest->payment_order_id,
+                    'status_pembayaran' => 'paid',
+                    'reschedule_status' => $rescheduleRequest->status,
+                    'paid_at' => $rescheduleRequest->paid_at,
+                ]);
+            }
+
+            $now = now();
+            if ($now->copy()->addMinutes(10)->gte($rescheduleRequest->expires_at)) {
+                abort(422, 'Batas persetujuan terlalu dekat untuk memulai pembayaran baru.');
+            }
+
+            if (
+                $rescheduleRequest->payment_status === 'pending'
+                && $rescheduleRequest->payment_order_id
+                && $rescheduleRequest->payment_expires_at?->isFuture()
+            ) {
+                $secondsLeft = $now->diffInSeconds(
+                    $rescheduleRequest->payment_expires_at,
+                    false,
+                );
+
+                return response()->json([
+                    'status' => 'success',
+                    'order_id' => $rescheduleRequest->payment_order_id,
+                    'status_pembayaran' => 'pending',
+                    'reschedule_status' => $rescheduleRequest->status,
+                    'qr_url' => $rescheduleRequest->payment_qr_url,
+                    'server_time' => $now->toIso8601String(),
+                    'expired_at' => $rescheduleRequest->payment_expires_at->toIso8601String(),
+                    'remaining_seconds' => max(0, (int) $secondsLeft),
+                ]);
+            }
+
+            if (
+                $rescheduleRequest->payment_status === 'pending'
+                && $rescheduleRequest->payment_order_id
+            ) {
+                try {
+                    $this->configureMidtrans();
+                    $previousTransaction = Transaction::status(
+                        $rescheduleRequest->payment_order_id,
+                    );
+                    $previousTransactionData = json_decode(
+                        json_encode($previousTransaction, JSON_THROW_ON_ERROR),
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR,
+                    );
+                    $this->syncReschedulePaymentStatus(
+                        $rescheduleRequest,
+                        $previousTransactionData,
+                    );
+                    $rescheduleRequest->refresh();
+
+                    if ($rescheduleRequest->payment_status === 'paid') {
+                        return response()->json([
+                            'status' => 'success',
+                            'order_id' => $rescheduleRequest->payment_order_id,
+                            'status_pembayaran' => 'paid',
+                            'reschedule_status' => $rescheduleRequest->status,
+                            'paid_at' => $rescheduleRequest->paid_at,
+                        ]);
+                    }
+
+                    if ($rescheduleRequest->payment_status === 'pending') {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Transaksi QRIS sebelumnya masih diproses. Coba lagi sebentar.',
+                        ], 409);
+                    }
+                } catch (\Throwable $exception) {
+                    Log::warning('Midtrans previous reschedule payment check failed.', [
+                        'order_id' => $rescheduleRequest->payment_order_id,
+                        'message' => $exception->getMessage(),
+                    ]);
+
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Status transaksi sebelumnya belum dapat diperiksa.',
+                    ], 502);
+                }
+            }
+
+            $this->configureMidtrans();
+
+            try {
+                $orderId = 'RESCHEDULE-'.$rescheduleRequest->id.'-'.strtoupper(Str::random(8));
+                $nowWib = Carbon::now('Asia/Jakarta');
+                $expiredAtWib = $nowWib->copy()->addMinutes(10);
+                $transaction = CoreApi::charge([
+                    'payment_type' => 'qris',
+                    'transaction_details' => [
+                        'order_id' => $orderId,
+                        'gross_amount' => $rescheduleRequest->selisih_harga,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $validated['customer_name']
+                            ?? $reservation->nama_pengunjung,
+                        'email' => $validated['customer_email'] ?? 'user@nexpool.test',
+                        'phone' => $reservation->no_hp,
+                    ],
+                    'qris' => [
+                        'acquirer' => 'gopay',
+                    ],
+                    'custom_expiry' => [
+                        'order_time' => $nowWib->format('Y-m-d H:i:s O'),
+                        'expiry_duration' => 10,
+                        'unit' => 'minute',
+                    ],
+                ]);
+
+                $transactionData = json_decode(
+                    json_encode($transaction, JSON_THROW_ON_ERROR),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR,
+                );
+                $qrAction = collect($transactionData['actions'] ?? [])
+                    ->firstWhere('name', 'generate-qr-code');
+                $qrUrl = is_array($qrAction) ? ($qrAction['url'] ?? null) : null;
+
+                if (
+                    ($transactionData['status_code'] ?? null) !== '201'
+                    || ! is_string($qrUrl)
+                    || $qrUrl === ''
+                ) {
+                    throw new \RuntimeException('Midtrans tidak mengembalikan URL QRIS.');
+                }
+
+                $rescheduleRequest->forceFill([
+                    'payment_order_id' => $orderId,
+                    'payment_transaction_id' => $transactionData['transaction_id'] ?? null,
+                    'payment_qr_url' => $qrUrl,
+                    'payment_status' => 'pending',
+                    'payment_expires_at' => $expiredAtWib,
+                ])->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'order_id' => $orderId,
+                    'status_pembayaran' => 'pending',
+                    'reschedule_status' => $rescheduleRequest->status,
+                    'qr_url' => $qrUrl,
+                    'server_time' => $nowWib->toIso8601String(),
+                    'expired_at' => $expiredAtWib->toIso8601String(),
+                    'remaining_seconds' => 600,
+                ]);
+            } catch (\Throwable $exception) {
+                Log::error('Midtrans reschedule QRIS creation failed.', [
+                    'reschedule_request_id' => $rescheduleRequest->id,
+                    'message' => $exception->getMessage(),
+                ]);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal membuat pembayaran selisih. Silakan coba lagi.',
+                ], 502);
+            }
+        });
+    }
+
     public function status(string $orderId): JsonResponse
     {
+        $rescheduleRequest = RescheduleRequest::query()
+            ->where('payment_order_id', $orderId)
+            ->first();
+
+        if ($rescheduleRequest !== null) {
+            if ($rescheduleRequest->payment_status !== 'paid') {
+                $this->configureMidtrans();
+
+                try {
+                    $transaction = Transaction::status($orderId);
+                    $transactionData = json_decode(
+                        json_encode($transaction, JSON_THROW_ON_ERROR),
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR,
+                    );
+                    $this->syncReschedulePaymentStatus($rescheduleRequest, $transactionData);
+                    $rescheduleRequest->refresh();
+                } catch (\Throwable $exception) {
+                    Log::warning('Midtrans reschedule status check failed.', [
+                        'order_id' => $orderId,
+                        'message' => $exception->getMessage(),
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Status pembayaran selisih belum dapat diperiksa.',
+                    ], 502);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'order_id' => $rescheduleRequest->payment_order_id,
+                    'reservation_code' => $rescheduleRequest->reservasi?->kode_reservasi,
+                    'status_pembayaran' => $rescheduleRequest->payment_status,
+                    'reschedule_status' => $rescheduleRequest->status,
+                    'tanggal_kunjungan' => $rescheduleRequest->reservasi
+                        ?->fresh()
+                        ?->tanggal_kunjungan
+                        ?->format('Y-m-d'),
+                    'selisih_harga' => $rescheduleRequest->selisih_harga,
+                    'paid_at' => $rescheduleRequest->paid_at,
+                    'qr_url' => $rescheduleRequest->payment_qr_url,
+                    'server_time' => Carbon::now('Asia/Jakarta')->toIso8601String(),
+                ],
+            ]);
+        }
+
         $reservation = Reservasi::where('midtrans_order_id', $orderId)->firstOrFail();
 
         if ($reservation->status_pembayaran !== 'paid') {
@@ -271,9 +557,16 @@ class PaymentApiController extends Controller
 
     public function qrImage(string $orderId)
     {
-        $reservation = Reservasi::where('midtrans_order_id', $orderId)->firstOrFail();
+        $rescheduleRequest = RescheduleRequest::query()
+            ->where('payment_order_id', $orderId)
+            ->first();
+        $reservation = $rescheduleRequest?->reservasi
+            ?? Reservasi::query()->where('midtrans_order_id', $orderId)->firstOrFail();
+        $transactionId = $rescheduleRequest?->payment_transaction_id
+            ?? $reservation->midtrans_transaction_id;
+
         abort_unless(
-            filled($reservation->midtrans_transaction_id),
+            filled($transactionId),
             404,
             'QRIS belum tersedia.',
         );
@@ -282,7 +575,7 @@ class PaymentApiController extends Controller
 
         $url = Config::getBaseUrl()
             .'/v2/qris/'
-            .rawurlencode($reservation->midtrans_transaction_id)
+            .rawurlencode($transactionId)
             .'/qr-code';
 
         try {
@@ -393,46 +686,68 @@ class PaymentApiController extends Controller
             $validated['order_id'],
         )->first();
 
-        if (! $reservation) {
-            return response()->json(['message' => 'Reservasi tidak ditemukan.'], 404);
+        if ($reservation !== null) {
+            if (
+                number_format((float) $reservation->total_harga, 2, '.', '')
+                !== number_format((float) $validated['gross_amount'], 2, '.', '')
+            ) {
+                return response()->json(['message' => 'Nominal pembayaran tidak sesuai.'], 422);
+            }
+
+            $this->syncPaymentStatus($reservation, $request->all());
+
+            return response()->json(['success' => true]);
+        }
+
+        $rescheduleRequest = RescheduleRequest::query()
+            ->where('payment_order_id', $validated['order_id'])
+            ->first();
+
+        if ($rescheduleRequest === null) {
+            return response()->json(['message' => 'Transaksi tidak ditemukan.'], 404);
         }
 
         if (
-            number_format((float) $reservation->total_harga, 2, '.', '')
+            number_format((float) $rescheduleRequest->selisih_harga, 2, '.', '')
             !== number_format((float) $validated['gross_amount'], 2, '.', '')
         ) {
             return response()->json(['message' => 'Nominal pembayaran tidak sesuai.'], 422);
         }
 
-        $this->syncPaymentStatus($reservation, $request->all());
+        if (! $this->syncReschedulePaymentStatus($rescheduleRequest, $request->all())) {
+            return response()->json([
+                'message' => 'Pengajuan reschedule sudah kedaluwarsa dan pembayaran tidak diterapkan.',
+            ], 422);
+        }
 
         return response()->json(['success' => true]);
     }
 
     private function configureMidtrans(): void
-{
-    $this->assertMidtransConfigured();
+    {
+        $this->assertMidtransConfigured();
 
-    Config::$serverKey = config('services.midtrans.server_key');
-    Config::$isProduction = (bool) config('services.midtrans.is_production');
-    Config::$isSanitized = true;
-    Config::$is3ds = true;
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$isProduction = (bool) config('services.midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
 
-    // Wajib ada: library Midtrans membaca key ini saat curlOptions tidak kosong.
-    Config::$curlOptions = [
-        CURLOPT_HTTPHEADER => [],
-    ];
+        // Wajib ada: library Midtrans membaca key ini saat curlOptions tidak kosong.
+        Config::$curlOptions = [
+            CURLOPT_HTTPHEADER => [],
+        ];
 
-    $caPath = storage_path('cacert.pem');
-    if (file_exists($caPath)) {
-        Config::$curlOptions[CURLOPT_CAINFO] = $caPath;
+        $caPath = storage_path('cacert.pem');
+        if (file_exists($caPath)) {
+            Config::$curlOptions[CURLOPT_CAINFO] = $caPath;
+        }
+
+        if (! Config::$isProduction || app()->isLocal()) {
+            Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
+            Config::$curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
+        }
     }
 
-    if (! Config::$isProduction || app()->isLocal()) {
-        Config::$curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
-        Config::$curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
-    }
-}
     private function assertMidtransConfigured(): void
     {
         abort_unless(
@@ -497,6 +812,114 @@ class PaymentApiController extends Controller
             }
 
             $lockedReservation->forceFill($attributes)->save();
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $transaction
+     */
+    private function syncReschedulePaymentStatus(
+        RescheduleRequest $rescheduleRequest,
+        array $transaction,
+    ): bool {
+        if (
+            isset($transaction['order_id'])
+            && $transaction['order_id'] !== $rescheduleRequest->payment_order_id
+        ) {
+            abort(422, 'Order ID Midtrans tidak sesuai.');
+        }
+
+        if (
+            isset($transaction['gross_amount'])
+            && number_format((float) $rescheduleRequest->selisih_harga, 2, '.', '')
+                !== number_format((float) $transaction['gross_amount'], 2, '.', '')
+        ) {
+            abort(422, 'Nominal pembayaran selisih tidak sesuai.');
+        }
+
+        $transactionStatus = strtolower(
+            (string) ($transaction['transaction_status'] ?? 'pending'),
+        );
+        $fraudStatus = strtolower((string) ($transaction['fraud_status'] ?? 'accept'));
+
+        $paymentStatus = match ($transactionStatus) {
+            'settlement' => 'paid',
+            'capture' => $fraudStatus === 'accept' ? 'paid' : 'pending',
+            'expire' => 'expired',
+            'cancel' => 'cancelled',
+            'deny' => 'failed',
+            'refund', 'partial_refund', 'chargeback' => 'refunded',
+            default => 'pending',
+        };
+
+        return DB::transaction(function () use (
+            $rescheduleRequest,
+            $paymentStatus,
+            $transaction,
+        ): bool {
+            $lockedRequest = RescheduleRequest::query()
+                ->whereKey($rescheduleRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                $lockedRequest->payment_order_id
+                !== ($transaction['order_id'] ?? $lockedRequest->payment_order_id)
+            ) {
+                return false;
+            }
+
+            if ($lockedRequest->payment_status === 'paid') {
+                return true;
+            }
+
+            if ($lockedRequest->status !== RescheduleRequest::STATUS_AWAITING_PAYMENT) {
+                return false;
+            }
+
+            if ($lockedRequest->expires_at?->isPast()) {
+                $lockedRequest->status = RescheduleRequest::STATUS_EXPIRED;
+                $lockedRequest->save();
+
+                return false;
+            }
+
+            $lockedReservation = Reservasi::query()
+                ->whereKey($lockedRequest->reservasi_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                $lockedReservation->tanggal_kunjungan?->format('Y-m-d')
+                !== $lockedRequest->tanggal_lama?->format('Y-m-d')
+                || $lockedReservation->status_pembayaran !== 'paid'
+                || in_array(
+                    $lockedReservation->status_reservasi,
+                    ['Dibatalkan', 'Selesai'],
+                    true,
+                )
+            ) {
+                $lockedRequest->status = RescheduleRequest::STATUS_EXPIRED;
+                $lockedRequest->save();
+
+                return false;
+            }
+
+            $lockedRequest->payment_status = $paymentStatus;
+            $lockedRequest->payment_transaction_id = $transaction['transaction_id']
+                ?? $lockedRequest->payment_transaction_id;
+
+            if ($paymentStatus === 'paid') {
+                $lockedReservation->tanggal_kunjungan = $lockedRequest->tanggal_baru;
+                $lockedReservation->save();
+
+                $lockedRequest->status = RescheduleRequest::STATUS_COMPLETED;
+                $lockedRequest->paid_at = now();
+            }
+
+            $lockedRequest->save();
+
+            return true;
         });
     }
 }

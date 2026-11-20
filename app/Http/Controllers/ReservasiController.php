@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RescheduleRequest;
 use App\Models\Reservasi;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ReservasiController extends Controller
@@ -20,7 +24,18 @@ class ReservasiController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('reservasi.index', compact('reservasi'));
+        $rescheduleRequests = RescheduleRequest::query()
+            ->with('reservasi')
+            ->where('status', RescheduleRequest::STATUS_AWAITING_APPROVAL)
+            ->where('expires_at', '>', now())
+            ->whereHas(
+                'reservasi',
+                fn (Builder $query): Builder => $query->where('pool_id', $poolId),
+            )
+            ->latest('id')
+            ->get();
+
+        return view('reservasi.index', compact('reservasi', 'rescheduleRequests'));
     }
 
     /**
@@ -108,5 +123,127 @@ class ReservasiController extends Controller
         return redirect()
             ->route('reservasi.index')
             ->with('success', 'Status reservasi berhasil diperbarui.');
+    }
+
+    public function approveReschedule(RescheduleRequest $rescheduleRequest): RedirectResponse
+    {
+        $approved = DB::transaction(function () use ($rescheduleRequest): bool {
+            $lockedRequest = RescheduleRequest::query()
+                ->whereKey($rescheduleRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $reservasi = Reservasi::query()
+                ->whereKey($lockedRequest->reservasi_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($reservasi->pool_id !== session('admin_pool_id')) {
+                abort(403, 'Anda tidak memiliki akses ke data ini.');
+            }
+
+            if ($lockedRequest->status !== RescheduleRequest::STATUS_AWAITING_APPROVAL) {
+                throw ValidationException::withMessages([
+                    'reschedule' => 'Pengajuan ini sudah diproses atau tidak lagi aktif.',
+                ]);
+            }
+
+            if ($lockedRequest->expires_at?->isPast()) {
+                $lockedRequest->status = RescheduleRequest::STATUS_EXPIRED;
+                $lockedRequest->save();
+
+                return false;
+            }
+
+            if (
+                $reservasi->status_pembayaran !== 'paid'
+                || in_array($reservasi->status_reservasi, ['Dibatalkan', 'Selesai'], true)
+            ) {
+                $lockedRequest->status = RescheduleRequest::STATUS_EXPIRED;
+                $lockedRequest->save();
+
+                return false;
+            }
+
+            if ($lockedRequest->selisih_harga > 0) {
+                $lockedRequest->status = RescheduleRequest::STATUS_AWAITING_PAYMENT;
+                $lockedRequest->approved_at = now();
+                $lockedRequest->save();
+
+                return true;
+            }
+
+            $reservasi->tanggal_kunjungan = $lockedRequest->tanggal_baru;
+            $reservasi->save();
+
+            $lockedRequest->status = RescheduleRequest::STATUS_COMPLETED;
+            $lockedRequest->payment_status = 'not_required';
+            $lockedRequest->approved_at = now();
+            $lockedRequest->save();
+
+            return true;
+        });
+
+        if (! $approved) {
+            return back()->with('error', 'Pengajuan reschedule sudah kedaluwarsa atau tiket tidak lagi memenuhi syarat.');
+        }
+
+        return back()->with(
+            'success',
+            $rescheduleRequest->selisih_harga > 0
+                ? 'Pengajuan disetujui. Pengunjung dapat membayar selisih harga.'
+                : 'Pengajuan disetujui dan tanggal kunjungan berhasil diubah.',
+        );
+    }
+
+    public function rejectReschedule(
+        Request $request,
+        RescheduleRequest $rescheduleRequest,
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'alasan_penolakan' => ['required', 'string', 'max:500'],
+        ], [
+            'alasan_penolakan.required' => 'Alasan penolakan wajib diisi.',
+            'alasan_penolakan.max' => 'Alasan penolakan maksimal 500 karakter.',
+        ]);
+
+        $rejected = DB::transaction(function () use ($rescheduleRequest, $validated): bool {
+            $lockedRequest = RescheduleRequest::query()
+                ->whereKey($rescheduleRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $reservasi = Reservasi::query()
+                ->whereKey($lockedRequest->reservasi_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($reservasi->pool_id !== session('admin_pool_id')) {
+                abort(403, 'Anda tidak memiliki akses ke data ini.');
+            }
+
+            if ($lockedRequest->status !== RescheduleRequest::STATUS_AWAITING_APPROVAL) {
+                throw ValidationException::withMessages([
+                    'reschedule' => 'Pengajuan ini sudah diproses atau tidak lagi aktif.',
+                ]);
+            }
+
+            if ($lockedRequest->expires_at?->isPast()) {
+                $lockedRequest->status = RescheduleRequest::STATUS_EXPIRED;
+                $lockedRequest->save();
+
+                return false;
+            }
+
+            $lockedRequest->status = RescheduleRequest::STATUS_REJECTED;
+            $lockedRequest->alasan_penolakan = $validated['alasan_penolakan'];
+            $lockedRequest->save();
+
+            return true;
+        });
+
+        if (! $rejected) {
+            return back()->with('error', 'Pengajuan reschedule sudah kedaluwarsa.');
+        }
+
+        return back()->with('success', 'Pengajuan reschedule berhasil ditolak.');
     }
 }

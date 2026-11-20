@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\HargaTiket;
 use App\Models\Promo;
+use App\Models\RescheduleRequest;
 use App\Models\Reservasi;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -324,77 +325,235 @@ class ReservasiApiController extends Controller
         }
     }
 
-    /**
-     * Mengubah tanggal kunjungan reservasi lunas dari aplikasi mobile.
-     */
-    public function rescheduleByKode(Request $request, string $kode): JsonResponse
+    public function quoteReschedule(Request $request, string $kode): JsonResponse
     {
         $validated = $request->validate([
             'no_hp' => ['required', 'string', 'max:20'],
-            'tanggal_kunjungan' => ['required', 'date_format:Y-m-d', 'after:today'],
-        ], [
-            'no_hp.required' => 'Nomor HP pemesan wajib diisi.',
-            'tanggal_kunjungan.required' => 'Tanggal kunjungan baru wajib dipilih.',
-            'tanggal_kunjungan.date_format' => 'Format tanggal kunjungan tidak valid.',
-            'tanggal_kunjungan.after' => 'Tanggal kunjungan baru harus setelah hari ini.',
+            'tanggal_kunjungan' => ['required', 'date_format:Y-m-d'],
         ]);
 
-        $reservasi = DB::transaction(function () use ($kode, $validated): ?Reservasi {
-            $reservasi = Reservasi::where('kode_reservasi', $kode)
-                ->lockForUpdate()
-                ->first();
+        $reservasi = Reservasi::query()
+            ->where('kode_reservasi', $kode)
+            ->firstOrFail();
+        $this->assertMatchingPhone($reservasi, $validated['no_hp']);
+        $this->assertRescheduleEligible(
+            $reservasi,
+            Carbon::createFromFormat('Y-m-d', $validated['tanggal_kunjungan']),
+        );
+        $this->expireActiveRescheduleRequests($reservasi);
 
-            if ($reservasi === null) {
-                return null;
-            }
-
-            $savedPhone = preg_replace('/\D+/', '', (string) $reservasi->no_hp);
-            $providedPhone = preg_replace('/\D+/', '', $validated['no_hp']);
-
-            if ($savedPhone === '' || ! hash_equals($savedPhone, $providedPhone)) {
-                abort(403, 'Data pemesan tidak cocok dengan reservasi.');
-            }
-
-            if ($reservasi->status_pembayaran !== 'paid') {
-                abort(422, 'Reservasi hanya dapat dijadwalkan ulang setelah pembayaran lunas.');
-            }
-
-            if (
-                $reservasi->status_reservasi === 'Dibatalkan'
-                || $reservasi->status_reservasi === 'Selesai'
-            ) {
-                abort(422, 'Reservasi yang dibatalkan atau selesai tidak dapat dijadwalkan ulang.');
-            }
-
-            if (
-                $reservasi->tanggal_kunjungan === null
-                || $reservasi->tanggal_kunjungan->isBefore(today())
-            ) {
-                abort(422, 'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.');
-            }
-
-            $reservasi->tanggal_kunjungan = $validated['tanggal_kunjungan'];
-            $reservasi->save();
-
-            return $reservasi->refresh();
-        });
-
-        if ($reservasi === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kode reservasi tidak ditemukan.',
-            ], 404);
+        if ($this->hasActiveRescheduleRequest($reservasi)) {
+            abort(422, 'Masih ada pengajuan reschedule aktif untuk tiket ini.');
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Tanggal kunjungan berhasil dijadwalkan ulang.',
             'data' => [
-                'kode_reservasi' => $reservasi->kode_reservasi,
-                'tanggal_kunjungan' => $reservasi->tanggal_kunjungan?->format('Y-m-d'),
-                'status_reservasi' => $reservasi->status_reservasi,
-                'status_pembayaran' => $reservasi->status_pembayaran,
+                'tanggal_lama' => $reservasi->tanggal_kunjungan?->format('Y-m-d'),
+                'tanggal_baru' => $validated['tanggal_kunjungan'],
+                'selisih_harga' => $this->rescheduleDifference(
+                    $reservasi,
+                    Carbon::createFromFormat('Y-m-d', $validated['tanggal_kunjungan']),
+                ),
             ],
         ]);
+    }
+
+    public function requestReschedule(Request $request, string $kode): JsonResponse
+    {
+        $validated = $request->validate([
+            'no_hp' => ['required', 'string', 'max:20'],
+            'tanggal_kunjungan' => ['required', 'date_format:Y-m-d'],
+        ], [
+            'no_hp.required' => 'Nomor HP pemesan wajib diisi.',
+            'tanggal_kunjungan.required' => 'Tanggal kunjungan baru wajib dipilih.',
+            'tanggal_kunjungan.date_format' => 'Format tanggal kunjungan tidak valid.',
+        ]);
+
+        $rescheduleRequest = DB::transaction(function () use ($kode, $validated): RescheduleRequest {
+            $reservasi = Reservasi::query()
+                ->where('kode_reservasi', $kode)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $newDate = Carbon::createFromFormat(
+                'Y-m-d',
+                $validated['tanggal_kunjungan'],
+            );
+
+            $this->assertMatchingPhone($reservasi, $validated['no_hp']);
+            $this->assertRescheduleEligible($reservasi, $newDate);
+            $this->expireActiveRescheduleRequests($reservasi);
+
+            if ($this->hasActiveRescheduleRequest($reservasi)) {
+                abort(422, 'Masih ada pengajuan reschedule aktif untuk tiket ini.');
+            }
+
+            $difference = $this->rescheduleDifference($reservasi, $newDate);
+
+            return RescheduleRequest::query()->create([
+                'reservasi_id' => $reservasi->id,
+                'tanggal_lama' => $reservasi->tanggal_kunjungan,
+                'tanggal_baru' => $newDate->toDateString(),
+                'selisih_harga' => $difference,
+                'status' => RescheduleRequest::STATUS_AWAITING_APPROVAL,
+                'payment_status' => $difference === 0 ? 'not_required' : null,
+                'expires_at' => now()->addHours(24),
+            ]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan reschedule menunggu persetujuan admin.',
+            'data' => $this->rescheduleRequestData($rescheduleRequest),
+        ], 201);
+    }
+
+    public function showReschedule(Request $request, string $kode): JsonResponse
+    {
+        $validated = $request->validate([
+            'no_hp' => ['required', 'string', 'max:20'],
+        ]);
+
+        $data = DB::transaction(function () use ($kode, $validated): array {
+            $reservasi = Reservasi::query()
+                ->where('kode_reservasi', $kode)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $this->assertMatchingPhone($reservasi, $validated['no_hp']);
+            $this->expireActiveRescheduleRequests($reservasi);
+
+            $latestRequest = RescheduleRequest::query()
+                ->where('reservasi_id', $reservasi->id)
+                ->latest('id')
+                ->first();
+            $latestSuccessfulRequest = RescheduleRequest::query()
+                ->where('reservasi_id', $reservasi->id)
+                ->where('status', RescheduleRequest::STATUS_COMPLETED)
+                ->latest('id')
+                ->first();
+            $firstSuccessfulRequest = RescheduleRequest::query()
+                ->where('reservasi_id', $reservasi->id)
+                ->where('status', RescheduleRequest::STATUS_COMPLETED)
+                ->oldest('id')
+                ->first();
+
+            return [
+                'status_reservasi' => $reservasi->status_reservasi,
+                'tanggal_kunjungan' => $reservasi->tanggal_kunjungan?->format('Y-m-d'),
+                'tanggal_kunjungan_awal' => $firstSuccessfulRequest
+                    ?->tanggal_lama
+                    ?->format('Y-m-d')
+                    ?? $reservasi->tanggal_kunjungan?->format('Y-m-d'),
+                'request' => $latestRequest
+                    ? $this->rescheduleRequestData($latestRequest)
+                    : null,
+                'latest_successful_request' => $latestSuccessfulRequest
+                    ? $this->rescheduleRequestData($latestSuccessfulRequest)
+                    : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
+    private function assertMatchingPhone(Reservasi $reservasi, string $phone): void
+    {
+        $savedPhone = preg_replace('/\D+/', '', (string) $reservasi->no_hp);
+        $providedPhone = preg_replace('/\D+/', '', $phone);
+
+        if ($savedPhone === '' || ! hash_equals($savedPhone, $providedPhone)) {
+            abort(403, 'Data pemesan tidak cocok dengan reservasi.');
+        }
+    }
+
+    private function assertRescheduleEligible(Reservasi $reservasi, Carbon $newDate): void
+    {
+        if ($reservasi->status_pembayaran !== 'paid') {
+            abort(422, 'Reservasi hanya dapat dijadwalkan ulang setelah pembayaran lunas.');
+        }
+
+        if (in_array($reservasi->status_reservasi, ['Dibatalkan', 'Selesai'], true)) {
+            abort(422, 'Tiket yang dibatalkan atau sudah digunakan tidak dapat dijadwalkan ulang.');
+        }
+
+        $minimumDate = today()->addDays(2)->toDateString();
+        if (
+            $reservasi->tanggal_kunjungan === null
+            || $reservasi->tanggal_kunjungan->toDateString() < $minimumDate
+            || $newDate->toDateString() < $minimumDate
+        ) {
+            abort(422, 'Pengajuan reschedule hanya dapat dilakukan paling lambat H-2 sebelum kunjungan.');
+        }
+
+        if ($reservasi->tanggal_kunjungan->isSameDay($newDate)) {
+            abort(422, 'Tanggal kunjungan baru harus berbeda dari tanggal saat ini.');
+        }
+    }
+
+    private function rescheduleDifference(Reservasi $reservasi, Carbon $newDate): int
+    {
+        $oldDayType = $reservasi->tanggal_kunjungan?->isWeekend()
+            ? 'Weekend'
+            : 'Weekday';
+        $newDayType = $newDate->isWeekend() ? 'Weekend' : 'Weekday';
+
+        $oldPrice = HargaTiket::query()
+            ->where('pool_id', $reservasi->pool_id)
+            ->where('jenis_hari', $oldDayType)
+            ->value('harga');
+        $newPrice = HargaTiket::query()
+            ->where('pool_id', $reservasi->pool_id)
+            ->where('jenis_hari', $newDayType)
+            ->value('harga');
+
+        if ($oldPrice === null || $newPrice === null) {
+            abort(422, 'Harga tiket untuk tanggal reschedule belum tersedia.');
+        }
+
+        $priceDifferencePerAdult = (int) round((float) $newPrice)
+            - (int) round((float) $oldPrice);
+
+        return max(0, $priceDifferencePerAdult) * $reservasi->jumlah_dewasa;
+    }
+
+    private function expireActiveRescheduleRequests(Reservasi $reservasi): void
+    {
+        RescheduleRequest::query()
+            ->where('reservasi_id', $reservasi->id)
+            ->whereIn('status', RescheduleRequest::ACTIVE_STATUSES)
+            ->where('expires_at', '<=', now())
+            ->update(['status' => RescheduleRequest::STATUS_EXPIRED]);
+    }
+
+    private function hasActiveRescheduleRequest(Reservasi $reservasi): bool
+    {
+        return RescheduleRequest::query()
+            ->where('reservasi_id', $reservasi->id)
+            ->whereIn('status', RescheduleRequest::ACTIVE_STATUSES)
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function rescheduleRequestData(RescheduleRequest $rescheduleRequest): array
+    {
+        return [
+            'id' => $rescheduleRequest->id,
+            'tanggal_lama' => $rescheduleRequest->tanggal_lama?->format('Y-m-d'),
+            'tanggal_baru' => $rescheduleRequest->tanggal_baru?->format('Y-m-d'),
+            'selisih_harga' => $rescheduleRequest->selisih_harga,
+            'status' => $rescheduleRequest->status,
+            'alasan_penolakan' => $rescheduleRequest->alasan_penolakan,
+            'payment_status' => $rescheduleRequest->payment_status,
+            'payment_order_id' => $rescheduleRequest->payment_order_id,
+            'payment_expires_at' => $rescheduleRequest->payment_expires_at?->toIso8601String(),
+            'expires_at' => $rescheduleRequest->expires_at?->toIso8601String(),
+            'paid_at' => $rescheduleRequest->paid_at?->toIso8601String(),
+        ];
     }
 }

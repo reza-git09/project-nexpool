@@ -86,6 +86,15 @@ Route::get('/reviews/{id}', [ReviewApiController::class, 'show']);
 // =========================================================
 Route::get('/reservasi', [ReservasiApiController::class, 'index']);
 Route::post('/reservasi', [ReservasiApiController::class, 'store']);
-Route::put('/reservasi/kode/{kode}/reschedule', [ReservasiApiController::class, 'rescheduleByKode']);
+Route::get('/reservasi/kode/{kode}/reschedule/quote', [ReservasiApiController::class, 'quoteReschedule']);
+Route::get('/reservasi/kode/{kode}/reschedule', [ReservasiApiController::class, 'showReschedule']);
+Route::post('/reservasi/kode/{kode}/reschedule', [ReservasiApiController::class, 'requestReschedule'])
+    ->middleware('throttle:10,1');
+Route::put('/reservasi/kode/{kode}/reschedule', [ReservasiApiController::class, 'requestReschedule'])
+    ->middleware('throttle:10,1');
+Route::post(
+    '/reservasi/kode/{kode}/reschedule/{rescheduleRequest}/payment',
+    [PaymentApiController::class, 'createRescheduleQris'],
+)->middleware('throttle:5,1');
 Route::get('/reservasi/kode/{kode}', [ReservasiApiController::class, 'showByKode']);
 Route::get('/reservasi/{id}', [ReservasiApiController::class, 'show']);

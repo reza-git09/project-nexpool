@@ -227,6 +227,20 @@ Route::get('/reservasi/dikonfirmasi', [ReservasiController::class, 'dikonfirmasi
     ->middleware(['admin', 'must.change.password'])
     ->name('reservasi.dikonfirmasi');
 
+Route::post(
+    '/reservasi/reschedule-requests/{rescheduleRequest}/approve',
+    [ReservasiController::class, 'approveReschedule'],
+)
+    ->middleware(['admin', 'must.change.password'])
+    ->name('reservasi.reschedule-requests.approve');
+
+Route::post(
+    '/reservasi/reschedule-requests/{rescheduleRequest}/reject',
+    [ReservasiController::class, 'rejectReschedule'],
+)
+    ->middleware(['admin', 'must.change.password'])
+    ->name('reservasi.reschedule-requests.reject');
+
 Route::resource('reservasi', ReservasiController::class)
     ->middleware(['admin', 'must.change.password']);
 
