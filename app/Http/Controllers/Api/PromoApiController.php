@@ -53,9 +53,10 @@ class PromoApiController extends Controller
         $targetDate = Carbon::parse($validated['tanggal_kunjungan'] ?? today())
             ->startOfDay();
         $semua = $request->boolean('semua');
+        $includeUpcoming = $request->boolean('include_upcoming');
 
         $data = $query->get()
-            ->filter(function ($row) use ($targetDate, $semua) {
+             ->filter(function ($row) use ($targetDate, $semua, $includeUpcoming) {
                 if ($semua) {
                     return true;
                 }
@@ -71,7 +72,7 @@ class PromoApiController extends Controller
                     'tanggal_selesai', 'tgl_selesai', 'tanggal_berakhir', 'selesai', 'end_date',
                 ]));
 
-                if ($mulai && $targetDate->lt($mulai)) {
+                 if (! $includeUpcoming && $mulai && $targetDate->lt($mulai)) {
                     return false; // belum mulai
                 }
                 if ($selesai && $targetDate->gt($selesai)) {

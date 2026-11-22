@@ -1122,6 +1122,18 @@
 
             @endif
 
+            @if(session('error') || $errors->any())
+
+                <div class="alert" style="background:#fff1f2;color:#be123c;">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {{ session('error') ?? $errors->first() }}
+
+                </div>
+
+            @endif
+
 
             <!-- PAGE HEADER -->
             <div class="page-header">
@@ -1530,6 +1542,110 @@
 
                         </p>
 
+                    </div>
+
+                @endif
+
+            </div>
+
+            <div class="table-card" style="margin-top:24px;">
+
+                <div class="table-top">
+
+                    <div class="table-top-icon">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                    </div>
+
+                    <div>
+                        <h3>Pengajuan Reschedule Menunggu Persetujuan</h3>
+                        <p>Periksa tanggal baru dan setujui atau tolak pengajuan pengunjung.</p>
+                    </div>
+
+                </div>
+
+                @if(($rescheduleRequests ?? collect())->isNotEmpty())
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Reservasi</th>
+                                    <th>Pengunjung</th>
+                                    <th>Tanggal Lama</th>
+                                    <th>Tanggal Baru</th>
+                                    <th>Selisih</th>
+                                    <th>Batas Respons</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rescheduleRequests as $rescheduleRequest)
+                                    <tr>
+                                        <td class="kode">{{ $rescheduleRequest->reservasi->kode_reservasi }}</td>
+                                        <td class="nama-pengunjung">
+                                            {{ $rescheduleRequest->reservasi->nama_pengunjung }}
+                                            <br>
+                                            <span>{{ $rescheduleRequest->reservasi->no_hp }}</span>
+                                        </td>
+                                        <td>{{ $rescheduleRequest->tanggal_lama->format('d-m-Y') }}</td>
+                                        <td>{{ $rescheduleRequest->tanggal_baru->format('d-m-Y') }}</td>
+                                        <td class="harga">
+                                            @if($rescheduleRequest->selisih_harga > 0)
+                                                Rp{{ number_format($rescheduleRequest->selisih_harga, 0, ',', '.') }}
+                                            @else
+                                                Tidak ada selisih
+                                            @endif
+                                        </td>
+                                        <td>{{ $rescheduleRequest->expires_at->format('d-m-Y H:i') }}</td>
+                                        <td>
+                                            <div class="actions">
+                                                <form
+                                                    action="{{ route('reservasi.reschedule-requests.approve', $rescheduleRequest) }}"
+                                                    method="POST"
+                                                >
+                                                    @csrf
+                                                    <button type="submit" class="btn-edit">
+                                                        <i class="fa-solid fa-check"></i>
+                                                        Setujui
+                                                    </button>
+                                                </form>
+
+                                                <form
+                                                    action="{{ route('reservasi.reschedule-requests.reject', $rescheduleRequest) }}"
+                                                    method="POST"
+                                                >
+                                                    @csrf
+                                                    <input
+                                                        type="text"
+                                                        name="alasan_penolakan"
+                                                        maxlength="500"
+                                                        placeholder="Alasan penolakan"
+                                                        aria-label="Alasan penolakan {{ $rescheduleRequest->reservasi->kode_reservasi }}"
+                                                        required
+                                                    >
+                                                    <button type="submit" class="btn-detail">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                        Tolak
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                @else
+
+                    <div class="empty">
+                        <div class="empty-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <h3>Belum Ada Pengajuan Reschedule</h3>
+                        <p>Pengajuan baru akan muncul di sini untuk kolam Anda.</p>
                     </div>
 
                 @endif

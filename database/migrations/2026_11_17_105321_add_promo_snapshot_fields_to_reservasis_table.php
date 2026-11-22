@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reservasis', function (Blueprint $table) {
-            $table->string('nama_promo')->nullable();
-            $table->decimal('potongan_promo', 12, 2)->default(0);
+            if (!Schema::hasColumn('reservasis', 'nama_promo')) {
+                $table->string('nama_promo')->nullable();
+            }
+
+            if (!Schema::hasColumn('reservasis', 'potongan_promo')) {
+                $table->decimal('potongan_promo', 12, 2)->default(0);
+            }
         });
     }
 
@@ -23,7 +28,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reservasis', function (Blueprint $table) {
-            $table->dropColumn(['nama_promo', 'potongan_promo']);
+            $columns = array_filter(
+                ['nama_promo', 'potongan_promo'],
+                fn ($column) => Schema::hasColumn('reservasis', $column)
+            );
+
+            if (!empty($columns)) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };
