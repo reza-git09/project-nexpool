@@ -444,7 +444,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1050px;
+            min-width: 900px;
         }
 
         th {
@@ -555,6 +555,24 @@
             color: #475569;
         }
 
+        .badge-reschedule-pending {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .badge-reschedule-approved {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .reschedule-dates {
+            display: block;
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
         /* =========================
            ACTION
         ========================= */
@@ -602,6 +620,35 @@
         .btn-detail:hover {
             background: #e2e8f0;
             transform: translateY(-1px);
+        }
+
+        .reject-reschedule-form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .reject-reschedule-form input {
+            width: 145px;
+            padding: 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            font-size: 10px;
+        }
+
+        .btn-reject {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 7px 10px;
+            border: none;
+            border-radius: 7px;
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         /* =========================
@@ -1164,32 +1211,14 @@
 
 
             <!-- =================================================
-                 2 TAB RESERVASI
+                 RESERVASI
             ================================================== -->
 
             <div class="reservation-tabs">
-
-                <!-- RESERVASI MENUNGGU -->
-                <a href="{{ url('/reservasi') }}"
-                    class="reservation-tab active">
-
-                    <i class="fa-solid fa-clock"></i>
-
-                    Reservasi Menunggu
-
+                <a href="{{ route('reservasi.index') }}" class="reservation-tab active">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    Reservasi
                 </a>
-
-
-                <!-- RESERVASI DIKONFIRMASI -->
-                <a href="{{ url('/reservasi/dikonfirmasi') }}"
-                    class="reservation-tab">
-
-                    <i class="fa-solid fa-circle-check"></i>
-
-                    Reservasi Dikonfirmasi
-
-                </a>
-
             </div>
 
 
@@ -1206,10 +1235,8 @@
 
                 </div>
 
-                Data reservasi pada halaman ini berasal dari
-                <strong>aplikasi mobile NEXPOOL</strong>.
-                Reservasi tetap menunggu sampai pengunjung datang ke loket,
-                menunjukkan struk pembayaran, lalu admin mengubah status melalui menu Kelola.
+                Semua reservasi pengunjung ditampilkan dalam satu daftar.
+                Pengajuan reschedule yang membutuhkan persetujuan ditandai pada baris reservasi terkait.
 
                 <br>
 
@@ -1236,11 +1263,11 @@
                     <div>
 
                         <h3>
-                            Daftar Reservasi Menunggu
+                            Daftar Reservasi
                         </h3>
 
                         <p>
-                            Reservasi pengunjung yang menunggu konfirmasi admin
+                            Reservasi pengunjung untuk kolam ini
                         </p>
 
                     </div>
@@ -1272,15 +1299,7 @@
                                     </th>
 
                                     <th>
-                                        Kolam Renang
-                                    </th>
-
-                                    <th>
                                         Pengunjung
-                                    </th>
-
-                                    <th>
-                                        No. HP
                                     </th>
 
                                     <th>
@@ -1288,15 +1307,11 @@
                                     </th>
 
                                     <th>
-                                        Jumlah Tiket
-                                    </th>
-
-                                    <th>
                                         Total Harga
                                     </th>
 
                                     <th>
-                                        Status
+                                        Reschedule
                                     </th>
 
                                     <th>
@@ -1328,29 +1343,10 @@
                                         </td>
 
 
-                                        <!-- KOLAM -->
-                                        <td class="pool">
-
-                                            {{ session(
-                                                'admin_pool_nama',
-                                                '-'
-                                            ) }}
-
-                                        </td>
-
-
                                         <!-- PENGUNJUNG -->
                                         <td class="nama-pengunjung">
 
                                             {{ $item->nama_pengunjung ?? '-' }}
-
-                                        </td>
-
-
-                                        <!-- NO HP -->
-                                        <td>
-
-                                            {{ $item->no_hp ?? '-' }}
 
                                         </td>
 
@@ -1373,26 +1369,6 @@
                                         </td>
 
 
-                                        <!-- JUMLAH TIKET -->
-                                        <td class="jumlah-tiket">
-
-                                            <span>
-                                                Dewasa:
-                                            </span>
-
-                                            {{ $item->jumlah_dewasa ?? 0 }}
-
-                                            <br>
-
-                                            <span>
-                                                Anak:
-                                            </span>
-
-                                            {{ $item->jumlah_anak ?? 0 }}
-
-                                        </td>
-
-
                                         <!-- TOTAL HARGA -->
                                         <td class="harga">
 
@@ -1405,84 +1381,36 @@
 
                                         </td>
 
-
-                                        <!-- STATUS -->
                                         <td>
-
-                                            @if(($item->status_reservasi ?? '') === 'Menunggu')
-
-                                                <span class="badge badge-menunggu">
-
-                                                    <i class="fa-solid fa-clock"></i>
-
-                                                    Menunggu
-
+                                            @php
+                                                $rescheduleRequest = $item->latestRescheduleRequest;
+                                            @endphp
+                                            @if($rescheduleRequest)
+                                                @php
+                                                    $rescheduleBadge = match ($rescheduleRequest->status) {
+                                                        \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL => ['badge-reschedule-pending', 'Menunggu Persetujuan'],
+                                                        \App\Models\RescheduleRequest::STATUS_AWAITING_PAYMENT => ['badge-reschedule-approved', 'Disetujui · Menunggu Pembayaran'],
+                                                        \App\Models\RescheduleRequest::STATUS_COMPLETED => ['badge-reschedule-approved', 'Berhasil'],
+                                                        \App\Models\RescheduleRequest::STATUS_REJECTED => ['badge-reschedule-pending', 'Ditolak'],
+                                                        default => ['badge-default', 'Kedaluwarsa'],
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $rescheduleBadge[0] }}">
+                                                    <i class="fa-solid fa-calendar-plus"></i>
+                                                    Reschedule · {{ $rescheduleBadge[1] }}
                                                 </span>
-
-                                            @elseif(($item->status_reservasi ?? '') === 'Dikonfirmasi')
-
-                                                <span class="badge badge-dikonfirmasi">
-
-                                                    <i class="fa-solid fa-check"></i>
-
-                                                    Dikonfirmasi
-
-                                                </span>
-
-                                            @elseif(($item->status_reservasi ?? '') === 'Selesai')
-
-                                                <span class="badge badge-selesai">
-
-                                                    <i class="fa-solid fa-circle-check"></i>
-
-                                                    Selesai
-
-                                                </span>
-
-                                            @elseif(($item->status_reservasi ?? '') === 'Dibatalkan')
-
-                                                <span class="badge badge-dibatalkan">
-
-                                                    <i class="fa-solid fa-xmark"></i>
-
-                                                    Dibatalkan
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="badge badge-default">
-
-                                                    {{ $item->status_reservasi ?? 'Tidak diketahui' }}
-
-                                                </span>
-
+                                                <small class="reschedule-dates">
+                                                    {{ $rescheduleRequest->tanggal_lama->format('d-m-Y') }}
+                                                    →
+                                                    {{ $rescheduleRequest->tanggal_baru->format('d-m-Y') }}
+                                                </small>
                                             @endif
-
                                         </td>
 
                                         <!-- AKSI -->
                                         <td>
 
-                                                            <div class="actions">
-
-                                                <!-- KELOLA -->
-                                                <a
-                                                    href="{{ route(
-                                                        'reservasi.edit',
-                                                        $item->id
-                                                    ) }}"
-                                                    class="btn-edit"
-                                                >
-
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-
-                                                    Kelola
-
-                                                </a>
-
-
-                                                <!-- DETAIL -->
+                                            <div class="actions">
                                                 <button
                                                     type="button"
                                                     class="btn-detail"
@@ -1494,7 +1422,38 @@
                                                     Detail
 
                                                 </button>
+                                                @if($rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL)
+                                                    <form
+                                                        action="{{ route('reservasi.reschedule-requests.approve', $rescheduleRequest) }}"
+                                                        method="POST"
+                                                    >
+                                                        @csrf
+                                                        <button type="submit" class="btn-edit">
+                                                            <i class="fa-solid fa-check"></i>
+                                                            Setujui
+                                                        </button>
+                                                    </form>
 
+                                                    <form
+                                                        action="{{ route('reservasi.reschedule-requests.reject', $rescheduleRequest) }}"
+                                                        method="POST"
+                                                        class="reject-reschedule-form"
+                                                    >
+                                                        @csrf
+                                                        <input
+                                                            type="text"
+                                                            name="alasan_penolakan"
+                                                            maxlength="500"
+                                                            placeholder="Alasan penolakan"
+                                                            aria-label="Alasan penolakan {{ $item->kode_reservasi }}"
+                                                            required
+                                                        >
+                                                        <button type="submit" class="btn-reject">
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                            Tolak
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
 
                                         </td>
@@ -1542,110 +1501,6 @@
 
                         </p>
 
-                    </div>
-
-                @endif
-
-            </div>
-
-            <div class="table-card" style="margin-top:24px;">
-
-                <div class="table-top">
-
-                    <div class="table-top-icon">
-                        <i class="fa-solid fa-calendar-plus"></i>
-                    </div>
-
-                    <div>
-                        <h3>Pengajuan Reschedule Menunggu Persetujuan</h3>
-                        <p>Periksa tanggal baru dan setujui atau tolak pengajuan pengunjung.</p>
-                    </div>
-
-                </div>
-
-                @if(($rescheduleRequests ?? collect())->isNotEmpty())
-
-                    <div class="table-wrapper">
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Kode Reservasi</th>
-                                    <th>Pengunjung</th>
-                                    <th>Tanggal Lama</th>
-                                    <th>Tanggal Baru</th>
-                                    <th>Selisih</th>
-                                    <th>Batas Respons</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($rescheduleRequests as $rescheduleRequest)
-                                    <tr>
-                                        <td class="kode">{{ $rescheduleRequest->reservasi->kode_reservasi }}</td>
-                                        <td class="nama-pengunjung">
-                                            {{ $rescheduleRequest->reservasi->nama_pengunjung }}
-                                            <br>
-                                            <span>{{ $rescheduleRequest->reservasi->no_hp }}</span>
-                                        </td>
-                                        <td>{{ $rescheduleRequest->tanggal_lama->format('d-m-Y') }}</td>
-                                        <td>{{ $rescheduleRequest->tanggal_baru->format('d-m-Y') }}</td>
-                                        <td class="harga">
-                                            @if($rescheduleRequest->selisih_harga > 0)
-                                                Rp{{ number_format($rescheduleRequest->selisih_harga, 0, ',', '.') }}
-                                            @else
-                                                Tidak ada selisih
-                                            @endif
-                                        </td>
-                                        <td>{{ $rescheduleRequest->expires_at->format('d-m-Y H:i') }}</td>
-                                        <td>
-                                            <div class="actions">
-                                                <form
-                                                    action="{{ route('reservasi.reschedule-requests.approve', $rescheduleRequest) }}"
-                                                    method="POST"
-                                                >
-                                                    @csrf
-                                                    <button type="submit" class="btn-edit">
-                                                        <i class="fa-solid fa-check"></i>
-                                                        Setujui
-                                                    </button>
-                                                </form>
-
-                                                <form
-                                                    action="{{ route('reservasi.reschedule-requests.reject', $rescheduleRequest) }}"
-                                                    method="POST"
-                                                >
-                                                    @csrf
-                                                    <input
-                                                        type="text"
-                                                        name="alasan_penolakan"
-                                                        maxlength="500"
-                                                        placeholder="Alasan penolakan"
-                                                        aria-label="Alasan penolakan {{ $rescheduleRequest->reservasi->kode_reservasi }}"
-                                                        required
-                                                    >
-                                                    <button type="submit" class="btn-detail">
-                                                        <i class="fa-solid fa-xmark"></i>
-                                                        Tolak
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                @else
-
-                    <div class="empty">
-                        <div class="empty-icon">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <h3>Belum Ada Pengajuan Reschedule</h3>
-                        <p>Pengajuan baru akan muncul di sini untuk kolam Anda.</p>
                     </div>
 
                 @endif
@@ -1843,72 +1698,6 @@
                         </div>
 
 
-                        <!-- STATUS -->
-
-                        <div class="modal-item">
-
-                            <div class="modal-label">
-
-                                <i class="fa-solid fa-circle-check"></i>
-
-                                Status Reservasi
-
-                            </div>
-
-
-                            @if(($item->status_reservasi ?? '') === 'Menunggu')
-
-                                <span class="badge badge-menunggu">
-
-                                    <i class="fa-solid fa-clock"></i>
-
-                                    Menunggu
-
-                                </span>
-
-                            @elseif(($item->status_reservasi ?? '') === 'Dikonfirmasi')
-
-                                <span class="badge badge-dikonfirmasi">
-
-                                    <i class="fa-solid fa-check"></i>
-
-                                    Dikonfirmasi
-
-                                </span>
-
-                            @elseif(($item->status_reservasi ?? '') === 'Selesai')
-
-                                <span class="badge badge-selesai">
-
-                                    <i class="fa-solid fa-circle-check"></i>
-
-                                    Selesai
-
-                                </span>
-
-                            @elseif(($item->status_reservasi ?? '') === 'Dibatalkan')
-
-                                <span class="badge badge-dibatalkan">
-
-                                    <i class="fa-solid fa-xmark"></i>
-
-                                    Dibatalkan
-
-                                </span>
-
-                            @else
-
-                                <span class="badge badge-default">
-
-                                    {{ $item->status_reservasi ?? 'Tidak diketahui' }}
-
-                                </span>
-
-                            @endif
-
-                        </div>
-
-
                         <!-- JUMLAH TIKET -->
 
                         <div class="modal-item">
@@ -2010,11 +1799,8 @@
                                 "
                             >
 
-                                Data reservasi berasal dari
-                                aplikasi mobile NEXPOOL.
-                                Admin dapat memeriksa dan
-                                memperbarui status reservasi
-                                melalui menu Kelola.
+                                Data reservasi berasal dari aplikasi mobile NEXPOOL.
+                                Persetujuan admin hanya diperlukan untuk pengajuan reschedule.
 
                             </div>
 
@@ -2043,20 +1829,6 @@
 
                     </button>
 
-
-                    <a
-                        href="{{ route(
-                            'reservasi.edit',
-                            $item->id
-                        ) }}"
-                        class="modal-btn modal-btn-edit"
-                    >
-
-                        <i class="fa-solid fa-pen-to-square"></i>
-
-                        Kelola Status
-
-                    </a>
 
                 </div>
 

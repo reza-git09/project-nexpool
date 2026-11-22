@@ -479,13 +479,19 @@ class ReservasiApiController extends Controller
             abort(422, 'Tiket yang dibatalkan atau sudah digunakan tidak dapat dijadwalkan ulang.');
         }
 
+        if (
+            $reservasi->tanggal_kunjungan !== null
+            && $reservasi->tanggal_kunjungan->lt(today())
+        ) {
+            abort(422, 'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.');
+        }
+
         $minimumDate = today()->addDays(2)->toDateString();
         if (
             $reservasi->tanggal_kunjungan === null
-            || $reservasi->tanggal_kunjungan->toDateString() < $minimumDate
             || $newDate->toDateString() < $minimumDate
         ) {
-            abort(422, 'Pengajuan reschedule hanya dapat dilakukan paling lambat H-2 sebelum kunjungan.');
+            abort(422, 'Tanggal baru reschedule minimal H+2 dari hari ini.');
         }
 
         if ($reservasi->tanggal_kunjungan->isSameDay($newDate)) {

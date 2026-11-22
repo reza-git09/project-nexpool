@@ -144,9 +144,55 @@ class RescheduleWorkflowTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonPath(
                 'message',
-                'Pengajuan reschedule hanya dapat dilakukan paling lambat H-2 sebelum kunjungan.',
+                'Tanggal baru reschedule minimal H+2 dari hari ini.',
             );
 
+        $this->assertDatabaseCount('reschedule_requests', 0);
+    }
+
+    public function test_ticket_for_today_can_be_rescheduled_to_a_date_at_least_two_days_ahead(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation();
+        $reservation->forceFill(['tanggal_kunjungan' => '2026-11-20'])->save();
+        $this->addTicketPrices();
+
+        $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-22',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.tanggal_lama', '2026-11-20')
+            ->assertJsonPath('data.tanggal_baru', '2026-11-22');
+
+        $this->assertSame(
+            '2026-11-20',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
+        $this->assertDatabaseCount('reschedule_requests', 1);
+    }
+
+    public function test_ticket_from_a_past_visit_date_cannot_be_rescheduled(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation();
+        $reservation->forceFill(['tanggal_kunjungan' => '2026-11-19'])->save();
+        $this->addTicketPrices();
+
+        $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-22',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'message',
+                'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.',
+            );
+
+        $this->assertSame(
+            '2026-11-19',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
         $this->assertDatabaseCount('reschedule_requests', 0);
     }
 
@@ -180,10 +226,12 @@ class RescheduleWorkflowTest extends TestCase
         $this->withSession($this->poolAdminSession())
             ->get(route('reservasi.index'))
             ->assertOk()
-            ->assertSee('Pengajuan Reschedule Menunggu Persetujuan')
+            ->assertSee('Daftar Reservasi')
             ->assertSee($reservation->kode_reservasi)
+            ->assertSee('Reschedule · Menunggu Persetujuan')
             ->assertSee('Setujui')
-            ->assertSee('Tolak');
+            ->assertSee('Tolak')
+            ->assertDontSee('Pengajuan Reschedule Menunggu Persetujuan');
 
         $this->withSession($this->poolAdminSession())
             ->post(route('reservasi.reschedule-requests.approve', $rescheduleRequest))
@@ -194,6 +242,11 @@ class RescheduleWorkflowTest extends TestCase
             RescheduleRequest::STATUS_AWAITING_PAYMENT,
             $rescheduleRequest->refresh()->status,
         );
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.index'))
+            ->assertOk()
+            ->assertSee('Reschedule · Disetujui · Menunggu Pembayaran')
+            ->assertDontSee('Setujui');
         $this->assertSame(
             '2026-11-25',
             $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),

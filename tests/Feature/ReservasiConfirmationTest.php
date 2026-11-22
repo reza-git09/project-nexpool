@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\HargaTiket;
 use App\Models\Reservasi;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,18 +33,50 @@ class ReservasiConfirmationTest extends TestCase
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('reschedule_requests', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('reservasi_id');
+            $table->date('tanggal_lama');
+            $table->date('tanggal_baru');
+            $table->unsignedBigInteger('selisih_harga')->default(0);
+            $table->string('status', 32);
+            $table->string('alasan_penolakan', 500)->nullable();
+            $table->timestamp('expires_at');
+            $table->timestamp('approved_at')->nullable();
+            $table->string('payment_status', 24)->nullable();
+            $table->string('payment_order_id')->nullable()->unique();
+            $table->string('payment_transaction_id')->nullable();
+            $table->text('payment_qr_url')->nullable();
+            $table->timestamp('payment_expires_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamps();
+            $table->index(['reservasi_id', 'status', 'expires_at']);
+        });
+
+        Schema::create('harga_tiket', function (Blueprint $table): void {
+            $table->id();
+            $table->string('pool_id');
+            $table->string('jenis_hari');
+            $table->decimal('harga', 12, 2);
+            $table->timestamps();
+        });
     }
 
-    public function test_paid_reservation_waits_for_status_change_in_manage_form(): void
+    public function test_paid_reservation_appears_in_the_unified_list_without_regular_status_controls(): void
     {
         $reservation = $this->createReservation('paid');
 
         $this->withSession($this->poolAdminSession())
             ->get(route('reservasi.index'))
             ->assertOk()
-            ->assertSee('Status')
+            ->assertSee('Daftar Reservasi')
+            ->assertSee($reservation->kode_reservasi)
             ->assertDontSee('Lunas')
-            ->assertSee('Kelola')
+            ->assertDontSee('Status Reservasi')
+            ->assertDontSee('Reservasi Menunggu')
+            ->assertDontSee('Reservasi Dikonfirmasi')
+            ->assertDontSee(route('reservasi.edit', $reservation))
             ->assertDontSee('btn-confirm')
             ->assertDontSee('reservasi.confirm');
 
@@ -54,6 +87,21 @@ class ReservasiConfirmationTest extends TestCase
         ]);
     }
 
+    public function test_unified_list_includes_reservations_in_different_reservation_states(): void
+    {
+        $waiting = $this->createReservation('paid');
+        $confirmed = $this->createReservation('paid');
+        $confirmed->forceFill(['status_reservasi' => 'Dikonfirmasi'])->save();
+
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.index'))
+            ->assertOk()
+            ->assertSee($waiting->kode_reservasi)
+            ->assertSee($confirmed->kode_reservasi)
+            ->assertDontSee('Reservasi Menunggu')
+            ->assertDontSee('Reservasi Dikonfirmasi');
+    }
+
     public function test_admin_changes_paid_reservation_to_confirmed_through_manage_form(): void
     {
         $reservation = $this->createReservation('paid');
@@ -62,7 +110,7 @@ class ReservasiConfirmationTest extends TestCase
             ->put(route('reservasi.update', $reservation), [
                 'status_reservasi' => 'Dikonfirmasi',
             ])
-            ->assertRedirect(route('reservasi.dikonfirmasi'))
+            ->assertRedirect(route('reservasi.index'))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('reservasis', [
@@ -164,10 +212,11 @@ class ReservasiConfirmationTest extends TestCase
         ]);
     }
 
-    public function test_mobile_reschedule_updates_the_date_seen_by_pool_admin(): void
+    public function test_mobile_reschedule_request_appears_in_the_reservation_list_without_changing_the_date(): void
     {
         $this->travelTo('2026-11-14 08:00:00');
         $reservation = $this->createReservation('paid');
+        $this->addTicketPrices();
         $reservation->forceFill([
             'tanggal_kunjungan' => '2026-11-20',
         ])->save();
@@ -176,39 +225,43 @@ class ReservasiConfirmationTest extends TestCase
             'no_hp' => '081234567890',
             'tanggal_kunjungan' => '2026-11-25',
         ])
-            ->assertOk()
+            ->assertCreated()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.tanggal_kunjungan', '2026-11-25');
+            ->assertJsonPath('data.tanggal_baru', '2026-11-25')
+            ->assertJsonPath('data.status', 'menunggu_persetujuan');
 
         $this->assertSame(
-            '2026-11-25',
+            '2026-11-20',
             $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
         );
 
         $this->withSession($this->poolAdminSession())
             ->get(route('reservasi.index'))
             ->assertOk()
+            ->assertSee('Reschedule · Menunggu Persetujuan')
             ->assertSee('25-11-2026');
     }
 
-    public function test_mobile_reschedule_allows_a_reservation_on_its_visit_date(): void
+    public function test_mobile_reschedule_request_allows_a_reservation_on_its_visit_date(): void
     {
         $this->travelTo('2026-11-14 08:00:00');
         $reservation = $this->createReservation('paid');
+        $this->addTicketPrices();
         $reservation->forceFill([
             'tanggal_kunjungan' => '2026-11-14',
         ])->save();
 
         $this->putJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
             'no_hp' => '081234567890',
-            'tanggal_kunjungan' => '2026-11-15',
+            'tanggal_kunjungan' => '2026-11-16',
         ])
-            ->assertOk()
+            ->assertCreated()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.tanggal_kunjungan', '2026-11-15');
+            ->assertJsonPath('data.tanggal_baru', '2026-11-16')
+            ->assertJsonPath('data.status', 'menunggu_persetujuan');
 
         $this->assertSame(
-            '2026-11-15',
+            '2026-11-14',
             $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
         );
     }
@@ -280,6 +333,20 @@ class ReservasiConfirmationTest extends TestCase
             'total_harga' => 25000,
             'status_reservasi' => 'Menunggu',
             'status_pembayaran' => $paymentStatus,
+        ]);
+    }
+
+    private function addTicketPrices(string $poolId = 'pool_id_01'): void
+    {
+        HargaTiket::query()->create([
+            'pool_id' => $poolId,
+            'jenis_hari' => 'Weekday',
+            'harga' => 15000,
+        ]);
+        HargaTiket::query()->create([
+            'pool_id' => $poolId,
+            'jenis_hari' => 'Weekend',
+            'harga' => 20000,
         ]);
     }
 

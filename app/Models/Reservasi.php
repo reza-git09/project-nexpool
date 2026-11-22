@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservasi extends Model
 {
@@ -47,5 +48,10 @@ class Reservasi extends Model
             'pool_id',
             'pool_id'
         );
+    }
+
+    public function latestRescheduleRequest(): HasOne
+    {
+        return $this->hasOne(RescheduleRequest::class)->latestOfMany();
     }
 }
