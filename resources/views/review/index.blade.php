@@ -61,7 +61,7 @@ a{text-decoration:none}
 .table-top h3{font-size:14px}
 .table-top p{margin-top:3px;font-size:10px;color:#94a3b8}
 .table-wrapper{width:100%;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:1150px}
+table{width:100%;border-collapse:collapse;min-width:760px}
 th{background:#f8fafc;color:#64748b;font-size:11px;font-weight:700;text-align:left;padding:13px 20px;border-bottom:1px solid #e8ecf3;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
 td{padding:14px 20px;font-size:12px;color:#475569;border-bottom:1px solid #eef1f5;vertical-align:middle}
 tr:last-child td{border-bottom:none}
@@ -281,11 +281,8 @@ body.review-photo-scroll-locked{overflow:hidden}
                             <tr>
                                 <th>No</th>
                                 <th>Pengunjung</th>
-                                <th>Kolam Renang</th>
                                 <th>Rating</th>
-                                <th>Komentar</th>
                                 <th>Foto</th>
-                                <th>Balasan Admin</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
@@ -298,21 +295,11 @@ body.review-photo-scroll-locked{overflow:hidden}
 
                                     <td class="nama">{{ $item->nama_pengunjung }}</td>
 
-                                    <td class="pool">{{ session('admin_pool_nama', '-') }}</td>
-
                                     <td>
                                         <div class="rating">
                                             @for($i = 1; $i <= 5; $i++){{ $i <= $item->rating ? '★' : '☆' }}@endfor
                                             <span class="rating-number">({{ $item->rating }}/5)</span>
                                         </div>
-                                    </td>
-
-                                    <td>
-                                        @if($item->komentar)
-                                            <div class="komentar">{{ $item->komentar }}</div>
-                                        @else
-                                            <span class="belum-dibalas">Tidak ada komentar.</span>
-                                        @endif
                                     </td>
 
                                     <td>
@@ -325,14 +312,6 @@ body.review-photo-scroll-locked{overflow:hidden}
                                             </button>
                                         @else
                                             -
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        @if($item->balasan_admin)
-                                            <div class="balasan">{{ $item->balasan_admin }}</div>
-                                        @else
-                                            <span class="belum-dibalas">Belum ada balasan.</span>
                                         @endif
                                     </td>
 
@@ -352,7 +331,7 @@ body.review-photo-scroll-locked{overflow:hidden}
                                                 @if($item->status === 'Menunggu')
                                                     <i class="fa-solid fa-reply"></i> Balas
                                                 @else
-                                                    <i class="fa-solid fa-pen-to-square"></i> Balasan Admin
+                                                    <i class="fa-solid fa-pen-to-square"></i> kelola
                                                 @endif
                                             </a>
 

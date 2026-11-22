@@ -584,6 +584,22 @@
             white-space: nowrap;
         }
 
+        .actions-reschedule {
+            width: 150px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 7px;
+            white-space: normal;
+        }
+
+        .actions-reschedule form {
+            width: 100%;
+        }
+
+        .actions-reschedule button {
+            width: 100%;
+        }
+
         .btn-edit,
         .btn-detail {
             display: inline-flex;
@@ -628,12 +644,22 @@
             gap: 5px;
         }
 
+        .actions-reschedule .reject-reschedule-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 7px;
+        }
+
         .reject-reschedule-form input {
             width: 145px;
             padding: 7px 8px;
             border: 1px solid #e2e8f0;
             border-radius: 7px;
             font-size: 10px;
+        }
+
+        .actions-reschedule .reject-reschedule-form input {
+            width: 100%;
         }
 
         .btn-reject {
@@ -1410,7 +1436,7 @@
                                         <!-- AKSI -->
                                         <td>
 
-                                            <div class="actions">
+                                            <div class="actions{{ $rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL ? ' actions-reschedule' : '' }}">
                                                 <button
                                                     type="button"
                                                     class="btn-detail"
