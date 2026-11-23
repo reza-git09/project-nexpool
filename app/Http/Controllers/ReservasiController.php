@@ -12,45 +12,31 @@ use Illuminate\Validation\ValidationException;
 
 class ReservasiController extends Controller
 {
-    /**
-     * RESERVASI MENUNGGU
-     */
     public function index()
     {
         $poolId = session('admin_pool_id');
 
-        $reservasi = Reservasi::where('pool_id', $poolId)
-            ->where('status_reservasi', 'Menunggu')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $rescheduleRequests = RescheduleRequest::query()
-            ->with('reservasi')
-            ->where('status', RescheduleRequest::STATUS_AWAITING_APPROVAL)
-            ->where('expires_at', '>', now())
+        RescheduleRequest::query()
+            ->whereIn('status', RescheduleRequest::ACTIVE_STATUSES)
+            ->where('expires_at', '<=', now())
             ->whereHas(
                 'reservasi',
                 fn (Builder $query): Builder => $query->where('pool_id', $poolId),
             )
-            ->latest('id')
-            ->get();
+            ->update(['status' => RescheduleRequest::STATUS_EXPIRED]);
 
-        return view('reservasi.index', compact('reservasi', 'rescheduleRequests'));
-    }
-
-    /**
-     * RESERVASI DIKONFIRMASI
-     */
-    public function dikonfirmasi()
-    {
-        $poolId = session('admin_pool_id');
-
-        $reservasi = Reservasi::where('pool_id', $poolId)
-            ->where('status_reservasi', 'Dikonfirmasi')
+        $reservasi = Reservasi::query()
+            ->where('pool_id', $poolId)
+            ->with('latestRescheduleRequest')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('reservasi.dikonfirmasi', compact('reservasi'));
+        return view('reservasi.index', compact('reservasi'));
+    }
+
+    public function dikonfirmasi(): RedirectResponse
+    {
+        return redirect()->route('reservasi.index');
     }
 
     /**
@@ -112,14 +98,6 @@ class ReservasiController extends Controller
         $reservasi->status_reservasi = $validated['status_reservasi'];
         $reservasi->save();
 
-        // Jika dikonfirmasi
-        if ($reservasi->status_reservasi === 'Dikonfirmasi') {
-            return redirect()
-                ->route('reservasi.dikonfirmasi')
-                ->with('success', 'Reservasi berhasil dikonfirmasi.');
-        }
-
-        // Status selain Dikonfirmasi
         return redirect()
             ->route('reservasi.index')
             ->with('success', 'Status reservasi berhasil diperbarui.');

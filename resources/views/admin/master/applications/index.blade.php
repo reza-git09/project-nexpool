@@ -48,11 +48,18 @@
     .reject-panel label { display:block; margin-bottom:8px; color:#334155; font-size:12px; font-weight:700; }
     .reject-panel textarea { width:100%; min-height:100px; resize:vertical; border:1px solid #cbd5e1; border-radius:8px; padding:11px; font:inherit; font-size:13px; }
     .reject-error { color:#dc2626; font-size:12px; margin-top:6px; }
+    .reject-confirm-overlay { z-index:10000; background:rgba(15,23,42,.72); backdrop-filter:blur(4px); }
+    .reject-confirm-card { width:100%; max-width:430px; padding:25px; border-radius:18px; background:#fff; box-shadow:0 24px 60px rgba(15,23,42,.3); }
+    .reject-confirm-icon { display:flex; align-items:center; justify-content:center; width:48px; height:48px; margin-bottom:16px; border-radius:14px; background:#fee2e2; color:#dc2626; font-size:20px; }
+    .reject-confirm-card h3 { margin-bottom:9px; color:#172033; font-size:18px; }
+    .reject-confirm-card p { color:#64748b; font-size:13px; line-height:1.6; }
+    .reject-confirm-card strong { color:#334155; }
     @media(max-width:600px) {
         .detail-list { grid-template-columns:1fr; gap:5px; }
         .detail-list dd { margin-bottom:9px; }
         .modal-actions { justify-content:stretch; }
         .modal-actions button { flex:1; }
+        .reject-confirm-card { padding:20px; }
     }
 </style>
 @endpush
@@ -172,9 +179,29 @@
                     <textarea id="rejection_reason" name="rejection_reason" required minlength="10" maxlength="500" placeholder="Tuliskan alasan penolakan (minimal 10 karakter)."></textarea>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" onclick="hideRejectForm()">Batal</button>
-                        <button type="submit" class="btn-submit-reject" onclick="return confirm('Tolak pengajuan admin ini?')">Konfirmasi Tolak</button>
+                        <button id="openRejectConfirmation" type="button" class="btn-submit-reject" onclick="showRejectConfirmation()">Konfirmasi Tolak</button>
                     </div>
                 </form>
+            </div>
+        </section>
+    </div>
+
+    <div id="rejectConfirmationModal" class="modal-overlay reject-confirm-overlay" aria-hidden="true">
+        <section class="reject-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="rejectConfirmationTitle" aria-describedby="rejectConfirmationMessage">
+            <div class="reject-confirm-icon" aria-hidden="true">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="rejectConfirmationTitle">Konfirmasi Penolakan</h3>
+            <p id="rejectConfirmationMessage">
+                Yakin ingin menolak pengajuan admin atas nama
+                <strong id="rejectConfirmationName"></strong>?
+                Pastikan alasan penolakan sudah sesuai.
+            </p>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="hideRejectConfirmation()">Periksa Kembali</button>
+                <button id="confirmRejectButton" type="button" class="btn-submit-reject" onclick="confirmRejectApplication()">
+                    <i class="fa-solid fa-xmark"></i> Ya, Tolak
+                </button>
             </div>
         </section>
     </div>
@@ -223,6 +250,38 @@
         document.getElementById('pendingActions').hidden = false;
     }
 
+    function showRejectConfirmation() {
+        const rejectForm = document.getElementById('rejectForm');
+        if (!rejectForm.reportValidity()) {
+            return;
+        }
+
+        document.getElementById('rejectConfirmationName').textContent = selectedApplicantName;
+        const modal = document.getElementById('rejectConfirmationModal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.getElementById('confirmRejectButton').focus();
+    }
+
+    function hideRejectConfirmation() {
+        const modal = document.getElementById('rejectConfirmationModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.getElementById('openRejectConfirmation').focus();
+    }
+
+    function confirmRejectApplication() {
+        const rejectForm = document.getElementById('rejectForm');
+        if (!rejectForm.reportValidity()) {
+            hideRejectConfirmation();
+            document.getElementById('rejection_reason').focus();
+            return;
+        }
+
+        hideRejectConfirmation();
+        rejectForm.requestSubmit();
+    }
+
     function confirmApproval() {
         return confirm(`Terima pengajuan admin atas nama ${selectedApplicantName}?`);
     }
@@ -236,6 +295,18 @@
     document.getElementById('applicationDetailModal').addEventListener('click', (event) => {
         if (event.target === event.currentTarget) {
             closeApplicationDetail();
+        }
+    });
+
+    const rejectConfirmationModal = document.getElementById('rejectConfirmationModal');
+    rejectConfirmationModal.addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+            hideRejectConfirmation();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && rejectConfirmationModal.classList.contains('active')) {
+            hideRejectConfirmation();
         }
     });
 </script>
