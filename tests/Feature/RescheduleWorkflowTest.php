@@ -150,6 +150,24 @@ class RescheduleWorkflowTest extends TestCase
         $this->assertDatabaseCount('reschedule_requests', 0);
     }
 
+    public function test_quote_returns_422_when_new_date_is_before_h2(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation();
+
+        $this->getJson(
+            '/api/reservasi/kode/'.$reservation->kode_reservasi
+                .'/reschedule/quote?no_hp=081234567890&tanggal_kunjungan=2026-11-21',
+        )
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'message',
+                'Tanggal baru reschedule minimal H+2 dari hari ini.',
+            );
+
+        $this->assertDatabaseCount('reschedule_requests', 0);
+    }
+
     public function test_ticket_for_today_can_be_rescheduled_to_a_date_at_least_two_days_ahead(): void
     {
         $this->travelTo('2026-11-20 08:00:00');
@@ -229,9 +247,10 @@ class RescheduleWorkflowTest extends TestCase
             ->assertSee('Daftar Reservasi')
             ->assertSee($reservation->kode_reservasi)
             ->assertSee('Reschedule · Menunggu Persetujuan')
-            ->assertSee('Setujui')
-            ->assertSee('Tolak')
-            ->assertDontSee('Pengajuan Reschedule Menunggu Persetujuan');
+            ->assertSee('Kelola')
+            ->assertSee('Setujui Reschedule')
+            ->assertSee('Tolak Pengajuan')
+            ->assertSee('Pengajuan Reschedule Menunggu Persetujuan');
 
         $this->withSession($this->poolAdminSession())
             ->post(route('reservasi.reschedule-requests.approve', $rescheduleRequest))
