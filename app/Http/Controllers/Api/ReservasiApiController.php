@@ -486,12 +486,22 @@ class ReservasiApiController extends Controller
             abort(422, 'Reschedule tidak dapat dilakukan setelah tanggal kunjungan.');
         }
 
-        $minimumDate = today()->addDays(2)->toDateString();
+        $minimumDate = today()->addDays(2);
+        if ($reservasi->tanggal_kunjungan !== null) {
+            $minimumTicketDate = $reservasi->tanggal_kunjungan->copy()->addDays(2);
+            if ($minimumTicketDate->greaterThan($minimumDate)) {
+                $minimumDate = $minimumTicketDate;
+            }
+        }
+
         if (
             $reservasi->tanggal_kunjungan === null
-            || $newDate->toDateString() < $minimumDate
+            || $newDate->toDateString() < $minimumDate->toDateString()
         ) {
-            abort(422, 'Tanggal baru reschedule minimal H+2 dari hari ini.');
+            abort(
+                422,
+                'Tanggal baru reschedule minimal H+2 dari hari ini atau tanggal kunjungan saat ini, mana yang lebih akhir.',
+            );
         }
 
         if ($reservasi->tanggal_kunjungan->isSameDay($newDate)) {
