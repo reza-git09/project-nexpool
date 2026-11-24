@@ -497,6 +497,15 @@ class ReservasiApiController extends Controller
             abort(422, 'Reservasi hanya dapat dijadwalkan ulang setelah pembayaran lunas.');
         }
 
+        if (
+            RescheduleRequest::query()
+                ->where('reservasi_id', $reservasi->id)
+                ->where('status', RescheduleRequest::STATUS_COMPLETED)
+                ->exists()
+        ) {
+            abort(422, 'Tiket ini sudah pernah dijadwalkan ulang.');
+        }
+
         if (in_array($reservasi->status_reservasi, ['Dibatalkan', 'Selesai'], true)) {
             abort(422, 'Tiket yang dibatalkan atau sudah digunakan tidak dapat dijadwalkan ulang.');
         }

@@ -206,6 +206,38 @@ class RescheduleWorkflowTest extends TestCase
         );
     }
 
+    public function test_ticket_cannot_be_rescheduled_again_after_a_successful_reschedule(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation();
+        $this->addTicketPrices();
+        $rescheduleRequest = $this->submitRequest($reservation);
+        $rescheduleRequest->forceFill([
+            'status' => RescheduleRequest::STATUS_COMPLETED,
+        ])->save();
+        $reservation->forceFill(['tanggal_kunjungan' => '2026-11-28'])->save();
+
+        $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-12-01',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Tiket ini sudah pernah dijadwalkan ulang.');
+
+        $this->getJson(
+            '/api/reservasi/kode/'.$reservation->kode_reservasi
+                .'/reschedule/quote?no_hp=081234567890&tanggal_kunjungan=2026-12-01',
+        )
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Tiket ini sudah pernah dijadwalkan ulang.');
+
+        $this->assertDatabaseCount('reschedule_requests', 1);
+        $this->assertSame(
+            '2026-11-28',
+            $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
+        );
+    }
+
     public function test_request_rejects_a_new_date_before_h2(): void
     {
         $this->travelTo('2026-11-20 08:00:00');
