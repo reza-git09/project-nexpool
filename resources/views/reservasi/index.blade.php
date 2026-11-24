@@ -584,22 +584,6 @@
             white-space: nowrap;
         }
 
-        .actions-reschedule {
-            width: 150px;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 7px;
-            white-space: normal;
-        }
-
-        .actions-reschedule form {
-            width: 100%;
-        }
-
-        .actions-reschedule button {
-            width: 100%;
-        }
-
         .btn-edit,
         .btn-detail {
             display: inline-flex;
@@ -616,6 +600,21 @@
             transition:
                 background 0.2s ease,
                 transform 0.2s ease;
+        }
+
+        .btn-manage {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 7px 10px;
+            border: none;
+            border-radius: 7px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .btn-edit {
@@ -638,28 +637,56 @@
             transform: translateY(-1px);
         }
 
-        .reject-reschedule-form {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .reschedule-management {
+            margin-top: 16px;
+            padding: 16px;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: #f8fafc;
         }
 
-        .actions-reschedule .reject-reschedule-form {
+        .reschedule-management h3 {
+            margin-bottom: 4px;
+            color: #172033;
+            font-size: 13px;
+        }
+
+        .reschedule-management p,
+        .reschedule-management label {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .reschedule-management-actions {
+            display: grid;
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .reschedule-management-actions form {
+            display: flex;
+            min-width: 0;
             flex-direction: column;
-            align-items: stretch;
+            justify-content: flex-end;
             gap: 7px;
+            margin: 0;
+        }
+
+        .reschedule-management-actions .btn-edit,
+        .reschedule-management-actions .btn-reject {
+            width: 100%;
+            min-height: 36px;
+            font-size: 11px;
         }
 
         .reject-reschedule-form input {
-            width: 145px;
-            padding: 7px 8px;
+            width: 100%;
+            min-width: 0;
             border: 1px solid #e2e8f0;
             border-radius: 7px;
-            font-size: 10px;
-        }
-
-        .actions-reschedule .reject-reschedule-form input {
-            width: 100%;
+            padding: 8px;
+            font-size: 11px;
         }
 
         .btn-reject {
@@ -1077,6 +1104,10 @@
                 grid-template-columns: 1fr 1fr;
             }
 
+            .reschedule-management-actions {
+                grid-template-columns: 1fr;
+            }
+
             .modal-footer {
                 padding: 14px 16px;
             }
@@ -1436,49 +1467,26 @@
                                         <!-- AKSI -->
                                         <td>
 
-                                            <div class="actions{{ $rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL ? ' actions-reschedule' : '' }}">
+                                            <div class="actions">
+                                                @if($rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL)
                                                 <button
                                                     type="button"
-                                                    class="btn-detail"
+                                                    class="btn-manage"
                                                     onclick="openReservationModal('{{ $item->id }}')"
+                                                    aria-label="Kelola pengajuan reschedule {{ $item->kode_reservasi }}"
                                                 >
-
-                                                    <i class="fa-solid fa-eye"></i>
-
-                                                    Detail
-
+                                                    <i class="fa-solid fa-sliders"></i>
+                                                    Kelola
                                                 </button>
-                                                @if($rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL)
-                                                    <form
-                                                        action="{{ route('reservasi.reschedule-requests.approve', $rescheduleRequest) }}"
-                                                        method="POST"
+                                                @else
+                                                    <button
+                                                        type="button"
+                                                        class="btn-detail"
+                                                        onclick="openReservationModal('{{ $item->id }}')"
                                                     >
-                                                        @csrf
-                                                        <button type="submit" class="btn-edit">
-                                                            <i class="fa-solid fa-check"></i>
-                                                            Setujui
-                                                        </button>
-                                                    </form>
-
-                                                    <form
-                                                        action="{{ route('reservasi.reschedule-requests.reject', $rescheduleRequest) }}"
-                                                        method="POST"
-                                                        class="reject-reschedule-form"
-                                                    >
-                                                        @csrf
-                                                        <input
-                                                            type="text"
-                                                            name="alasan_penolakan"
-                                                            maxlength="500"
-                                                            placeholder="Alasan penolakan"
-                                                            aria-label="Alasan penolakan {{ $item->kode_reservasi }}"
-                                                            required
-                                                        >
-                                                        <button type="submit" class="btn-reject">
-                                                            <i class="fa-solid fa-xmark"></i>
-                                                            Tolak
-                                                        </button>
-                                                    </form>
+                                                        <i class="fa-solid fa-eye"></i>
+                                                        Detail
+                                                    </button>
                                                 @endif
                                             </div>
 
@@ -1544,6 +1552,11 @@
 
     @foreach($dataReservasi as $item)
 
+        @php
+            $rescheduleRequest = $item->latestRescheduleRequest;
+            $isAwaitingRescheduleApproval = $rescheduleRequest?->status === \App\Models\RescheduleRequest::STATUS_AWAITING_APPROVAL;
+        @endphp
+
         <div
             id="reservationModal{{ $item->id }}"
             class="modal"
@@ -1573,11 +1586,11 @@
                         <div>
 
                             <h2>
-                                Detail Reservasi
+                                {{ $isAwaitingRescheduleApproval ? 'Kelola Pengajuan Reschedule' : 'Detail Reservasi' }}
                             </h2>
 
                             <p>
-                                Informasi lengkap reservasi pengunjung
+                                {{ $isAwaitingRescheduleApproval ? 'Tinjau pengajuan dan tentukan keputusan admin' : 'Informasi lengkap reservasi pengunjung' }}
                             </p>
 
                         </div>
@@ -1834,29 +1847,53 @@
 
                     </div>
 
+                    @if($isAwaitingRescheduleApproval)
+                        <section class="reschedule-management">
+                            <h3>Pengajuan Reschedule Menunggu Persetujuan</h3>
+                            <p>Pilih setujui, atau isi alasan sebelum menolak pengajuan.</p>
+
+                            <div class="reschedule-management-actions">
+                                <form
+                                    action="{{ route('reservasi.reschedule-requests.approve', $rescheduleRequest) }}"
+                                    method="POST"
+                                >
+                                    @csrf
+                                    <button type="submit" class="btn-edit">
+                                        <i class="fa-solid fa-check"></i>
+                                        Setujui Reschedule
+                                    </button>
+                                </form>
+
+                                <form
+                                    action="{{ route('reservasi.reschedule-requests.reject', $rescheduleRequest) }}"
+                                    method="POST"
+                                    class="reject-reschedule-form"
+                                >
+                                    @csrf
+                                    <label for="alasan-penolakan-{{ $item->id }}">Alasan penolakan</label>
+                                    <input
+                                        id="alasan-penolakan-{{ $item->id }}"
+                                        type="text"
+                                        name="alasan_penolakan"
+                                        maxlength="500"
+                                        placeholder="Masukkan alasan penolakan"
+                                        required
+                                    >
+                                    <button type="submit" class="btn-reject">
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Tolak Pengajuan
+                                    </button>
+                                </form>
+                            </div>
+                        </section>
+                    @endif
+
                 </div>
 
 
                 <!-- MODAL FOOTER -->
 
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="modal-btn modal-btn-close"
-                        onclick="closeReservationModal(
-                            '{{ $item->id }}'
-                        )"
-                    >
-
-                        <i class="fa-solid fa-xmark"></i>
-
-                        Tutup
-
-                    </button>
-
-
-                </div>
+             
 
             </div>
 
