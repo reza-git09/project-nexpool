@@ -930,6 +930,55 @@
                         @method('PUT')
 
 
+                        <!-- KATEGORI TIKET -->
+
+                        <div class="form-group">
+
+                            <label for="kategori">
+
+                                Kategori Tiket
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <select
+                                id="kategori"
+                                name="kategori"
+                                class="form-control"
+                                required>
+
+                                <option
+                                    value="Dewasa"
+                                    {{ old('kategori', $hargaTiket->kategori) == 'Dewasa' ? 'selected' : '' }}>
+                                    Dewasa
+                                </option>
+
+                                <option
+                                    value="Anak"
+                                    {{ old('kategori', $hargaTiket->kategori) == 'Anak' ? 'selected' : '' }}>
+                                    Anak-anak
+                                </option>
+
+                            </select>
+
+                            @error('kategori')
+
+                                <div class="error">
+
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
                         <!-- JENIS HARI -->
 
                         <div class="form-group">

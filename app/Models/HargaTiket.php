@@ -10,6 +10,7 @@ class HargaTiket extends Model
 
     protected $fillable = [
         'pool_id',
+        'kategori',
         'jenis_hari',
         'harga',
     ];

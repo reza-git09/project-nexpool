@@ -57,6 +57,7 @@ class ReservasiConfirmationTest extends TestCase
         Schema::create('harga_tiket', function (Blueprint $table): void {
             $table->id();
             $table->string('pool_id');
+            $table->string('kategori')->default('Dewasa');
             $table->string('jenis_hari');
             $table->decimal('harga', 12, 2);
             $table->timestamps();
@@ -340,11 +341,13 @@ class ReservasiConfirmationTest extends TestCase
     {
         HargaTiket::query()->create([
             'pool_id' => $poolId,
+            'kategori' => 'Dewasa',
             'jenis_hari' => 'Weekday',
             'harga' => 15000,
         ]);
         HargaTiket::query()->create([
             'pool_id' => $poolId,
+            'kategori' => 'Dewasa',
             'jenis_hari' => 'Weekend',
             'harga' => 20000,
         ]);

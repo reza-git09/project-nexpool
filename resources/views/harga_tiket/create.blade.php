@@ -752,6 +752,45 @@
                         @csrf
 
 
+                        <!-- KATEGORI TIKET -->
+
+                        <div class="form-group">
+
+                            <label for="kategori">
+                                Kategori Tiket
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <i class="fa-solid fa-ticket input-icon"></i>
+
+                                <select id="kategori" name="kategori" required>
+
+                                    <option value="Dewasa"
+                                        {{ old('kategori', 'Dewasa') === 'Dewasa' ? 'selected' : '' }}>
+                                        Dewasa
+                                    </option>
+
+                                    <option value="Anak"
+                                        {{ old('kategori') === 'Anak' ? 'selected' : '' }}>
+                                        Anak-anak
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            @error('kategori')
+
+                                <div class="error">
+                                    {{ $message }}
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
                         <!-- JENIS HARI -->
 
                         <div class="form-group">

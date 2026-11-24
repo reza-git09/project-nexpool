@@ -1205,6 +1205,10 @@
                                     </th>
 
                                     <th>
+                                        Kategori
+                                    </th>
+
+                                    <th>
                                         Jenis Hari
                                     </th>
 
@@ -1232,6 +1236,14 @@
                                         <td class="number">
 
                                             {{ $loop->iteration }}
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge">
+                                                {{ $item->kategori === 'Anak' ? 'Anak-anak' : 'Dewasa' }}
+                                            </span>
 
                                         </td>
 

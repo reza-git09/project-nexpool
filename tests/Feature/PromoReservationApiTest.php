@@ -94,6 +94,94 @@ class PromoReservationApiTest extends TestCase
             ->assertJsonPath('data.total_harga', '38000.00');
     }
 
+    public function test_reservation_uses_adult_price_when_child_price_exists_for_the_same_day(): void
+    {
+        $this->createPromoSchema();
+        $this->addPrice('pool_id_01', 'Weekday', 15000, 'Dewasa');
+        $this->addPrice('pool_id_01', 'Weekday', 5000, 'Anak');
+
+        $this->postJson('/api/reservasi', $this->reservationPayload())
+            ->assertCreated()
+            ->assertJsonPath('data.subtotal_harga', 32000)
+            ->assertJsonPath('data.total_harga', '32000.00');
+    }
+
+    public function test_reservation_charges_children_at_the_configured_child_price(): void
+    {
+        $this->createPromoSchema();
+        $this->addPrice('pool_id_02', 'Weekday', 15000);
+        $this->addPrice('pool_id_02', 'Weekday', 7500, 'Anak');
+
+        $this->postJson('/api/reservasi', $this->reservationPayload([
+            'pool_id' => 'pool_id_02',
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 2,
+            'total_harga' => 32000,
+        ]))
+            ->assertCreated()
+            ->assertJsonPath('data.subtotal_harga', 32000)
+            ->assertJsonPath('data.total_harga', '32000.00');
+    }
+
+    public function test_tiara_children_are_charged_at_the_configured_child_price(): void
+    {
+        $this->createPromoSchema();
+        $this->addPrice('pool_id_01', 'Weekday', 15000);
+        $this->addPrice('pool_id_01', 'Weekday', 7500, 'Anak');
+
+        $this->postJson('/api/reservasi', $this->reservationPayload([
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 2,
+            'total_harga' => 32000,
+        ]))
+            ->assertCreated()
+            ->assertJsonPath('data.subtotal_harga', 32000)
+            ->assertJsonPath('data.total_harga', '32000.00');
+
+        $this->assertDatabaseHas('reservasis', [
+            'pool_id' => 'pool_id_01',
+            'jumlah_anak' => 2,
+            'total_harga' => 32000,
+        ]);
+    }
+
+    public function test_tiara_children_are_free_when_no_child_price_is_configured(): void
+    {
+        $this->createPromoSchema();
+        $this->addPrice('pool_id_01', 'Weekday', 15000);
+
+        $this->postJson('/api/reservasi', $this->reservationPayload([
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 2,
+            'total_harga' => 17000,
+        ]))
+            ->assertCreated()
+            ->assertJsonPath('data.subtotal_harga', 17000)
+            ->assertJsonPath('data.total_harga', '17000.00');
+    }
+
+    public function test_reservation_rejects_children_when_a_child_price_is_missing_for_the_day(): void
+    {
+        $this->createPromoSchema();
+        $this->addPrice('pool_id_02', 'Weekend', 20000);
+        $this->addPrice('pool_id_02', 'Weekday', 7500, 'Anak');
+
+        $this->postJson('/api/reservasi', $this->reservationPayload([
+            'pool_id' => 'pool_id_02',
+            'tanggal_kunjungan' => '2026-11-21',
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 1,
+            'total_harga' => 22000,
+        ]))
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'message',
+                'Harga tiket anak untuk kolam dan tanggal tersebut belum tersedia.',
+            );
+
+        $this->assertDatabaseCount('reservasis', 0);
+    }
+
     public function test_reservation_without_a_promo_keeps_the_regular_ticket_total(): void
     {
         $this->createPromoSchema();
@@ -171,6 +259,7 @@ class PromoReservationApiTest extends TestCase
         Schema::create('harga_tiket', function (Blueprint $table): void {
             $table->id();
             $table->string('pool_id');
+            $table->string('kategori')->default('Dewasa');
             $table->string('jenis_hari');
             $table->decimal('harga', 12, 2);
             $table->timestamps();
@@ -243,10 +332,11 @@ class PromoReservationApiTest extends TestCase
         ];
     }
 
-    private function addPrice(string $poolId, string $dayType, int $price): void
+    private function addPrice(string $poolId, string $dayType, int $price, string $category = 'Dewasa'): void
     {
         DB::table('harga_tiket')->insert([
             'pool_id' => $poolId,
+            'kategori' => $category,
             'jenis_hari' => $dayType,
             'harga' => $price,
             'created_at' => now(),

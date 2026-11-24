@@ -38,6 +38,7 @@ class RescheduleWorkflowTest extends TestCase
         Schema::create('harga_tiket', function (Blueprint $table): void {
             $table->id();
             $table->string('pool_id');
+            $table->string('kategori')->default('Dewasa');
             $table->string('jenis_hari');
             $table->decimal('harga', 12, 2);
             $table->timestamps();
@@ -69,6 +70,18 @@ class RescheduleWorkflowTest extends TestCase
         $this->travelTo('2026-11-20 08:00:00');
         $reservation = $this->createReservation();
 
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_01',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekday',
+            'harga' => 5000,
+        ]);
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_01',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekend',
+            'harga' => 6000,
+        ]);
         $this->addTicketPrices();
 
         $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
@@ -84,6 +97,68 @@ class RescheduleWorkflowTest extends TestCase
             $reservation->refresh()->tanggal_kunjungan->format('Y-m-d'),
         );
         $this->assertDatabaseCount('reschedule_requests', 1);
+    }
+
+    public function test_reschedule_difference_includes_adult_and_child_prices(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation('pool_id_02');
+        $reservation->forceFill([
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 1,
+        ])->save();
+
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_02',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekday',
+            'harga' => 5000,
+        ]);
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_02',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekend',
+            'harga' => 7500,
+        ]);
+        $this->addTicketPrices('pool_id_02');
+
+        $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-28',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.selisih_harga', 7500);
+    }
+
+    public function test_tiara_children_are_charged_when_rescheduling_with_a_child_price(): void
+    {
+        $this->travelTo('2026-11-20 08:00:00');
+        $reservation = $this->createReservation();
+        $reservation->forceFill([
+            'jumlah_dewasa' => 1,
+            'jumlah_anak' => 1,
+        ])->save();
+
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_01',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekday',
+            'harga' => 5000,
+        ]);
+        HargaTiket::query()->create([
+            'pool_id' => 'pool_id_01',
+            'kategori' => 'Anak',
+            'jenis_hari' => 'Weekend',
+            'harga' => 7500,
+        ]);
+        $this->addTicketPrices();
+
+        $this->postJson('/api/reservasi/kode/'.$reservation->kode_reservasi.'/reschedule', [
+            'no_hp' => '081234567890',
+            'tanggal_kunjungan' => '2026-11-28',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.selisih_harga', 7500);
     }
 
     public function test_quote_returns_the_difference_without_creating_a_request(): void
@@ -546,11 +621,13 @@ class RescheduleWorkflowTest extends TestCase
     {
         HargaTiket::query()->create([
             'pool_id' => $poolId,
+            'kategori' => 'Dewasa',
             'jenis_hari' => 'Weekday',
             'harga' => 15000,
         ]);
         HargaTiket::query()->create([
             'pool_id' => $poolId,
+            'kategori' => 'Dewasa',
             'jenis_hari' => 'Weekend',
             'harga' => 20000,
         ]);

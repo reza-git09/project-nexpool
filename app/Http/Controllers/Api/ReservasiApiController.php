@@ -125,20 +125,42 @@ class ReservasiApiController extends Controller
 
             $tanggalKunjungan = Carbon::parse($validated['tanggal_kunjungan']);
             $jenisHari = $tanggalKunjungan->isWeekend() ? 'Weekend' : 'Weekday';
-            $hargaTiket = HargaTiket::query()
+            $hargaDewasa = HargaTiket::query()
                 ->where('pool_id', $validated['pool_id'])
+                ->where('kategori', 'Dewasa')
+                ->where('jenis_hari', $jenisHari)
+                ->value('harga');
+            $hargaAnak = HargaTiket::query()
+                ->where('pool_id', $validated['pool_id'])
+                ->where('kategori', 'Anak')
                 ->where('jenis_hari', $jenisHari)
                 ->value('harga');
 
-            if ($hargaTiket === null) {
+            if ($hargaDewasa === null) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Harga tiket untuk kolam dan tanggal tersebut belum tersedia.',
                 ], 422);
             }
 
-            $hargaDewasa = (int) round((float) $hargaTiket);
-            $subtotalTiket = $validated['jumlah_dewasa'] * $hargaDewasa;
+            if ($validated['jumlah_anak'] > 0 && $hargaAnak === null) {
+                $hasChildPricing = HargaTiket::query()
+                    ->where('pool_id', $validated['pool_id'])
+                    ->where('kategori', 'Anak')
+                    ->exists();
+
+                if ($hasChildPricing) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Harga tiket anak untuk kolam dan tanggal tersebut belum tersedia.',
+                    ], 422);
+                }
+            }
+
+            $hargaDewasa = (int) round((float) $hargaDewasa);
+            $hargaAnak = (int) round((float) ($hargaAnak ?? 0));
+            $subtotalTiket = ($validated['jumlah_dewasa'] * $hargaDewasa)
+                + ($validated['jumlah_anak'] * $hargaAnak);
             $subtotal = $subtotalTiket + self::ADMIN_FEE;
             $promo = null;
             $potonganPromo = 0;
@@ -516,23 +538,47 @@ class ReservasiApiController extends Controller
             : 'Weekday';
         $newDayType = $newDate->isWeekend() ? 'Weekend' : 'Weekday';
 
-        $oldPrice = HargaTiket::query()
+        $oldAdultPrice = HargaTiket::query()
             ->where('pool_id', $reservasi->pool_id)
+            ->where('kategori', 'Dewasa')
             ->where('jenis_hari', $oldDayType)
             ->value('harga');
-        $newPrice = HargaTiket::query()
+        $newAdultPrice = HargaTiket::query()
             ->where('pool_id', $reservasi->pool_id)
+            ->where('kategori', 'Dewasa')
+            ->where('jenis_hari', $newDayType)
+            ->value('harga');
+        $oldChildPrice = HargaTiket::query()
+            ->where('pool_id', $reservasi->pool_id)
+            ->where('kategori', 'Anak')
+            ->where('jenis_hari', $oldDayType)
+            ->value('harga');
+        $newChildPrice = HargaTiket::query()
+            ->where('pool_id', $reservasi->pool_id)
+            ->where('kategori', 'Anak')
             ->where('jenis_hari', $newDayType)
             ->value('harga');
 
-        if ($oldPrice === null || $newPrice === null) {
+        if ($oldAdultPrice === null || $newAdultPrice === null) {
             abort(422, 'Harga tiket untuk tanggal reschedule belum tersedia.');
         }
 
-        $priceDifferencePerAdult = (int) round((float) $newPrice)
-            - (int) round((float) $oldPrice);
+        $hasChildPricing = $reservasi->jumlah_anak > 0
+            && HargaTiket::query()
+                ->where('pool_id', $reservasi->pool_id)
+                ->where('kategori', 'Anak')
+                ->exists();
 
-        return max(0, $priceDifferencePerAdult) * $reservasi->jumlah_dewasa;
+        if ($hasChildPricing && ($oldChildPrice === null || $newChildPrice === null)) {
+            abort(422, 'Harga tiket anak untuk tanggal reschedule belum tersedia.');
+        }
+
+        $oldTotal = ($reservasi->jumlah_dewasa * (int) round((float) $oldAdultPrice))
+            + ($reservasi->jumlah_anak * (int) round((float) ($oldChildPrice ?? 0)));
+        $newTotal = ($reservasi->jumlah_dewasa * (int) round((float) $newAdultPrice))
+            + ($reservasi->jumlah_anak * (int) round((float) ($newChildPrice ?? 0)));
+
+        return max(0, $newTotal - $oldTotal);
     }
 
     private function expireActiveRescheduleRequests(Reservasi $reservasi): void

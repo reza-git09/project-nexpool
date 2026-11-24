@@ -29,6 +29,7 @@ class HargaTiketController extends Controller
     {
         $priceOptions = range(5000, 100000, 5000);
         $validated = $request->validate([
+            'kategori' => ['required', Rule::in(['Dewasa', 'Anak'])],
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
@@ -42,6 +43,8 @@ class HargaTiketController extends Controller
                 'max:9999999999',
             ],
         ], [
+            'kategori.required' => 'Kategori tiket wajib dipilih.',
+            'kategori.in' => 'Kategori tiket tidak valid.',
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
@@ -52,21 +55,23 @@ class HargaTiketController extends Controller
             'harga_custom.max' => 'Harga custom maksimal Rp9.999.999.999.',
         ]);
 
-        // 2. Cek kombinasi ganda (pool_id + jenis_hari)
+        // 2. Cek kombinasi ganda (pool_id + kategori + jenis_hari)
         $isDuplicate = HargaTiket::where('pool_id', session('admin_pool_id'))
-            ->where('jenis_hari', $request->jenis_hari)
+            ->where('kategori', $validated['kategori'])
+            ->where('jenis_hari', $validated['jenis_hari'])
             ->exists();
 
         if ($isDuplicate) {
             return back()
                 ->withInput()
-                ->withErrors(['jenis_hari' => "Data harga tiket untuk hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
+                ->withErrors(['jenis_hari' => "Data harga tiket kategori '{$validated['kategori']}' untuk hari '{$validated['jenis_hari']}' sudah tersedia sebelumnya."]);
         }
 
         // 3. Simpan data
         HargaTiket::create([
             'pool_id' => session('admin_pool_id'),
-            'jenis_hari' => $request->jenis_hari,
+            'kategori' => $validated['kategori'],
+            'jenis_hari' => $validated['jenis_hari'],
             'harga' => $validated['harga'] === 'custom'
                 ? (int) $validated['harga_custom']
                 : (int) $validated['harga'],
@@ -98,7 +103,8 @@ class HargaTiketController extends Controller
         }
 
         // 1. Validasi ketat input edit
-        $request->validate([
+        $validated = $request->validate([
+            'kategori' => ['required', Rule::in(['Dewasa', 'Anak'])],
             'jenis_hari' => 'required|in:Weekday,Weekend',
             'harga' => [
                 'required',
@@ -109,6 +115,8 @@ class HargaTiketController extends Controller
                 'max:9999999999',
             ],
         ], [
+            'kategori.required' => 'Kategori tiket wajib dipilih.',
+            'kategori.in' => 'Kategori tiket tidak valid.',
             'jenis_hari.required' => 'Jenis hari wajib dipilih.',
             'jenis_hari.in' => 'Jenis hari tidak valid.',
             'harga.required' => 'Harga tiket wajib diisi.',
@@ -119,22 +127,24 @@ class HargaTiketController extends Controller
             'harga.max' => 'Harga tiket maksimal Rp9.999.999.999.',
         ]);
 
-        // 2. Cek apakah jenis hari baru sudah ada di record lain (kecuali data ini sendiri)
+        // 2. Cek apakah kombinasi kategori dan jenis hari sudah ada di record lain.
         $isDuplicate = HargaTiket::where('pool_id', session('admin_pool_id'))
-            ->where('jenis_hari', $request->jenis_hari)
+            ->where('kategori', $validated['kategori'])
+            ->where('jenis_hari', $validated['jenis_hari'])
             ->where('id', '!=', $hargaTiket->id)
             ->exists();
 
         if ($isDuplicate) {
             return back()
                 ->withInput()
-                ->withErrors(['jenis_hari' => "Data harga tiket untuk hari '{$request->jenis_hari}' sudah tersedia sebelumnya."]);
+                ->withErrors(['jenis_hari' => "Data harga tiket kategori '{$validated['kategori']}' untuk hari '{$validated['jenis_hari']}' sudah tersedia sebelumnya."]);
         }
 
         // 3. Update database
         $hargaTiket->update([
-            'jenis_hari' => $request->jenis_hari,
-            'harga' => (int) $request->harga,
+            'kategori' => $validated['kategori'],
+            'jenis_hari' => $validated['jenis_hari'],
+            'harga' => (int) $validated['harga'],
         ]);
 
         return redirect()
