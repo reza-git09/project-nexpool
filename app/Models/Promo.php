@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $pool_id
+ */
 class Promo extends Model
 {
     protected $table = 'promos';
@@ -26,7 +29,7 @@ class Promo extends Model
         'status' => 'boolean',
     ];
 
-    public function getStatusAttribute($value): bool
+    public function getStatusAttribute(mixed $value): bool
     {
         $tanggalSelesai = $this->tanggal_selesai;
 
