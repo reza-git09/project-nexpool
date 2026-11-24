@@ -1247,47 +1247,6 @@
 
 
 
-                    <!-- STATUS PROMO -->
-
-                    <div class="form-group">
-
-                        <label>
-                            Status Promo
-                        </label>
-
-                        <select
-                            name="status"
-                            required
-                        >
-
-                            <option
-                                value="1"
-                                {{ old('status', '1') == '1' ? 'selected' : '' }}
-                            >
-                                Aktif
-                            </option>
-
-                            <option
-                                value="0"
-                                {{ old('status') == '0' ? 'selected' : '' }}
-                            >
-                                Tidak Aktif
-                            </option>
-
-                        </select>
-
-                        @error('status')
-
-                            <div class="error">
-                                {{ $message }}
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-
-
                     <!-- BUTTON -->
 
                     <div class="buttons">

@@ -51,7 +51,6 @@ class PromoController extends Controller
                     }
                 },
             ],
-            'status'          => 'required|boolean',
         ], [
             'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
             'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
@@ -66,7 +65,7 @@ class PromoController extends Controller
             'nilai_diskon' => $request->nilai_diskon,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'status' => $request->status,
+            'status' => true,
         ]);
 
         return redirect()
@@ -126,7 +125,6 @@ class PromoController extends Controller
                     }
                 },
             ],
-            'status'          => 'required|boolean',
         ], [
             'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
             'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
@@ -140,7 +138,7 @@ class PromoController extends Controller
             'nilai_diskon' => $request->nilai_diskon,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'status' => $request->status,
+            'status' => true,
         ]);
 
         return redirect()

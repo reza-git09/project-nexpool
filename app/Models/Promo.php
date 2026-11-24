@@ -25,4 +25,13 @@ class Promo extends Model
         'tanggal_selesai' => 'date',
         'status' => 'boolean',
     ];
+
+    public function getStatusAttribute($value): bool
+    {
+        $tanggalSelesai = $this->tanggal_selesai;
+
+        return (bool) $value
+            && $tanggalSelesai !== null
+            && $tanggalSelesai->greaterThanOrEqualTo(today());
+    }
 }

@@ -686,23 +686,6 @@
                             <div id="error-tanggal" class="field-error"></div>
                         </div>
 
-                        <!-- STATUS -->
-                        <div class="form-group full">
-                            <label>Status Promo</label>
-
-                            <select name="status" required>
-                                <option value="1"
-                                    {{ old('status', $promo->status ? '1' : '0') == '1' ? 'selected' : '' }}>
-                                    Aktif
-                                </option>
-
-                                <option value="0"
-                                    {{ old('status', $promo->status ? '1' : '0') == '0' ? 'selected' : '' }}>
-                                    Tidak Aktif
-                                </option>
-                            </select>
-                        </div>
-
                     </div>
 
                     <div class="buttons">

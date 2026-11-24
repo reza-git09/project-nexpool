@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Promo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,27 @@ use Tests\TestCase;
 
 class PromoReservationApiTest extends TestCase
 {
+    public function test_promo_status_is_inactive_after_its_end_date(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 11, 24)->startOfDay());
+
+        try {
+            $expiredPromo = new Promo([
+                'tanggal_selesai' => '2026-11-23',
+                'status' => true,
+            ]);
+            $promoEndingToday = new Promo([
+                'tanggal_selesai' => '2026-11-24',
+                'status' => true,
+            ]);
+
+            $this->assertFalse($expiredPromo->status);
+            $this->assertTrue($promoEndingToday->status);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function test_promo_list_only_returns_pool_promos_valid_for_the_requested_visit_date(): void
     {
         $this->createPromoSchema();
