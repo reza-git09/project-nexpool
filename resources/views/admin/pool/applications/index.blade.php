@@ -44,6 +44,7 @@
     .form-field label { color:#334155; font-size:12px; font-weight:700; }
     .form-field input, .form-field select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:11px 12px; outline:none; font-size:13px; }
     .form-field input:focus, .form-field select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .form-field input[readonly] { background:#f8fafc; color:#475569; cursor:default; }
     .form-field .field-help { color:#64748b; font-size:11px; }
     .field-error { color:#dc2626; font-size:11px; }
     .phone-input { display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:8px; }
@@ -145,13 +146,9 @@
                         <span id="email_error" class="field-error" @if(!$errors->has('email')) hidden @endif>{{ $errors->first('email') }}</span>
                     </div>
                     <div class="form-field">
-                        <label for="position">Jabatan</label>
-                        <select id="position" name="position" required aria-describedby="position_error">
-                            <option value="" disabled @selected(old('position') === null)>Pilih jabatan</option>
-                            @foreach($positions as $value => $label)
-                                <option value="{{ $value }}" @selected(old('position') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
+                        <label for="position_display">Jabatan</label>
+                        <input id="position_display" type="text" value="Staf Admin" readonly aria-describedby="position_error">
+                        <input id="position" type="hidden" name="position" value="staf_admin">
                         <span id="position_error" class="field-error" @if(!$errors->has('position')) hidden @endif>{{ $errors->first('position') }}</span>
                     </div>
                     <div class="form-field">

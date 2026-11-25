@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Promo;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PromoController extends Controller
@@ -26,42 +27,40 @@ class PromoController extends Controller
     // Menyimpan promo baru
     public function store(Request $request)
     {
-        $jenisDiskon = $request->jenis_diskon;
-
         $request->validate([
-            'nama_promo'      => 'required|string|max:255',
-            'deskripsi'       => 'nullable|string',
-            'jenis_diskon'    => 'required|in:Persentase,Nominal',
-            'nilai_diskon'    => [
+            'nama_promo' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'jenis_diskon' => 'required|in:Persentase',
+            'nilai_diskon' => [
                 'required',
                 'numeric',
                 'min:0',
-                $jenisDiskon === 'Persentase' ? 'max:100' : 'max:999999999',
+                'max:100',
             ],
-            'tanggal_mulai'   => 'required|date|after_or_equal:today',
+            'tanggal_mulai' => 'required|date|after_or_equal:today',
             'tanggal_selesai' => [
                 'required',
                 'date',
                 'after:tanggal_mulai',
                 function ($attribute, $value, $fail) use ($request) {
-                    $mulai   = new \Carbon\Carbon($request->tanggal_mulai);
-                    $selesai = new \Carbon\Carbon($value);
+                    $mulai = new Carbon($request->tanggal_mulai);
+                    $selesai = new Carbon($value);
                     if ($selesai->greaterThan($mulai->copy()->addMonth())) {
                         $fail('Tanggal Selesai tidak boleh lebih dari 1 bulan setelah Tanggal Mulai.');
                     }
                 },
             ],
         ], [
-            'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
+            'nilai_diskon.max' => 'Nilai diskon persentase tidak boleh melebihi 100%.',
             'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
-            'tanggal_selesai.after'    => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
+            'tanggal_selesai.after' => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
         ]);
 
         Promo::create([
             'pool_id' => session('admin_pool_id'),
             'nama_promo' => $request->nama_promo,
             'deskripsi' => $request->deskripsi,
-            'jenis_diskon' => $request->jenis_diskon,
+            'jenis_diskon' => 'Persentase',
             'nilai_diskon' => $request->nilai_diskon,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
@@ -100,41 +99,39 @@ class PromoController extends Controller
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
 
-        $jenisDiskon = $request->jenis_diskon;
-
         $request->validate([
-            'nama_promo'      => 'required|string|max:255',
-            'deskripsi'       => 'nullable|string',
-            'jenis_diskon'    => 'required|in:Persentase,Nominal',
-            'nilai_diskon'    => [
+            'nama_promo' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'jenis_diskon' => 'required|in:Persentase',
+            'nilai_diskon' => [
                 'required',
                 'numeric',
                 'min:0',
-                $jenisDiskon === 'Persentase' ? 'max:100' : 'max:999999999',
+                'max:100',
             ],
-            'tanggal_mulai'   => 'required|date|after_or_equal:today',
+            'tanggal_mulai' => 'required|date|after_or_equal:today',
             'tanggal_selesai' => [
                 'required',
                 'date',
                 'after:tanggal_mulai',
                 function ($attribute, $value, $fail) use ($request) {
-                    $mulai   = new \Carbon\Carbon($request->tanggal_mulai);
-                    $selesai = new \Carbon\Carbon($value);
+                    $mulai = new Carbon($request->tanggal_mulai);
+                    $selesai = new Carbon($value);
                     if ($selesai->greaterThan($mulai->copy()->addMonth())) {
                         $fail('Tanggal Selesai tidak boleh lebih dari 1 bulan setelah Tanggal Mulai.');
                     }
                 },
             ],
         ], [
-            'nilai_diskon.max'         => 'Nilai diskon persentase tidak boleh melebihi 100%.',
+            'nilai_diskon.max' => 'Nilai diskon persentase tidak boleh melebihi 100%.',
             'tanggal_mulai.after_or_equal' => 'Tanggal Mulai tidak boleh sebelum hari ini.',
-            'tanggal_selesai.after'    => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
+            'tanggal_selesai.after' => 'Tanggal Selesai harus minimal 1 hari setelah Tanggal Mulai.',
         ]);
 
         $promo->update([
             'nama_promo' => $request->nama_promo,
             'deskripsi' => $request->deskripsi,
-            'jenis_diskon' => $request->jenis_diskon,
+            'jenis_diskon' => 'Persentase',
             'nilai_diskon' => $request->nilai_diskon,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,

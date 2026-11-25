@@ -982,6 +982,7 @@
 
     </style>
 
+    @include('layout.partials.delete-confirmation-styles')
     @include('layout.partials.sidebar-scroll')
 </head>
 
@@ -1392,7 +1393,8 @@
                                                 <form
                                                     action="{{ route('promo.destroy', $item->id) }}"
                                                     method="POST"
-                                                    onsubmit="return confirm('Yakin ingin menghapus promo {{ $item->nama_promo }}?')"
+                                                    data-confirm-delete
+                                                    data-confirm-message="Yakin ingin menghapus promo {{ $item->nama_promo }}?"
                                                 >
 
                                                     @csrf
@@ -1471,6 +1473,8 @@
 
 
     </main>
+
+    @include('layout.partials.delete-confirmation')
 
 
 </body>

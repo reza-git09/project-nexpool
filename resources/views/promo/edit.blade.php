@@ -328,6 +328,12 @@
             box-shadow: 0 0 0 3px rgba(37,99,235,.08);
         }
 
+        .form-group input[readonly] {
+            background: #f8fafc;
+            color: #475569;
+            cursor: default;
+        }
+
         .form-group textarea {
             min-height: 100px;
             resize: vertical;
@@ -627,12 +633,9 @@
 
                         <!-- JENIS DISKON -->
                         <div class="form-group">
-                            <label>Jenis Diskon</label>
-                            <select name="jenis_diskon" required>
-                                <option value="Persentase" selected>
-                                    Persentase (%)
-                                </option>
-                            </select>
+                            <label for="jenis_diskon_display">Jenis Diskon</label>
+                            <input id="jenis_diskon_display" type="text" value="Persentase (%)" readonly>
+                            <input type="hidden" name="jenis_diskon" value="Persentase">
                         </div>
 
                         <!-- NILAI DISKON -->

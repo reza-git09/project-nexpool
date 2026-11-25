@@ -1103,6 +1103,7 @@
         }
     </style>
 
+    @include('layout.partials.delete-confirmation-styles')
     @include('layout.partials.sidebar-scroll')
 </head>
 
@@ -1534,7 +1535,8 @@
                                                 <form
                                                     action="{{ route('fasilitas.destroy', $item->id) }}"
                                                     method="POST"
-                                                    onsubmit="return confirm('Yakin ingin menghapus fasilitas {{ $item->nama_fasilitas }}?')"
+                                                    data-confirm-delete
+                                                    data-confirm-message="Yakin ingin menghapus fasilitas {{ $item->nama_fasilitas }}?"
                                                     style="margin: 0;"
                                                 >
 
@@ -1596,6 +1598,8 @@
         </section>
 
     </main>
+
+    @include('layout.partials.delete-confirmation')
 
     <div class="facility-image-overlay" id="facilityImageModal" hidden>
         <section

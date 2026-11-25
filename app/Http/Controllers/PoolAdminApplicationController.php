@@ -36,9 +36,7 @@ class PoolAdminApplicationController extends Controller
             ->latest()
             ->paginate(15);
 
-        $positions = AdminApplication::POSITIONS;
-
-        return view('admin.pool.applications.index', compact('applications', 'positions'));
+        return view('admin.pool.applications.index', compact('applications'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -68,7 +66,7 @@ class PoolAdminApplicationController extends Controller
                 'max:255',
                 'regex:/^[a-z0-9._%+\-]+@gmail\.com$/',
             ],
-            'position' => ['bail', 'required', 'string', Rule::in(array_keys(AdminApplication::POSITIONS))],
+            'position' => ['bail', 'required', 'string', Rule::in(['staf_admin'])],
             'phone' => [
                 'bail',
                 'required',
@@ -97,9 +95,9 @@ class PoolAdminApplicationController extends Controller
             'email.email' => 'Gunakan email @gmail.com',
             'email.max' => 'Email tidak valid',
             'email.regex' => 'Gunakan email @gmail.com',
-            'position.required' => 'Jabatan wajib dipilih',
+            'position.required' => 'Jabatan wajib ditetapkan',
             'position.string' => 'Jabatan tidak valid',
-            'position.in' => 'Pilih jabatan yang tersedia',
+            'position.in' => 'Jabatan hanya dapat berupa Staf Admin',
             'phone.required' => 'Nomor HP wajib diisi',
             'phone.string' => 'Nomor HP tidak valid',
             'phone.regex' => 'Nomor HP tidak valid',

@@ -119,7 +119,7 @@ class AdminApplicationFlowTest extends TestCase
             'pool_id' => 'pool_a',
             'status' => AdminApplication::STATUS_PENDING,
             'phone' => '6281234567890',
-            'position' => 'kasir_tiket',
+            'position' => 'staf_admin',
         ]);
 
         $application = AdminApplication::query()->where('email', 'admin.baru@gmail.com')->firstOrFail();
@@ -438,7 +438,8 @@ class AdminApplicationFlowTest extends TestCase
             ->assertSee('openRegistrationModal();', false)
             ->assertSee('Gunakan email @gmail.com')
             ->assertDontSee('Periksa kembali data pengajuan.')
-            ->assertDontSee('name="position"', false)
+            ->assertSee('name="position" value="staf_admin"', false)
+            ->assertDontSee('<select id="position"', false)
             ->assertSee('novalidate', false)
             ->assertSee('name="phone"', false)
             ->assertSee('aria-label="Tampilkan password"', false);
@@ -512,7 +513,7 @@ class AdminApplicationFlowTest extends TestCase
         $this->assertDatabaseCount('admin_applications', 0);
     }
 
-    public function test_application_rejects_an_unsupported_position(): void
+    public function test_application_rejects_a_position_other_than_staf_admin(): void
     {
         $poolAdmin = $this->createAdmin('admin-a@example.test', 'pool_a');
 
@@ -521,7 +522,7 @@ class AdminApplicationFlowTest extends TestCase
             ->from(route('admin.pool.applications.index'))
             ->post(route('admin.pool.applications.store'), array_merge(
                 $this->applicationInput(),
-                ['position' => 'admin_master']
+                ['position' => 'kasir_tiket']
             ))
             ->assertRedirect(route('admin.pool.applications.index'))
             ->assertSessionHasErrors('position');

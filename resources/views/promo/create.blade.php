@@ -584,6 +584,12 @@
                 0 0 0 3px rgba(37,99,235,0.08);
         }
 
+        .form-group input[readonly] {
+            background: #f8fafc;
+            color: #475569;
+            cursor: default;
+        }
+
 
         .form-row {
             display: grid;
@@ -1102,28 +1108,12 @@
 
                         <div class="form-group">
 
-                            <label>
+                            <label for="jenis_diskon_display">
                                 Jenis Diskon
                             </label>
 
-                            <select
-                                name="jenis_diskon"
-                                required
-                            >
-
-                                <option value="">
-                                    -- Pilih Jenis Diskon --
-                                </option>
-
-                                <option
-                                    value="Persentase"
-                                    {{ old('jenis_diskon') == 'Persentase' ? 'selected' : '' }}
-                                >
-                                    Persentase (%)
-                                </option>
-
-                               
-                            </select>
+                            <input id="jenis_diskon_display" type="text" value="Persentase (%)" readonly>
+                            <input type="hidden" name="jenis_diskon" value="Persentase">
 
                             @error('jenis_diskon')
 
@@ -1292,8 +1282,6 @@
 
     // ====== VALIDASI NILAI DISKON ======
 
-    const jenisDiskonEl = document.querySelector('select[name="jenis_diskon"]');
-
     const nilaiDiskonEl = document.getElementById('nilai_diskon');
 
     const errorDiskon   = document.getElementById('error-diskon');
@@ -1324,8 +1312,6 @@
 
     function validateDiskon(input) {
 
-        const jenis = jenisDiskonEl.value;
-
         const val   = parseFloat(input.value);
 
 
@@ -1338,7 +1324,7 @@
         }
 
 
-        if (jenis === 'Persentase' && val > 100) {
+        if (val > 100) {
 
             showDiskonError(
                 'Nilai diskon persentase tidak boleh melebihi 100%.'
@@ -1361,40 +1347,6 @@
         }
 
     }
-
-
-    // Update max ketika jenis diskon berubah
-
-    jenisDiskonEl.addEventListener('change', function () {
-
-        if (this.value === 'Persentase') {
-
-            nilaiDiskonEl.setAttribute('max', '100');
-
-            nilaiDiskonEl.placeholder =
-                'Contoh: 20 (maks. 100%)';
-
-
-            // Re-validasi jika sudah ada nilai
-
-            if (nilaiDiskonEl.value !== '') {
-
-                validateDiskon(nilaiDiskonEl);
-
-            }
-
-        } else {
-
-            nilaiDiskonEl.removeAttribute('max');
-
-            nilaiDiskonEl.placeholder =
-                'Contoh: 10000';
-
-            hideDiskonError();
-
-        }
-
-    });
 
 
     function showDiskonError(msg) {

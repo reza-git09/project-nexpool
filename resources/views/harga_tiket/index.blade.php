@@ -904,6 +904,7 @@
         }
     </style>
 
+    @include('layout.partials.delete-confirmation-styles')
     @include('layout.partials.sidebar-scroll')
 </head>
 
@@ -1310,7 +1311,8 @@
                                                 <form
                                                     action="{{ route('harga-tiket.destroy', $item->id) }}"
                                                     method="POST"
-                                                    onsubmit="return confirm('Yakin ingin menghapus harga tiket ini?')"
+                                                    data-confirm-delete
+                                                    data-confirm-message="Yakin ingin menghapus harga tiket ini?"
                                                 >
 
                                                     @csrf
@@ -1371,6 +1373,8 @@
         </section>
 
     </main>
+
+    @include('layout.partials.delete-confirmation')
 
 </body>
 
