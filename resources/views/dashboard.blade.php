@@ -44,9 +44,10 @@
 
         .main { margin-left:255px; min-height:100vh; }
         .header {
-            min-height:76px; background:rgba(255,255,255,.96); backdrop-filter:blur(10px);
+            height:76px; min-height:76px; box-sizing:border-box;
+            background:rgba(255,255,255,.96); backdrop-filter:blur(10px);
             display:flex; align-items:center; justify-content:space-between; gap:20px;
-            padding:14px 32px; border-bottom:1px solid #e8ecf3;
+            padding:0 32px; border-bottom:1px solid #e8ecf3;
             position:sticky; top:0; z-index:900;
         }
         .header-left h3 { font-size:18px; color:#111827; }
@@ -147,11 +148,12 @@
             .menu a { padding:13px 8px; }
             .menu a.active::before { left:-10px; }
             .main { margin-left:70px; }
-            .header { padding:14px 20px; }
+            .header { padding:0 20px; }
             .content { padding:20px; }
             .admin-text { display:none; }
         }
         @media(max-width:520px) {
+            .header { height:auto; min-height:76px; padding:12px 16px; }
             .header-left h3 { font-size:16px; }
             .header-left p { max-width:210px; line-height:1.4; }
             .content { padding:16px; }

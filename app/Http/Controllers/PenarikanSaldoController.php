@@ -53,7 +53,7 @@ class PenarikanSaldoController extends Controller
 
         $validated = $request->validate([
             'bank_name' => ['required', 'string', Rule::in(array_keys(self::BANK_OPTIONS))],
-            'account_number' => ['required', 'string', 'regex:/^[0-9]{5,30}$/'],
+            'account_number' => ['required', 'string', 'regex:/\A[0-9]{5,20}\z/'],
             'amount' => [
                 'required',
                 'numeric',
@@ -64,7 +64,7 @@ class PenarikanSaldoController extends Controller
         ], [
             'bank_name.required' => 'Nama bank wajib diisi.',
             'account_number.required' => 'Nomor rekening wajib diisi.',
-            'account_number.regex' => 'Nomor rekening harus berisi 5 sampai 30 angka.',
+            'account_number.regex' => 'Nomor rekening harus berisi 5 sampai 20 angka.',
             'amount.required' => 'Jumlah pencairan wajib diisi.',
             'amount.gt' => 'Jumlah pencairan harus lebih dari nol.',
             'amount.decimal' => 'Jumlah pencairan maksimal memiliki 2 angka desimal.',

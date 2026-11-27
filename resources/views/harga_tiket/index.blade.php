@@ -251,6 +251,8 @@
 
         .header {
             height: 76px;
+            min-height: 76px;
+            box-sizing: border-box;
 
             background:
                 rgba(255,255,255,0.96);
@@ -262,6 +264,8 @@
             align-items: center;
 
             justify-content: space-between;
+
+            gap: 20px;
 
             padding: 0 32px;
 
@@ -875,6 +879,12 @@
         }
 
         @media (max-width: 600px) {
+
+            .header {
+                height: auto;
+                min-height: 76px;
+                padding: 12px 16px;
+            }
 
             .page-header {
                 align-items: flex-start;

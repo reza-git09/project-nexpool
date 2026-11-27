@@ -105,6 +105,8 @@ class PenarikanSaldoTest extends TestCase
             ->assertSee('BRI (Bank Rakyat Indonesia)')
             ->assertSee('Saldo tersedia untuk diajukan')
             ->assertSee('name="account_number"', false)
+            ->assertSee('pattern="[0-9]{5,20}"', false)
+            ->assertSee('maxlength="20"', false)
             ->assertSee('name="amount"', false)
             ->assertSee('data-max-amount="50000000"', false)
             ->assertSee('Maksimal Rp 50.000.000 per pengajuan; nominal lebih akan dibatasi.')
@@ -142,7 +144,7 @@ class PenarikanSaldoTest extends TestCase
             ->from(route('penarikan-saldo.index'))
             ->post(route('penarikan-saldo.store'), [
                 'bank_name' => 'BCA',
-                'account_number' => '123456789012',
+                'account_number' => '12345678901234567890',
                 'amount' => '450000.00',
             ])
             ->assertRedirect(route('penarikan-saldo.index'))
@@ -151,7 +153,7 @@ class PenarikanSaldoTest extends TestCase
         $this->assertDatabaseHas('penarikan_saldos', [
             'pool_id' => 'pool_01',
             'bank_name' => 'BCA',
-            'account_number' => '123456789012',
+            'account_number' => '12345678901234567890',
             'amount' => '450000.00',
             'requested_by' => 1,
             'status' => PenarikanSaldo::STATUS_PROSES,
@@ -328,6 +330,33 @@ class PenarikanSaldoTest extends TestCase
             ])
             ->assertRedirect(route('penarikan-saldo.index'))
             ->assertSessionHasErrors('amount');
+
+        $this->assertDatabaseCount('penarikan_saldos', 0);
+    }
+
+    public function test_account_number_rejects_non_digits_and_more_than_twenty_digits(): void
+    {
+        $invalidAccountNumbers = [
+            str_repeat('1', 21),
+            '12345abc',
+            '12345-6789',
+            "12345\n6789",
+        ];
+
+        foreach ($invalidAccountNumbers as $accountNumber) {
+            $this->withSession([
+                'admin_id' => 1,
+                'admin_pool_id' => 'pool_01',
+            ])
+                ->from(route('penarikan-saldo.index'))
+                ->post(route('penarikan-saldo.store'), [
+                    'bank_name' => 'BCA',
+                    'account_number' => $accountNumber,
+                    'amount' => '1000',
+                ])
+                ->assertRedirect(route('penarikan-saldo.index'))
+                ->assertSessionHasErrors('account_number');
+        }
 
         $this->assertDatabaseCount('penarikan_saldos', 0);
     }

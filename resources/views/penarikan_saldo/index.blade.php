@@ -300,7 +300,7 @@
             </div>
             <div class="form-group">
                 <label for="account_number">Nomor Rekening</label>
-                <input id="account_number" name="account_number" type="text" value="{{ old('account_number') }}" inputmode="numeric" pattern="[0-9]{5,30}" maxlength="30" autocomplete="off" placeholder="Masukkan nomor rekening" required>
+                <input id="account_number" name="account_number" type="text" value="{{ old('account_number') }}" inputmode="numeric" pattern="[0-9]{5,20}" maxlength="20" autocomplete="off" placeholder="Masukkan nomor rekening" required>
                 @error('account_number') <span class="field-error">{{ $message }}</span> @enderror
             </div>
             <div class="form-group">
@@ -332,7 +332,7 @@
     const proofImage = proofPreviewModal.querySelector('[data-proof-image]');
 
     const sanitizeAccountNumber = () => {
-        accountNumberInput.value = accountNumberInput.value.replace(/\D/g, '').slice(0, 30);
+        accountNumberInput.value = accountNumberInput.value.replace(/\D/g, '').slice(0, 20);
     };
 
     accountNumberInput.addEventListener('input', sanitizeAccountNumber);
