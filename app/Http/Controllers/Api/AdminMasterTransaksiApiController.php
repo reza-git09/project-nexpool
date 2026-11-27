@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Reservasi;
 use App\Models\KolamRenang;
+use App\Models\Reservasi;
 use Illuminate\Http\Request;
 
 class AdminMasterTransaksiApiController extends Controller
@@ -36,13 +36,22 @@ class AdminMasterTransaksiApiController extends Controller
                         'expire',
                         'expired',
                         'deny',
-                        'cancel'
+                        'cancel',
                     ])
                     ->count(),
 
                 'total_pendapatan' => (clone $query)
                     ->where('status_pembayaran', 'paid')
                     ->sum('total_harga'),
+
+                'pendapatan_platform' => (clone $query)
+                    ->where('status_pembayaran', 'paid')
+                    ->sum('admin_fee'),
+
+                'pendapatan_kolam' => (clone $query)
+                    ->where('status_pembayaran', 'paid')
+                    ->selectRaw('COALESCE(SUM(total_harga - admin_fee), 0) as pendapatan')
+                    ->value('pendapatan'),
 
                 'total_kolam' => KolamRenang::count(),
             ],
@@ -96,7 +105,7 @@ class AdminMasterTransaksiApiController extends Controller
         $transaksi = Reservasi::with('kolamRenang')
             ->find($id);
 
-        if (!$transaksi) {
+        if (! $transaksi) {
             return response()->json([
                 'success' => false,
                 'message' => 'Transaksi tidak ditemukan',

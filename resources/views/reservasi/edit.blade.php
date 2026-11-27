@@ -524,11 +524,11 @@
                         <!-- TOTAL -->
                         <div class="form-group">
 
-                            <label>Total Harga</label>
+                            <label>Pendapatan Kolam</label>
 
                             <input
                                 type="text"
-                                value="Rp{{ number_format($reservasi->total_harga, 0, ',', '.') }}"
+                                value="Rp{{ number_format($reservasi->pendapatan_kolam, 0, ',', '.') }}"
                                 readonly
                             >
 

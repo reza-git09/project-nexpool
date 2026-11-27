@@ -127,6 +127,10 @@
             <span><i></i>Uang Berhasil Masuk</span>
             <b>Rp {{ number_format($statistik->total_pendapatan ?? 0, 0, ',', '.') }}</b>
         </div>
+        <div class="trx-stat">
+            <span><i></i>Pendapatan Platform</span>
+            <b>Rp {{ number_format($statistik->pendapatan_platform ?? 0, 0, ',', '.') }}</b>
+        </div>
     </div>
 
     {{-- PENDAPATAN PER KOLAM --}}
@@ -225,6 +229,8 @@
                         <th>Kolam</th>
                         <th>Pengunjung</th>
                         <th class="num">Total</th>
+                        <th class="num">Biaya Admin</th>
+                        <th class="num">Pendapatan Kolam</th>
                         <th>Metode</th>
                         <th>Status</th>
                         <th>Waktu</th>
@@ -235,6 +241,8 @@
                         @php
                             $status = strtolower($item->status_pembayaran ?? '');
                             $waktu = $status == 'paid' ? $item->paid_at : $item->created_at;
+                            $adminFee = (int) $item->admin_fee;
+                            $poolRevenue = max((float) $item->total_harga - $adminFee, 0);
                         @endphp
                         <tr>
                             <td class="trx-sub">{{ $transaksi->firstItem() + $i }}</td>
@@ -242,6 +250,8 @@
                             <td>{{ $item->kolamRenang->nama_kolam ?? '-' }}</td>
                             <td>{{ $item->nama_pengunjung ?? '-' }}</td>
                             <td class="num"><strong>Rp {{ number_format($item->total_harga ?? 0, 0, ',', '.') }}</strong></td>
+                            <td class="num">Rp {{ number_format($adminFee, 0, ',', '.') }}</td>
+                            <td class="num">Rp {{ number_format($poolRevenue, 0, ',', '.') }}</td>
                             <td class="trx-sub">{{ $item->payment_method ? strtoupper($item->payment_method) : '-' }}</td>
                             <td>
                                 @if($status == 'paid')
@@ -257,7 +267,7 @@
                             <td class="trx-sub">{{ $waktu ? \Carbon\Carbon::parse($waktu)->format('d/m/Y H:i') : '-' }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="trx-empty">Belum ada transaksi yang ditemukan.</td></tr>
+                        <tr><td colspan="10" class="trx-empty">Belum ada transaksi yang ditemukan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

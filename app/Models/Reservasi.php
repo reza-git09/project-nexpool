@@ -18,6 +18,7 @@ class Reservasi extends Model
         'jumlah_dewasa',
         'jumlah_anak',
         'total_harga',
+        'admin_fee',
         'nama_promo',
         'potongan_promo',
         'status_reservasi',
@@ -34,6 +35,7 @@ class Reservasi extends Model
         'jumlah_dewasa' => 'integer',
         'jumlah_anak' => 'integer',
         'total_harga' => 'decimal:2',
+        'admin_fee' => 'integer',
         'potongan_promo' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
@@ -53,5 +55,10 @@ class Reservasi extends Model
     public function latestRescheduleRequest(): HasOne
     {
         return $this->hasOne(RescheduleRequest::class)->latestOfMany();
+    }
+
+    public function getPendapatanKolamAttribute(): float
+    {
+        return max((float) $this->total_harga - (float) $this->admin_fee, 0);
     }
 }

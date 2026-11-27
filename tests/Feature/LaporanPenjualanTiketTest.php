@@ -23,6 +23,7 @@ class LaporanPenjualanTiketTest extends TestCase
             $table->unsignedInteger('jumlah_dewasa');
             $table->unsignedInteger('jumlah_anak');
             $table->decimal('total_harga', 12, 2);
+            $table->unsignedInteger('admin_fee')->default(0);
             $table->string('status_reservasi');
         });
 
@@ -52,6 +53,7 @@ class LaporanPenjualanTiketTest extends TestCase
                 'jumlah_dewasa' => 2,
                 'jumlah_anak' => 1,
                 'total_harga' => 100000,
+                'admin_fee' => 2000,
                 'status_reservasi' => 'Dikonfirmasi',
             ],
             [
@@ -63,6 +65,7 @@ class LaporanPenjualanTiketTest extends TestCase
                 'jumlah_dewasa' => 1,
                 'jumlah_anak' => 0,
                 'total_harga' => 50000,
+                'admin_fee' => 0,
                 'status_reservasi' => 'Menunggu',
             ],
             [
@@ -74,6 +77,7 @@ class LaporanPenjualanTiketTest extends TestCase
                 'jumlah_dewasa' => 4,
                 'jumlah_anak' => 2,
                 'total_harga' => 200000,
+                'admin_fee' => 0,
                 'status_reservasi' => 'Dikonfirmasi',
             ],
             [
@@ -85,6 +89,7 @@ class LaporanPenjualanTiketTest extends TestCase
                 'jumlah_dewasa' => 1,
                 'jumlah_anak' => 0,
                 'total_harga' => 25000,
+                'admin_fee' => 0,
                 'status_reservasi' => 'Dikonfirmasi',
             ],
         ]);
@@ -104,7 +109,8 @@ class LaporanPenjualanTiketTest extends TestCase
             ->assertDontSee('TIKET-BULAN-DEPAN')
             ->assertDontSee('Pendapatan Tiket per Hari')
             ->assertDontSee('7 hari')
-            ->assertSee('100.000')
+            ->assertSee('98.000')
+            ->assertDontSee('100.000')
             ->assertSee('Jumlah tiket terjual')
             ->assertSee('3')
             ->assertSee('<th>Tiket</th>', false)

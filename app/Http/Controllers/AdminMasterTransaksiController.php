@@ -48,6 +48,8 @@ class AdminMasterTransaksiController extends Controller
             );
         }
 
+        $statistikQuery = clone $query;
+
         // Data transaksi dengan pagination
         $transaksi = $query
             ->orderByRaw("
@@ -61,8 +63,6 @@ class AdminMasterTransaksiController extends Controller
         $kolam = KolamRenang::orderBy('nama_kolam')->get();
 
         // Statistik berdasarkan filter yang sama
-        $statistikQuery = clone $query;
-
         $statistik = $statistikQuery
             ->reorder()
             ->selectRaw("
@@ -84,10 +84,17 @@ class AdminMasterTransaksiController extends Controller
             ->where('status_pembayaran', 'paid')
             ->sum('total_harga');
 
+        $statistik->pendapatan_platform = Reservasi::query()
+            ->where('status_pembayaran', 'paid')
+            ->sum('admin_fee');
+
         $pendapatanPerKolam = Reservasi::query()
             ->where('status_pembayaran', 'paid')
             ->select('pool_id')
-            ->selectRaw('COUNT(*) as transaksi_berhasil, COALESCE(SUM(total_harga), 0) as total_pendapatan')
+            ->selectRaw('
+                COUNT(*) as transaksi_berhasil,
+                COALESCE(SUM(total_harga - admin_fee), 0) as total_pendapatan
+            ')
             ->groupBy('pool_id');
 
         $penarikanPerKolam = PenarikanSaldo::query()

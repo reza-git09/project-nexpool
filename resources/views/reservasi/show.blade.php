@@ -859,14 +859,14 @@
 
                             <i class="fa-solid fa-money-bill-wave"></i>
 
-                            Total Pembayaran
+                            Pendapatan Kolam
 
                         </div>
 
                         <div class="total-price">
 
                             Rp{{ number_format(
-                                $reservasi->total_harga ?? 0,
+                                $reservasi->pendapatan_kolam,
                                 0,
                                 ',',
                                 '.'

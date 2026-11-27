@@ -238,7 +238,8 @@ class PenarikanSaldoController extends Controller
         $totalPendapatan = Reservasi::query()
             ->where('pool_id', $poolId)
             ->where('status_pembayaran', 'paid')
-            ->sum('total_harga');
+            ->selectRaw('COALESCE(SUM(total_harga - admin_fee), 0) as total_pendapatan')
+            ->value('total_pendapatan');
         $totalPenarikan = $this->withdrawalAmountForPool($poolId);
         $totalPendapatanInCents = $this->amountInCents($totalPendapatan);
         $totalPenarikanInCents = $this->amountInCents($totalPenarikan);

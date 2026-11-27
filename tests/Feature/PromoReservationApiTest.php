@@ -66,7 +66,8 @@ class PromoReservationApiTest extends TestCase
             ->assertJsonPath('data.nama_promo', 'Diskon Weekend')
             ->assertJsonPath('data.potongan_promo', '6000.00')
             ->assertJsonPath('data.subtotal_harga', 32000)
-            ->assertJsonPath('data.total_harga', '26000.00');
+            ->assertJsonPath('data.total_harga', '26000.00')
+            ->assertJsonPath('data.admin_fee', 2000);
 
         $this->assertDatabaseHas('reservasis', [
             'pool_id' => 'pool_id_01',
@@ -288,6 +289,7 @@ class PromoReservationApiTest extends TestCase
             $table->unsignedInteger('jumlah_dewasa')->default(0);
             $table->unsignedInteger('jumlah_anak')->default(0);
             $table->decimal('total_harga', 12, 2)->default(0);
+            $table->unsignedInteger('admin_fee')->default(0);
             $table->string('nama_promo')->nullable();
             $table->decimal('potongan_promo', 12, 2)->default(0);
             $table->string('status_reservasi')->default('Menunggu');

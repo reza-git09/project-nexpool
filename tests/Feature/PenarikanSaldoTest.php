@@ -46,6 +46,7 @@ class PenarikanSaldoTest extends TestCase
             $table->string('kode_reservasi')->nullable();
             $table->string('nama_pengunjung')->nullable();
             $table->decimal('total_harga', 15, 2)->default(0);
+            $table->unsignedInteger('admin_fee')->default(0);
             $table->string('status_pembayaran')->default('pending');
             $table->string('payment_method')->nullable();
             $table->timestamp('paid_at')->nullable();
@@ -119,6 +120,7 @@ class PenarikanSaldoTest extends TestCase
             [
                 'pool_id' => 'pool_01',
                 'total_harga' => '495000.05',
+                'admin_fee' => 2000,
                 'status_pembayaran' => 'paid',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -126,6 +128,7 @@ class PenarikanSaldoTest extends TestCase
             [
                 'pool_id' => 'pool_01',
                 'total_harga' => '250000.00',
+                'admin_fee' => 0,
                 'status_pembayaran' => 'pending',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -163,7 +166,7 @@ class PenarikanSaldoTest extends TestCase
             ->assertSee('Saldo tersedia saat ini:')
             ->assertDontSee('Total pendapatan terbayar')
             ->assertDontSee('Total pencairan terkonfirmasi')
-            ->assertSee('495.000,05');
+            ->assertSee('493.000,05');
 
         $this->withSession([
             'admin_id' => 1,
@@ -173,7 +176,7 @@ class PenarikanSaldoTest extends TestCase
             ->post(route('penarikan-saldo.store'), [
                 'bank_name' => 'BCA',
                 'account_number' => '123456789013',
-                'amount' => '495000.06',
+                'amount' => '493000.06',
             ])
             ->assertRedirect(route('penarikan-saldo.index'))
             ->assertSessionHasErrors('amount');

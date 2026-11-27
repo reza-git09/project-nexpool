@@ -41,7 +41,12 @@ class LaporanPenjualanController extends Controller
         $base = $this->filtered($s, $f, $paidValues);
         $g = DB::getQueryGrammar();
 
-        $sumTotal = $s['total'] ? 'COALESCE(SUM('.$g->wrap($s['total']).'),0)' : '0';
+        $feeExpression = $s['admin_fee']
+            ? 'COALESCE('.$g->wrap($s['admin_fee']).', 0)'
+            : '0';
+        $sumTotal = $s['total']
+            ? 'COALESCE(SUM('.$g->wrap($s['total']).' - '.$feeExpression.'),0)'
+            : '0';
         $sumDewasa = $s['dewasa'] ? 'COALESCE(SUM('.$g->wrap($s['dewasa']).'),0)' : '0';
         $sumAnak = $s['anak'] ? 'COALESCE(SUM('.$g->wrap($s['anak']).'),0)' : '0';
 
@@ -249,6 +254,7 @@ class LaporanPenjualanController extends Controller
             'table' => $table,
             'id' => Schema::hasColumn($table, 'id'),
             'total' => $col(['total_harga', 'total_bayar', 'grand_total', 'total_pembayaran', 'harga_total', 'jumlah_bayar', 'total']),
+            'admin_fee' => $col(['admin_fee']),
             'dewasa' => $col(['jumlah_dewasa', 'jml_dewasa', 'qty_dewasa', 'dewasa']),
             'anak' => $col(['jumlah_anak', 'jml_anak', 'qty_anak', 'anak']),
             'kunjungan' => $col(['tanggal_kunjungan', 'tgl_kunjungan', 'tanggal_reservasi', 'visit_date', 'tanggal']),
@@ -442,7 +448,10 @@ class LaporanPenjualanController extends Controller
             'kolam' => $kolam,
             'dewasa' => (int) ($get('dewasa') ?? 0),
             'anak' => (int) ($get('anak') ?? 0),
-            'total' => (float) ($get('total') ?? 0),
+            'total' => max(
+                (float) ($get('total') ?? 0) - (float) ($get('admin_fee') ?? 0),
+                0,
+            ),
             'status' => $status === null ? '-' : (string) $status,
             'status_class' => $this->statusClass($status === null ? '' : (string) $status),
         ];

@@ -1364,7 +1364,7 @@
                                     </th>
 
                                     <th>
-                                        Total Harga
+                                        Pendapatan Kolam
                                     </th>
 
                                     <th>
@@ -1426,11 +1426,11 @@
                                         </td>
 
 
-                                        <!-- TOTAL HARGA -->
+                                        <!-- PENDAPATAN KOLAM -->
                                         <td class="harga">
 
                                             Rp{{ number_format(
-                                                $item->total_harga ?? 0,
+                                                $item->pendapatan_kolam,
                                                 0,
                                                 ',',
                                                 '.'
@@ -1798,14 +1798,14 @@
 
                                 <i class="fa-solid fa-money-bill-wave"></i>
 
-                                Total Pembayaran
+                                Pendapatan Kolam
 
                             </div>
 
                             <div class="total-price">
 
                                 Rp{{ number_format(
-                                    $item->total_harga ?? 0,
+                                    $item->pendapatan_kolam,
                                     0,
                                     ',',
                                     '.'

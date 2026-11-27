@@ -24,6 +24,7 @@ class ReservasiConfirmationTest extends TestCase
             $table->unsignedInteger('jumlah_dewasa')->default(0);
             $table->unsignedInteger('jumlah_anak')->default(0);
             $table->decimal('total_harga', 12, 2)->default(0);
+            $table->unsignedInteger('admin_fee')->default(2000);
             $table->string('status_reservasi')->default('Menunggu');
             $table->string('status_pembayaran')->nullable();
             $table->string('payment_method')->nullable();
@@ -86,6 +87,42 @@ class ReservasiConfirmationTest extends TestCase
             'status_reservasi' => 'Menunggu',
             'status_pembayaran' => 'paid',
         ]);
+    }
+
+    public function test_pool_reservation_list_displays_ticket_revenue_without_the_platform_fee(): void
+    {
+        $reservation = $this->createReservation('paid');
+
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.index'))
+            ->assertOk()
+            ->assertSee('Pendapatan Kolam')
+            ->assertSee('Rp23.000')
+            ->assertDontSee('Rp25.000');
+    }
+
+    public function test_pool_reservation_details_display_ticket_revenue_without_the_platform_fee(): void
+    {
+        $reservation = $this->createReservation('paid');
+
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.show', $reservation))
+            ->assertOk()
+            ->assertSee('Pendapatan Kolam')
+            ->assertSee('Rp23.000')
+            ->assertDontSee('Rp25.000');
+    }
+
+    public function test_pool_reservation_edit_page_displays_ticket_revenue_without_the_platform_fee(): void
+    {
+        $reservation = $this->createReservation('paid');
+
+        $this->withSession($this->poolAdminSession())
+            ->get(route('reservasi.edit', $reservation))
+            ->assertOk()
+            ->assertSee('Pendapatan Kolam')
+            ->assertSee('Rp23.000')
+            ->assertDontSee('Rp25.000');
     }
 
     public function test_unified_list_includes_reservations_in_different_reservation_states(): void
@@ -332,6 +369,7 @@ class ReservasiConfirmationTest extends TestCase
             'jumlah_dewasa' => 1,
             'jumlah_anak' => 0,
             'total_harga' => 25000,
+            'admin_fee' => 2000,
             'status_reservasi' => 'Menunggu',
             'status_pembayaran' => $paymentStatus,
         ]);

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Controllers\AdminMasterTransaksiController;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -21,6 +22,7 @@ class AdminMasterTransaksiFilterTest extends TestCase
             $table->string('pool_id');
             $table->string('nama_pengunjung');
             $table->decimal('total_harga', 12, 2);
+            $table->unsignedInteger('admin_fee')->default(0);
             $table->string('status_pembayaran');
             $table->string('payment_method')->nullable();
             $table->timestamp('paid_at')->nullable();
@@ -31,6 +33,13 @@ class AdminMasterTransaksiFilterTest extends TestCase
             $table->id();
             $table->string('pool_id');
             $table->string('nama_kolam');
+        });
+
+        Schema::create('penarikan_saldos', function (Blueprint $table): void {
+            $table->id();
+            $table->string('pool_id');
+            $table->decimal('amount', 12, 2)->default(0);
+            $table->string('status');
         });
 
         DB::table('kolam_renang')->insert([
@@ -44,6 +53,7 @@ class AdminMasterTransaksiFilterTest extends TestCase
                 'pool_id' => 'tiara',
                 'nama_pengunjung' => 'Pengunjung 1',
                 'total_harga' => 50000,
+                'admin_fee' => 2000,
                 'status_pembayaran' => 'paid',
                 'paid_at' => '2026-11-11 08:00:00',
                 'created_at' => '2026-11-10 08:00:00',
@@ -54,6 +64,7 @@ class AdminMasterTransaksiFilterTest extends TestCase
                 'pool_id' => 'tiara',
                 'nama_pengunjung' => 'Pengunjung 2',
                 'total_harga' => 30000,
+                'admin_fee' => 0,
                 'status_pembayaran' => 'pending',
                 'paid_at' => null,
                 'created_at' => '2026-11-11 09:00:00',
@@ -64,6 +75,7 @@ class AdminMasterTransaksiFilterTest extends TestCase
                 'pool_id' => 'annasya',
                 'nama_pengunjung' => 'Pengunjung 3',
                 'total_harga' => 40000,
+                'admin_fee' => 3000,
                 'status_pembayaran' => 'paid',
                 'paid_at' => '2026-11-11 10:00:00',
                 'created_at' => '2026-11-11 10:00:00',
@@ -102,6 +114,57 @@ class AdminMasterTransaksiFilterTest extends TestCase
             ['TIARA-PAID', 'TIARA-PENDING', 'ANNASYA-PAID'],
             $transactions->pluck('kode_reservasi')->all()
         );
+    }
+
+    public function test_it_shows_the_second_transaction_page_without_failing_statistics(): void
+    {
+        $additionalTransactions = [];
+
+        for ($number = 4; $number <= 16; $number++) {
+            $additionalTransactions[] = [
+                'kode_reservasi' => 'RESERVATION-'.$number,
+                'pool_id' => 'tiara',
+                'nama_pengunjung' => 'Pengunjung '.$number,
+                'total_harga' => 10000,
+                'admin_fee' => 0,
+                'status_pembayaran' => 'paid',
+                'paid_at' => '2026-11-12 08:00:00',
+                'created_at' => '2026-11-12 08:00:00',
+                'updated_at' => '2026-11-12 08:00:00',
+            ];
+        }
+
+        DB::table('reservasis')->insert($additionalTransactions);
+
+        $request = Request::create('/admin-master/transaksi?page=2', 'GET');
+        Paginator::currentPageResolver(
+            static fn (string $pageName): int => (int) $request->query($pageName, 1)
+        );
+
+        $view = app(AdminMasterTransaksiController::class)->index($request);
+        $transactions = $view->getData()['transaksi'];
+
+        $this->assertSame(2, $transactions->currentPage());
+        $this->assertSame(1, $transactions->count());
+        $this->assertSame(16, $transactions->total());
+    }
+
+    public function test_it_separates_gross_payments_platform_fees_and_pool_revenue(): void
+    {
+        $view = app(AdminMasterTransaksiController::class)->index(
+            Request::create('/admin-master/transaksi', 'GET')
+        );
+        $data = $view->getData();
+        $poolRevenue = $data['pendapatanKolam']->keyBy('pool_id');
+
+        $this->assertSame(90000, (int) $data['statistik']->total_pendapatan);
+        $this->assertSame(5000, (int) $data['statistik']->pendapatan_platform);
+        $this->assertSame(48000, (int) $poolRevenue->get('tiara')->total_pendapatan);
+        $this->assertSame(37000, (int) $poolRevenue->get('annasya')->total_pendapatan);
+
+        $content = $view->render();
+        $this->assertStringContainsString('Biaya Admin', $content);
+        $this->assertStringContainsString('Pendapatan Kolam', $content);
     }
 
     private function transactionsFor(array $filters)

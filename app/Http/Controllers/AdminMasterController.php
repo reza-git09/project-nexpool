@@ -51,10 +51,10 @@ class AdminMasterController extends Controller
             ['failed', 'expire', 'expired', 'deny', 'cancel']
         )->count();
 
-        $totalPendapatan = Reservasi::where(
-            'status_pembayaran',
-            'paid'
-        )->sum('total_harga');
+        $totalPendapatan = (float) Reservasi::query()
+            ->where('status_pembayaran', 'paid')
+            ->selectRaw('COALESCE(SUM(total_harga - admin_fee), 0) as pendapatan')
+            ->value('pendapatan');
 
         $totalPenarikan = PenarikanSaldo::where(
             'status',
@@ -113,9 +113,12 @@ class AdminMasterController extends Controller
             $query->where('pool_id', $validated['pool_id']);
         }
 
-        $total = (float) (clone $query)->sum('total_harga');
+        $ticketRevenueExpression = 'total_harga - admin_fee';
+        $total = (float) (clone $query)
+            ->selectRaw("COALESCE(SUM($ticketRevenueExpression), 0) as pendapatan")
+            ->value('pendapatan');
         $aggregates = $query
-            ->selectRaw("$dateExpression as tanggal, COALESCE(SUM(total_harga), 0) as pendapatan")
+            ->selectRaw("$dateExpression as tanggal, COALESCE(SUM($ticketRevenueExpression), 0) as pendapatan")
             ->groupByRaw($dateExpression)
             ->orderBy('tanggal')
             ->get()
